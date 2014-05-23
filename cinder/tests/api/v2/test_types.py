@@ -80,7 +80,7 @@ class VolumeTypesApiTest(test.TestCase):
 
         expected_names = ['vol_type_1', 'vol_type_2', 'vol_type_3']
         actual_names = map(lambda e: e['name'], res_dict['volume_types'])
-        self.assertEqual(set(actual_names), set(expected_names))
+        self.assertEqual(set(expected_names), set(actual_names))
         for entry in res_dict['volume_types']:
             self.assertEqual('value1', entry['extra_specs']['key1'])
 
@@ -180,9 +180,9 @@ class VolumeTypesSerializerTest(test.TestCase):
         seen = set(vtype['extra_specs'].keys())
         for child in extra_specs:
             self.assertIn(child.tag, seen)
-            self.assertEqual(vtype['extra_specs'][child.tag], child.text)
+            self.assertEqual(child.text, vtype['extra_specs'][child.tag])
             seen.remove(child.tag)
-        self.assertEqual(len(seen), 0)
+        self.assertEqual(0, len(seen))
 
     def test_index_serializer(self):
         serializer = types.VolumeTypesTemplate()

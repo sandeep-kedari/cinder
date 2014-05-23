@@ -102,10 +102,10 @@ class SnapshotApiTest(test.TestCase):
         resp_dict = self.controller.create(req, body)
 
         self.assertIn('snapshot', resp_dict)
-        self.assertEqual(resp_dict['snapshot']['name'],
-                         snapshot_name)
-        self.assertEqual(resp_dict['snapshot']['description'],
-                         snapshot_description)
+        self.assertEqual(snapshot_name,
+                         resp_dict['snapshot']['name'])
+        self.assertEqual(snapshot_description,
+                         resp_dict['snapshot']['description'])
 
     def test_snapshot_create_force(self):
         self.stubs.Set(volume.api.API, "create_snapshot_force",
@@ -124,10 +124,10 @@ class SnapshotApiTest(test.TestCase):
         resp_dict = self.controller.create(req, body)
 
         self.assertIn('snapshot', resp_dict)
-        self.assertEqual(resp_dict['snapshot']['name'],
-                         snapshot_name)
-        self.assertEqual(resp_dict['snapshot']['description'],
-                         snapshot_description)
+        self.assertEqual(snapshot_name,
+                      resp_dict['snapshot']['name'])
+        self.assertEqual(snapshot_description,
+                      resp_dict['snapshot']['description'])
 
         snapshot = {
             "volume_id": "12",
@@ -209,7 +209,7 @@ class SnapshotApiTest(test.TestCase):
         snapshot_id = UUID
         req = fakes.HTTPRequest.blank('/v2/snapshots/%s' % snapshot_id)
         resp = self.controller.delete(req, snapshot_id)
-        self.assertEqual(resp.status_int, 202)
+        self.assertEqual(202, resp.status_int)
 
     def test_snapshot_delete_invalid_id(self):
         self.stubs.Set(volume.api.API, "delete_snapshot", stub_snapshot_delete)
@@ -224,7 +224,7 @@ class SnapshotApiTest(test.TestCase):
         resp_dict = self.controller.show(req, UUID)
 
         self.assertIn('snapshot', resp_dict)
-        self.assertEqual(resp_dict['snapshot']['id'], UUID)
+        self.assertEqual(UUID, resp_dict['snapshot']['id'])
 
     def test_snapshot_show_invalid_id(self):
         snapshot_id = INVALID_UUID
@@ -240,10 +240,10 @@ class SnapshotApiTest(test.TestCase):
 
         self.assertIn('snapshots', resp_dict)
         resp_snapshots = resp_dict['snapshots']
-        self.assertEqual(len(resp_snapshots), 1)
+        self.assertEqual(1, len(resp_snapshots))
 
         resp_snapshot = resp_snapshots.pop()
-        self.assertEqual(resp_snapshot['id'], UUID)
+        self.assertEqual(UUID, resp_snapshot['id'])
 
     def test_snapshot_list_by_status(self):
         def stub_snapshot_get_all_by_project(context, project_id):
@@ -261,22 +261,22 @@ class SnapshotApiTest(test.TestCase):
         # no status filter
         req = fakes.HTTPRequest.blank('/v2/snapshots')
         resp = self.controller.index(req)
-        self.assertEqual(len(resp['snapshots']), 3)
+        self.assertEqual(3, len(resp['snapshots']))
         # single match
         req = fakes.HTTPRequest.blank('/v2/snapshots?status=creating')
         resp = self.controller.index(req)
-        self.assertEqual(len(resp['snapshots']), 1)
-        self.assertEqual(resp['snapshots'][0]['status'], 'creating')
+        self.assertEqual(1, len(resp['snapshots']))
+        self.assertEqual('creating', resp['snapshots'][0]['status'])
         # multiple match
         req = fakes.HTTPRequest.blank('/v2/snapshots?status=available')
         resp = self.controller.index(req)
-        self.assertEqual(len(resp['snapshots']), 2)
+        self.assertEqual(2, len(resp['snapshots']))
         for snapshot in resp['snapshots']:
-            self.assertEqual(snapshot['status'], 'available')
+            self.assertEqual('available', snapshot['status'], 'available')
         # no match
         req = fakes.HTTPRequest.blank('/v2/snapshots?status=error')
         resp = self.controller.index(req)
-        self.assertEqual(len(resp['snapshots']), 0)
+        self.assertEqual(0, len(resp['snapshots']))
 
     def test_snapshot_list_by_volume(self):
         def stub_snapshot_get_all_by_project(context, project_id):
@@ -291,21 +291,21 @@ class SnapshotApiTest(test.TestCase):
         # single match
         req = fakes.HTTPRequest.blank('/v2/snapshots?volume_id=vol2')
         resp = self.controller.index(req)
-        self.assertEqual(len(resp['snapshots']), 1)
-        self.assertEqual(resp['snapshots'][0]['volume_id'], 'vol2')
+        self.assertEqual(1, len(resp['snapshots']))
+        self.assertEqual('vol2', resp['snapshots'][0]['volume_id'])
         # multiple match
         req = fakes.HTTPRequest.blank('/v2/snapshots?volume_id=vol1')
         resp = self.controller.index(req)
-        self.assertEqual(len(resp['snapshots']), 2)
+        self.assertEqual(2, len(resp['snapshots']))
         for snapshot in resp['snapshots']:
-            self.assertEqual(snapshot['volume_id'], 'vol1')
+            self.assertEqual('vol1', snapshot['volume_id'])
         # multiple filters
         req = fakes.HTTPRequest.blank('/v2/snapshots?volume_id=vol1'
                                       '&status=available')
         resp = self.controller.index(req)
-        self.assertEqual(len(resp['snapshots']), 1)
-        self.assertEqual(resp['snapshots'][0]['volume_id'], 'vol1')
-        self.assertEqual(resp['snapshots'][0]['status'], 'available')
+        self.assertEqual(1, len(resp['snapshots']))
+        self.assertEqual('vol1', resp['snapshots'][0]['volume_id'])
+        self.assertEqual('available', resp['snapshots'][0]['status'])
 
     def test_snapshot_list_by_name(self):
         def stub_snapshot_get_all_by_project(context, project_id):
@@ -320,16 +320,16 @@ class SnapshotApiTest(test.TestCase):
         # no name filter
         req = fakes.HTTPRequest.blank('/v2/snapshots')
         resp = self.controller.index(req)
-        self.assertEqual(len(resp['snapshots']), 3)
+        self.assertEqual(3, len(resp['snapshots']))
         # filter by one name
         req = fakes.HTTPRequest.blank('/v2/snapshots?name=backup2')
         resp = self.controller.index(req)
-        self.assertEqual(len(resp['snapshots']), 1)
-        self.assertEqual(resp['snapshots'][0]['name'], 'backup2')
+        self.assertEqual(1, len(resp['snapshots']))
+        self.assertEqual('backup2', resp['snapshots'][0]['name'])
         # filter no match
         req = fakes.HTTPRequest.blank('/v2/snapshots?name=backup4')
         resp = self.controller.index(req)
-        self.assertEqual(len(resp['snapshots']), 0)
+        self.assertEqual(0, len(resp['snapshots']))
 
     def test_admin_list_snapshots_limited_to_project(self):
         req = fakes.HTTPRequest.blank('/v2/fake/snapshots',
@@ -405,11 +405,11 @@ class SnapshotApiTest(test.TestCase):
 
 class SnapshotSerializerTest(test.TestCase):
     def _verify_snapshot(self, snap, tree):
-        self.assertEqual(tree.tag, 'snapshot')
+        self.assertEqual('snapshot', tree.tag)
 
         for attr in ('id', 'status', 'size', 'created_at',
                      'name', 'description', 'volume_id'):
-            self.assertEqual(str(snap[attr]), tree.get(attr))
+            self.assertEqual(tree.get(attr), str(snap[attr]))
 
     def test_snapshot_show_create_serializer(self):
         serializer = snapshots.SnapshotTemplate()

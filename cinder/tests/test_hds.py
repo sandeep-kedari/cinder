@@ -187,8 +187,8 @@ class HUSiSCSIDriverTest(test.TestCase):
 
     def test_get_volume_stats(self):
         stats = self.driver.get_volume_stats(True)
-        self.assertEqual(stats["vendor_name"], "HDS")
-        self.assertEqual(stats["storage_protocol"], "iSCSI")
+        self.assertEqual("HDS", stats["vendor_name"])
+        self.assertEqual("iSCSI", stats["storage_protocol"])
         self.assertGreater(stats["total_capacity_gb"], 0)
 
     def test_create_volume(self):

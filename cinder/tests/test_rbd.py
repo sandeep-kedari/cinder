@@ -124,8 +124,8 @@ CEPH_MON_DUMP = """dumped monmap epoch 1
 class TestUtil(test.TestCase):
     def test_ascii_str(self):
         self.assertIsNone(driver.ascii_str(None))
-        self.assertEqual('foo', driver.ascii_str('foo'))
-        self.assertEqual('foo', driver.ascii_str(u'foo'))
+        self.assertEqual(driver.ascii_str('foo'), 'foo')
+        self.assertEqual(driver.ascii_str(u'foo'), 'foo')
         self.assertRaises(UnicodeEncodeError,
                           driver.ascii_str, 'foo' + unichr(300))
 
@@ -236,7 +236,7 @@ class RBDTestCase(test.TestCase):
         self.assertIsNone(self.driver.delete_volume(self.volume))
         self.mock_rbd.Image.assert_called_once()
         # Make sure the exception was raised
-        self.assertEqual(RAISED_EXCEPTIONS, [self.mock_rbd.ImageNotFound])
+        self.assertEqual([self.mock_rbd.ImageNotFound], RAISED_EXCEPTIONS)
 
     @common_mocks
     def test_delete_busy_volume(self):
@@ -264,8 +264,8 @@ class RBDTestCase(test.TestCase):
                     self.assertFalse(self.mock_rbd.Image.unprotect_snap.called)
                     self.mock_rbd.RBD.remove.assert_called_once()
                     # Make sure the exception was raised
-                    self.assertEqual(RAISED_EXCEPTIONS,
-                                     [self.mock_rbd.ImageBusy])
+                    self.assertEqual([self.mock_rbd.ImageBusy],
+                                        RAISED_EXCEPTIONS)
 
     @common_mocks
     def test_create_snapshot(self):
@@ -299,7 +299,7 @@ class RBDTestCase(test.TestCase):
 
         info = self.driver._get_clone_info(volume, self.volume_name)
 
-        self.assertEqual(info, parent_info)
+        self.assertEqual(parent_info, info)
 
         self.assertFalse(volume.set_snap.called)
         volume.parent_info.assert_called_once()
@@ -317,10 +317,10 @@ class RBDTestCase(test.TestCase):
         info = self.driver._get_clone_info(volume, self.volume_name,
                                            snap=snapshot)
 
-        self.assertEqual(info, parent_info)
+        self.assertEqual(parent_info, info)
 
         volume.set_snap.assert_called_once()
-        self.assertEqual(volume.set_snap.call_count, 2)
+        self.assertEqual(2, volume.set_snap.call_count)
         volume.parent_info.assert_called_once()
 
     @common_mocks
@@ -335,13 +335,13 @@ class RBDTestCase(test.TestCase):
         info = self.driver._get_clone_info(volume, self.volume_name,
                                            snap=snapshot)
 
-        self.assertEqual(info, (None, None, None))
+        self.assertEqual((None, None, None), info)
 
         volume.set_snap.assert_called_once()
-        self.assertEqual(volume.set_snap.call_count, 2)
+        self.assertEqual(2, volume.set_snap.call_count)
         volume.parent_info.assert_called_once()
         # Make sure the exception was raised
-        self.assertEqual(RAISED_EXCEPTIONS, [self.mock_rbd.ImageNotFound])
+        self.assertEqual([self.mock_rbd.ImageNotFound], RAISED_EXCEPTIONS)
 
     @common_mocks
     def test_get_clone_info_deleted_volume(self):
@@ -354,7 +354,7 @@ class RBDTestCase(test.TestCase):
         info = self.driver._get_clone_info(volume,
                                            "%s.deleted" % (self.volume_name))
 
-        self.assertEqual(info, parent_info)
+        self.assertEqual(parent_info, info)
 
         self.assertFalse(volume.set_snap.called)
         volume.parent_info.assert_called_once()
@@ -589,7 +589,7 @@ class RBDTestCase(test.TestCase):
             mock_execute.return_value = (CEPH_MON_DUMP, '')
             hosts = ['::1', '::1', '::1', '127.0.0.1', 'example.com']
             ports = ['6789', '6790', '6791', '6792', '6791']
-            self.assertEqual((hosts, ports), self.driver._get_mon_addrs())
+            self.assertEqual(self.driver._get_mon_addrs(), (hosts, ports))
 
     @common_mocks
     def test_initialize_connection(self):
@@ -643,7 +643,7 @@ class RBDTestCase(test.TestCase):
                 client_stack[1].ioctx, str(self.volume_name)]
         kwargs = {'features': self.mock_rbd.RBD_FEATURE_LAYERING}
         self.mock_rbd.RBD.clone.assert_called_once_with(*args, **kwargs)
-        self.assertEqual(client.__enter__.call_count, 2)
+        self.assertEqual(2, client.__enter__.call_count)
 
     @common_mocks
     def test_extend_volume(self):
@@ -704,7 +704,7 @@ class RBDTestCase(test.TestCase):
         self.assertTrue(self.mock_rados.Rados.connect.called)
         self.assertTrue(self.mock_rados.Rados.open_ioctx.called)
         self.assertIsInstance(ret[0], self.mock_rados.Rados)
-        self.assertEqual(ret[1], self.mock_rados.Rados.ioctx)
+        self.assertEqual(self.mock_rados.Rados.ioctx, ret[1])
         self.mock_rados.Rados.open_ioctx.assert_called_with(self.cfg.rbd_pool)
 
         # different pool
@@ -712,7 +712,7 @@ class RBDTestCase(test.TestCase):
         self.assertTrue(self.mock_rados.Rados.connect.called)
         self.assertTrue(self.mock_rados.Rados.open_ioctx.called)
         self.assertIsInstance(ret[0], self.mock_rados.Rados)
-        self.assertEqual(ret[1], self.mock_rados.Rados.ioctx)
+        self.assertEqual(self.mock_rados.Rados.ioctx, ret[1])
         self.mock_rados.Rados.open_ioctx.assert_called_with('alt_pool')
 
         # error
@@ -743,25 +743,25 @@ class RBDImageIOWrapperTestCase(test.TestCase):
         super(RBDImageIOWrapperTestCase, self).tearDown()
 
     def test_init(self):
-        self.assertEqual(self.mock_rbd_wrapper._rbd_meta, self.meta)
-        self.assertEqual(self.mock_rbd_wrapper._offset, 0)
+        self.assertEqual(self.meta, self.mock_rbd_wrapper._rbd_meta)
+        self.assertEqual(0, self.mock_rbd_wrapper._offset)
 
     def test_inc_offset(self):
         self.mock_rbd_wrapper._inc_offset(10)
         self.mock_rbd_wrapper._inc_offset(10)
-        self.assertEqual(self.mock_rbd_wrapper._offset, 20)
+        self.assertEqual(20, self.mock_rbd_wrapper._offset)
 
     def test_rbd_image(self):
-        self.assertEqual(self.mock_rbd_wrapper.rbd_image, self.meta.image)
+        self.assertEqual(self.meta.image, self.mock_rbd_wrapper.rbd_image)
 
     def test_rbd_user(self):
-        self.assertEqual(self.mock_rbd_wrapper.rbd_user, self.meta.user)
+        self.assertEqual(self.meta.user, self.mock_rbd_wrapper.rbd_user)
 
     def test_rbd_pool(self):
-        self.assertEqual(self.mock_rbd_wrapper.rbd_conf, self.meta.conf)
+        self.assertEqual(self.meta.conf, self.mock_rbd_wrapper.rbd_conf)
 
     def test_rbd_conf(self):
-        self.assertEqual(self.mock_rbd_wrapper.rbd_pool, self.meta.pool)
+        self.assertEqual(self.meta.pool, self.mock_rbd_wrapper.rbd_pool)
 
     def test_read(self):
 
@@ -772,57 +772,57 @@ class RBDImageIOWrapperTestCase(test.TestCase):
         self.meta.image.size.return_value = self.data_length
 
         data = self.mock_rbd_wrapper.read()
-        self.assertEqual(data, self.full_data)
+        self.assertEqual(self.full_data, data)
 
         data = self.mock_rbd_wrapper.read()
-        self.assertEqual(data, '')
+        self.assertEqual('', data)
 
         self.mock_rbd_wrapper.seek(0)
         data = self.mock_rbd_wrapper.read()
-        self.assertEqual(data, self.full_data)
+        self.assertEqual(self.full_data, data)
 
         self.mock_rbd_wrapper.seek(0)
         data = self.mock_rbd_wrapper.read(10)
-        self.assertEqual(data, self.full_data[:10])
+        self.assertEqual(self.full_data[:10], data)
 
     def test_write(self):
         self.mock_rbd_wrapper.write(self.full_data)
-        self.assertEqual(self.mock_rbd_wrapper._offset, 1024)
+        self.assertEqual(1024, self.mock_rbd_wrapper._offset)
 
     def test_seekable(self):
         self.assertTrue(self.mock_rbd_wrapper.seekable)
 
     def test_seek(self):
-        self.assertEqual(self.mock_rbd_wrapper._offset, 0)
+        self.assertEqual(0, self.mock_rbd_wrapper._offset)
         self.mock_rbd_wrapper.seek(10)
-        self.assertEqual(self.mock_rbd_wrapper._offset, 10)
+        self.assertEqual(10, self.mock_rbd_wrapper._offset)
         self.mock_rbd_wrapper.seek(10)
-        self.assertEqual(self.mock_rbd_wrapper._offset, 10)
+        self.assertEqual(10, self.mock_rbd_wrapper._offset)
         self.mock_rbd_wrapper.seek(10, 1)
-        self.assertEqual(self.mock_rbd_wrapper._offset, 20)
+        self.assertEqual(20, self.mock_rbd_wrapper._offset)
 
         self.mock_rbd_wrapper.seek(0)
         self.mock_rbd_wrapper.write(self.full_data)
         self.meta.image.size.return_value = self.data_length
         self.mock_rbd_wrapper.seek(0)
-        self.assertEqual(self.mock_rbd_wrapper._offset, 0)
+        self.assertEqual(0, self.mock_rbd_wrapper._offset)
 
         self.mock_rbd_wrapper.seek(10, 2)
-        self.assertEqual(self.mock_rbd_wrapper._offset, self.data_length + 10)
+        self.assertEqual(self.data_length + 10, self.mock_rbd_wrapper._offset)
         self.mock_rbd_wrapper.seek(-10, 2)
-        self.assertEqual(self.mock_rbd_wrapper._offset, self.data_length - 10)
+        self.assertEqual(self.data_length - 10, self.mock_rbd_wrapper._offset)
 
         # test exceptions.
         self.assertRaises(IOError, self.mock_rbd_wrapper.seek, 0, 3)
         self.assertRaises(IOError, self.mock_rbd_wrapper.seek, -1)
         # offset should not have been changed by any of the previous
         # operations.
-        self.assertEqual(self.mock_rbd_wrapper._offset, self.data_length - 10)
+        self.assertEqual(self.data_length - 10, self.mock_rbd_wrapper._offset)
 
     def test_tell(self):
-        self.assertEqual(self.mock_rbd_wrapper.tell(), 0)
+        self.assertEqual(0, self.mock_rbd_wrapper.tell())
         self.mock_rbd_wrapper._inc_offset(10)
-        self.assertEqual(self.mock_rbd_wrapper.tell(), 10)
+        self.assertEqual(10, self.mock_rbd_wrapper.tell())
 
     def test_flush(self):
         with mock.patch.object(driver, 'LOG') as mock_logger:
@@ -895,7 +895,7 @@ class ManagedRBDTestCase(DriverTestCase):
                                   image_id=image_id)
 
             volume = db.volume_get(self.context, volume_id)
-            self.assertEqual(volume['status'], expected_status)
+            self.assertEqual(expected_status, volume['status'])
         finally:
             # cleanup
             db.volume_destroy(self.context, volume_id)
@@ -961,10 +961,10 @@ class ManagedRBDTestCase(DriverTestCase):
             image_loc = (mock.Mock(), mock.Mock())
             actual = driver.clone_image(mock.Mock(), image_loc,
                                         mock.Mock(), {})
-            self.assertEqual(({}, False), actual)
+            self.assertEqual(actual, ({}, False))
 
-        self.assertEqual(({}, False),
-                         driver.clone_image(object(), None, None, {}))
+        self.assertEqual(driver.clone_image(object(), None, None, {}),
+                           ({}, False))
 
     def test_clone_success(self):
         expected = ({'provider_location': None}, True)
@@ -983,6 +983,6 @@ class ManagedRBDTestCase(DriverTestCase):
                                                 'id.foo',
                                                 {'disk_format': 'raw'})
 
-                    self.assertEqual(expected, actual)
+                    self.assertEqual(actual, expected)
                     mock_clone.assert_called_once()
                     mock_resize.assert_called_once()

@@ -334,7 +334,7 @@ class HP3PARBaseDriver(object):
         result = self.driver.migrate_volume(context.get_admin_context(),
                                             volume, host)
         self.assertIsNotNone(result)
-        self.assertEqual((True, None), result)
+        self.assertEqual(result, (True, None))
 
         osv_matcher = 'osv-' + volume_name_3par
         omv_matcher = 'omv-' + volume_name_3par
@@ -379,7 +379,7 @@ class HP3PARBaseDriver(object):
         result = self.driver.migrate_volume(context.get_admin_context(),
                                             volume, host)
         self.assertIsNotNone(result)
-        self.assertEqual((False, None), result)
+        self.assertEqual(result, (False, None))
 
     def test_migrate_volume_diff_domain(self):
         conf = {
@@ -410,7 +410,7 @@ class HP3PARBaseDriver(object):
         result = self.driver.migrate_volume(context.get_admin_context(),
                                             volume, host)
         self.assertIsNotNone(result)
-        self.assertEqual((False, None), result)
+        self.assertEqual(result, (False, None))
 
     def test_migrate_volume_attached(self):
         conf = {
@@ -444,7 +444,7 @@ class HP3PARBaseDriver(object):
         result = self.driver.migrate_volume(context.get_admin_context(),
                                             volume, host)
         self.assertIsNotNone(result)
-        self.assertEqual((False, None), result)
+        self.assertEqual(result, (False, None))
 
     def test_attach_volume(self):
 
@@ -805,7 +805,7 @@ class HP3PARBaseDriver(object):
         new_size = old_size + grow_size
         self.driver.extend_volume(self.volume, str(new_size))
 
-        self.assertEqual(2, mock_client.growVolume.call_count)
+        self.assertEqual(mock_client.growVolume.call_count, 2)
 
     def test_extend_volume_non_base_failure(self):
         extend_ex = hpexceptions.HTTPForbidden(error={'code': 150})
@@ -864,7 +864,7 @@ class HP3PARBaseDriver(object):
                  'portPos': {'node': 0, 'slot': 6, 'cardPort': 3}}]}
 
         ports = self.driver.common.get_ports()['members']
-        self.assertEqual(len(ports), 3)
+        self.assertEqual(3, len(ports))
 
     def test_get_by_qos_spec_with_scoping(self):
         self.setup_driver()
@@ -881,9 +881,9 @@ class HP3PARBaseDriver(object):
                                           type_ref['id'])
         type_ref = volume_types.get_volume_type(self.ctxt, type_ref['id'])
         qos = self.driver.common._get_qos_by_volume_type(type_ref)
-        self.assertEqual(qos, {'maxIOPS': '1000', 'maxBWS': '50',
+        self.assertEqual({'maxIOPS': '1000', 'maxBWS': '50',
                                'minIOPS': '100', 'minBWS': '25',
-                               'latency': '25', 'priority': 'low'})
+                               'latency': '25', 'priority': 'low'}, qos)
 
     def test_get_by_qos_spec(self):
         self.setup_driver()
@@ -900,9 +900,9 @@ class HP3PARBaseDriver(object):
                                           type_ref['id'])
         type_ref = volume_types.get_volume_type(self.ctxt, type_ref['id'])
         qos = self.driver.common._get_qos_by_volume_type(type_ref)
-        self.assertEqual(qos, {'maxIOPS': '1000', 'maxBWS': '50',
+        self.assertEqual({'maxIOPS': '1000', 'maxBWS': '50',
                                'minIOPS': '100', 'minBWS': '25',
-                               'latency': '25', 'priority': 'low'})
+                               'latency': '25', 'priority': 'low'}, qos)
 
     def test_get_by_qos_by_type_only(self):
         self.setup_driver()
@@ -915,9 +915,9 @@ class HP3PARBaseDriver(object):
                                                  "qos:priority": "high"})
         type_ref = volume_types.get_volume_type(self.ctxt, type_ref['id'])
         qos = self.driver.common._get_qos_by_volume_type(type_ref)
-        self.assertEqual(qos, {'maxIOPS': '100', 'maxBWS': '50',
+        self.assertEqual({'maxIOPS': '100', 'maxBWS': '50',
                                'minIOPS': '10', 'minBWS': '20',
-                               'latency': '5', 'priority': 'high'})
+                               'latency': '5', 'priority': 'high'}, qos)
 
 
 class TestHP3PARFCDriver(HP3PARBaseDriver, test.TestCase):
@@ -1054,9 +1054,9 @@ class TestHP3PARFCDriver(HP3PARBaseDriver, test.TestCase):
         mock_client.getStorageSystemInfo.return_value = {'serialNumber':
                                                          '1234'}
         stats = self.driver.get_volume_stats(True)
-        self.assertEqual(stats['storage_protocol'], 'FC')
-        self.assertEqual(stats['total_capacity_gb'], 'infinite')
-        self.assertEqual(stats['free_capacity_gb'], 'infinite')
+        self.assertEqual('FC', stats['storage_protocol'])
+        self.assertEqual('infinite', stats['total_capacity_gb'])
+        self.assertEqual('infinite', stats['free_capacity_gb'])
 
         expected = [
             mock.call.login(HP3PAR_USER_NAME, HP3PAR_USER_PASS),
@@ -1066,9 +1066,9 @@ class TestHP3PARFCDriver(HP3PARBaseDriver, test.TestCase):
 
         mock_client.assert_has_calls(expected)
         stats = self.driver.get_volume_stats(True)
-        self.assertEqual(stats['storage_protocol'], 'FC')
-        self.assertEqual(stats['total_capacity_gb'], 'infinite')
-        self.assertEqual(stats['free_capacity_gb'], 'infinite')
+        self.assertEqual('FC', stats['storage_protocol'])
+        self.assertEqual('infinite', stats['total_capacity_gb'])
+        self.assertEqual('infinite', stats['free_capacity_gb'])
 
         cpg2 = self.cpgs[0].copy()
         cpg2.update({'SDGrowth': {'limitMiB': 8192}})
@@ -1076,12 +1076,12 @@ class TestHP3PARFCDriver(HP3PARBaseDriver, test.TestCase):
 
         const = 0.0009765625
         stats = self.driver.get_volume_stats(True)
-        self.assertEqual(stats['storage_protocol'], 'FC')
+        self.assertEqual('FC', stats['storage_protocol'])
         total_capacity_gb = 8192 * const
-        self.assertEqual(stats['total_capacity_gb'], total_capacity_gb)
+        self.assertEqual(total_capacity_gb, stats['total_capacity_gb'])
         free_capacity_gb = int(
             (8192 - self.cpgs[0]['UsrUsage']['usedMiB']) * const)
-        self.assertEqual(stats['free_capacity_gb'], free_capacity_gb)
+        self.assertEqual(free_capacity_gb, stats['free_capacity_gb'])
         self.driver.common.client.deleteCPG(HP3PAR_CPG)
         self.driver.common.client.createCPG(HP3PAR_CPG, {})
 
@@ -1129,7 +1129,7 @@ class TestHP3PARFCDriver(HP3PARBaseDriver, test.TestCase):
 
         mock_client.assert_has_calls(expected)
 
-        self.assertEqual(host['name'], self.FAKE_HOST)
+        self.assertEqual(self.FAKE_HOST, host['name'])
 
     def test_create_invalid_host(self):
         # setup_mock_client drive with default configuration
@@ -1156,7 +1156,7 @@ class TestHP3PARFCDriver(HP3PARBaseDriver, test.TestCase):
 
         mock_client.assert_has_calls(expected)
 
-        self.assertEqual(host['name'], 'fakehost.foo')
+        self.assertEqual('fakehost.foo', host['name'])
 
     def test_create_modify_host(self):
         # setup_mock_client drive with default configuration
@@ -1183,8 +1183,8 @@ class TestHP3PARFCDriver(HP3PARBaseDriver, test.TestCase):
 
         mock_client.assert_has_calls(expected)
 
-        self.assertEqual(host['name'], self.FAKE_HOST)
-        self.assertEqual(len(host['FCPaths']), 2)
+        self.assertEqual(self.FAKE_HOST, host['name'])
+        self.assertEqual(2, len(host['FCPaths']))
 
     def test_modify_host_with_new_wwn(self):
         # setup_mock_client drive with default configuration
@@ -1214,8 +1214,8 @@ class TestHP3PARFCDriver(HP3PARBaseDriver, test.TestCase):
 
         mock_client.assert_has_calls(expected)
 
-        self.assertEqual(host['name'], self.FAKE_HOST)
-        self.assertEqual(len(host['FCPaths']), 2)
+        self.assertEqual(self.FAKE_HOST, host['name'])
+        self.assertEqual(2, len(host['FCPaths']))
 
     def test_modify_host_with_unknown_wwn_and_new_wwn(self):
         # setup_mock_client drive with default configuration
@@ -1247,8 +1247,8 @@ class TestHP3PARFCDriver(HP3PARBaseDriver, test.TestCase):
 
         mock_client.assert_has_calls(expected)
 
-        self.assertEqual(host['name'], self.FAKE_HOST)
-        self.assertEqual(len(host['FCPaths']), 3)
+        self.assertEqual(self.FAKE_HOST, host['name'])
+        self.assertEqual(3, len(host['FCPaths']))
 
 
 class TestHP3PARISCSIDriver(HP3PARBaseDriver, test.TestCase):
@@ -1347,9 +1347,9 @@ class TestHP3PARISCSIDriver(HP3PARBaseDriver, test.TestCase):
         mock_client.getStorageSystemInfo.return_value = {'serialNumber':
                                                          '1234'}
         stats = self.driver.get_volume_stats(True)
-        self.assertEqual(stats['storage_protocol'], 'iSCSI')
-        self.assertEqual(stats['total_capacity_gb'], 'infinite')
-        self.assertEqual(stats['free_capacity_gb'], 'infinite')
+        self.assertEqual('iSCSI', stats['storage_protocol'])
+        self.assertEqual('infinite', stats['total_capacity_gb'])
+        self.assertEqual('infinite', stats['free_capacity_gb'])
 
         expected = [
             mock.call.login(HP3PAR_USER_NAME, HP3PAR_USER_PASS),
@@ -1359,9 +1359,9 @@ class TestHP3PARISCSIDriver(HP3PARBaseDriver, test.TestCase):
 
         mock_client.assert_has_calls(expected)
 
-        self.assertEqual(stats['storage_protocol'], 'iSCSI')
-        self.assertEqual(stats['total_capacity_gb'], 'infinite')
-        self.assertEqual(stats['free_capacity_gb'], 'infinite')
+        self.assertEqual('iSCSI', stats['storage_protocol'])
+        self.assertEqual('infinite', stats['total_capacity_gb'])
+        self.assertEqual('infinite', stats['free_capacity_gb'])
 
         cpg2 = self.cpgs[0].copy()
         cpg2.update({'SDGrowth': {'limitMiB': 8192}})
@@ -1369,12 +1369,12 @@ class TestHP3PARISCSIDriver(HP3PARBaseDriver, test.TestCase):
 
         const = 0.0009765625
         stats = self.driver.get_volume_stats(True)
-        self.assertEqual(stats['storage_protocol'], 'iSCSI')
+        self.assertEqual('iSCSI', stats['storage_protocol'])
         total_capacity_gb = 8192 * const
-        self.assertEqual(stats['total_capacity_gb'], total_capacity_gb)
+        self.assertEqual(total_capacity_gb, stats['total_capacity_gb'])
         free_capacity_gb = int(
             (8192 - self.cpgs[0]['UsrUsage']['usedMiB']) * const)
-        self.assertEqual(stats['free_capacity_gb'], free_capacity_gb)
+        self.assertEqual(free_capacity_gb, stats['free_capacity_gb'])
 
     def test_create_host(self):
         # setup_mock_client drive with default configuration
@@ -1403,7 +1403,7 @@ class TestHP3PARISCSIDriver(HP3PARBaseDriver, test.TestCase):
 
         mock_client.assert_has_calls(expected)
 
-        self.assertEqual(host['name'], self.FAKE_HOST)
+        self.assertEqual(self.FAKE_HOST, host['name'])
 
     def test_create_invalid_host(self):
         # setup_mock_client drive with default configuration
@@ -1427,7 +1427,7 @@ class TestHP3PARISCSIDriver(HP3PARBaseDriver, test.TestCase):
 
         mock_client.assert_has_calls(expected)
 
-        self.assertEqual(host['name'], 'fakehost.foo')
+        self.assertEqual('fakehost.foo', host['name'])
 
     def test_create_modify_host(self):
         # setup_mock_client drive with default configuration
@@ -1455,8 +1455,8 @@ class TestHP3PARISCSIDriver(HP3PARBaseDriver, test.TestCase):
 
         mock_client.assert_has_calls(expected)
 
-        self.assertEqual(host['name'], self.FAKE_HOST)
-        self.assertEqual(len(host['FCPaths']), 2)
+        self.assertEqual(self.FAKE_HOST, host['name'])
+        self.assertEqual(2, len(host['FCPaths']))
 
     def test_get_least_used_nsp_for_host_single(self):
         # setup_mock_client drive with default configuration
@@ -1473,7 +1473,7 @@ class TestHP3PARISCSIDriver(HP3PARBaseDriver, test.TestCase):
         self.driver.initialize_iscsi_ports()
 
         nsp = self.driver._get_least_used_nsp_for_host('newhost')
-        self.assertEqual(nsp, "1:8:1")
+        self.assertEqual("1:8:1", nsp)
 
     def test_get_least_used_nsp_for_host_new(self):
         # setup_mock_client drive with default configuration
@@ -1492,7 +1492,7 @@ class TestHP3PARISCSIDriver(HP3PARBaseDriver, test.TestCase):
         # Host 'newhost' does not yet have any iscsi paths,
         # so the 'least used' is returned
         nsp = self.driver._get_least_used_nsp_for_host('newhost')
-        self.assertEqual(nsp, "1:8:2")
+        self.assertEqual("1:8:2", nsp)
 
     def test_get_least_used_nsp_for_host_reuse(self):
         # setup_mock_client drive with default configuration
@@ -1511,10 +1511,10 @@ class TestHP3PARISCSIDriver(HP3PARBaseDriver, test.TestCase):
         # hosts 'foo' and 'bar' already have active iscsi paths
         # the same one should be used
         nsp = self.driver._get_least_used_nsp_for_host('foo')
-        self.assertEqual(nsp, "1:8:2")
+        self.assertEqual("1:8:2", nsp)
 
         nsp = self.driver._get_least_used_nsp_for_host('bar')
-        self.assertEqual(nsp, "1:8:1")
+        self.assertEqual("1:8:1", nsp)
 
     def test_get_least_used_nps_for_host_fc(self):
         # setup_mock_client drive with default configuration
@@ -1532,7 +1532,7 @@ class TestHP3PARISCSIDriver(HP3PARBaseDriver, test.TestCase):
 
         nsp = self.driver._get_least_used_nsp_for_host('newhost')
         self.assertNotEqual(nsp, "0:6:3")
-        self.assertEqual(nsp, "1:8:1")
+        self.assertEqual("1:8:1", nsp)
 
     def test_invalid_iscsi_ip(self):
         config = self.setup_configuration()
@@ -1585,7 +1585,7 @@ class TestHP3PARISCSIDriver(HP3PARBaseDriver, test.TestCase):
         vluns = self.driver.common.client.getVLUNs()
         nsp = self.driver._get_least_used_nsp(vluns['members'],
                                               ['0:2:1', '1:8:1'])
-        self.assertEqual(nsp, '1:8:1')
+        self.assertEqual('1:8:1', nsp)
 
         ports = [
             {'portPos': {'node': 1, 'slot': 2, 'cardPort': 1}, 'active': True},
@@ -1604,7 +1604,7 @@ class TestHP3PARISCSIDriver(HP3PARBaseDriver, test.TestCase):
         vluns = self.driver.common.client.getVLUNs()
         nsp = self.driver._get_least_used_nsp(vluns['members'],
                                               ['0:2:1', '1:2:1'])
-        self.assertEqual(nsp, '1:2:1')
+        self.assertEqual('1:2:1', nsp)
 
         ports = [
             {'portPos': {'node': 1, 'slot': 2, 'cardPort': 1}, 'active': True},
@@ -1623,7 +1623,7 @@ class TestHP3PARISCSIDriver(HP3PARBaseDriver, test.TestCase):
         vluns = self.driver.common.client.getVLUNs()
         nsp = self.driver._get_least_used_nsp(vluns['members'],
                                               ['1:1:1', '1:2:1'])
-        self.assertEqual(nsp, '1:1:1')
+        self.assertEqual('1:1:1', nsp)
 
 VLUNS5_RET = ({'members':
                [{'portPos': {'node': 0, 'slot': 8, 'cardPort': 2},
