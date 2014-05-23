@@ -23,22 +23,22 @@ class ContextTestCase(test.TestCase):
         ctxt = context.RequestContext('111',
                                       '222',
                                       roles=['admin', 'weasel'])
-        self.assertEqual(ctxt.is_admin, True)
+        self.assertEqual(True, ctxt.is_admin)
 
     def test_request_context_sets_is_admin_upcase(self):
         ctxt = context.RequestContext('111',
                                       '222',
                                       roles=['Admin', 'weasel'])
-        self.assertEqual(ctxt.is_admin, True)
+        self.assertEqual(True, ctxt.is_admin)
 
     def test_request_context_read_deleted(self):
         ctxt = context.RequestContext('111',
                                       '222',
                                       read_deleted='yes')
-        self.assertEqual(ctxt.read_deleted, 'yes')
+        self.assertEqual('yes', ctxt.read_deleted)
 
         ctxt.read_deleted = 'no'
-        self.assertEqual(ctxt.read_deleted, 'no')
+        self.assertEqual('no', ctxt.read_deleted)
 
     def test_request_context_read_deleted_invalid(self):
         self.assertRaises(ValueError,
@@ -85,12 +85,12 @@ class ContextTestCase(test.TestCase):
         compute_catalog = [{u'type': u'compute', u'name': u'nova'}]
         ctxt = context.RequestContext('111', '222',
                                       service_catalog=service_catalog)
-        self.assertEqual(ctxt.service_catalog, compute_catalog)
+        self.assertEqual(compute_catalog, ctxt.service_catalog)
 
     def test_user_identity(self):
         ctx = context.RequestContext("user", "tenant",
                                      domain="domain",
                                      user_domain="user-domain",
                                      project_domain="project-domain")
-        self.assertEqual('user tenant domain user-domain project-domain',
-                         ctx.to_dict()["user_identity"])
+        self.assertEqual(ctx.to_dict()["user_identity"],
+                      'user tenant domain user-domain project-domain')

@@ -115,7 +115,7 @@ class VolumeApiTest(test.TestCase):
                          'user_id': 'fakeuser',
                          'volume_type': 'vol_type_name',
                          'encrypted': False}}
-        self.assertEqual(res_dict, ex)
+        self.assertEqual(ex, res_dict)
 
     def test_volume_create_with_type(self):
         vol_type = db.volume_type_create(
@@ -144,14 +144,14 @@ class VolumeApiTest(test.TestCase):
         body.update(dict(volume=vol))
         res_dict = self.controller.create(req, body)
         volume_id = res_dict['volume']['id']
-        self.assertEqual(len(res_dict), 1)
+        self.assertEqual(1, len(res_dict))
 
         # Use correct volume type id
         vol.update(dict(volume_type=db_vol_type['id']))
         body.update(dict(volume=vol))
         res_dict = self.controller.create(req, body)
         volume_id = res_dict['volume']['id']
-        self.assertEqual(len(res_dict), 1)
+        self.assertEqual(1, len(res_dict))
 
         self.stubs.Set(volume_api.API, 'get_all',
                        lambda *args, **kwargs:
@@ -221,7 +221,7 @@ class VolumeApiTest(test.TestCase):
         body = {"volume": vol}
         req = fakes.HTTPRequest.blank('/v2/volumes')
         res_dict = self.controller.create(req, body)
-        self.assertEqual(res_dict, ex)
+        self.assertEqual(ex, res_dict)
 
     def test_volume_create_with_image_id_is_integer(self):
         self.stubs.Set(volume_api.API, "create", stubs.stub_volume_create)
@@ -305,8 +305,8 @@ class VolumeApiTest(test.TestCase):
                 ],
             }
         }
-        self.assertEqual(res_dict, expected)
-        self.assertEqual(len(fake_notifier.NOTIFICATIONS), 2)
+        self.assertEqual(expected, res_dict)
+        self.assertEqual(2, len(fake_notifier.NOTIFICATIONS))
 
     def test_volume_update_deprecation(self):
         self.stubs.Set(volume_api.API, 'get', stubs.stub_volume_get)
@@ -318,7 +318,7 @@ class VolumeApiTest(test.TestCase):
         }
         body = {"volume": updates}
         req = fakes.HTTPRequest.blank('/v2/volumes/1')
-        self.assertEqual(len(fake_notifier.NOTIFICATIONS), 0)
+        self.assertEqual(0, len(fake_notifier.NOTIFICATIONS))
         res_dict = self.controller.update(req, '1', body)
         expected = {
             'volume': {
@@ -357,8 +357,8 @@ class VolumeApiTest(test.TestCase):
                 ],
             }
         }
-        self.assertEqual(res_dict, expected)
-        self.assertEqual(len(fake_notifier.NOTIFICATIONS), 2)
+        self.assertEqual(expected, res_dict)
+        self.assertEqual(2, len(fake_notifier.NOTIFICATIONS))
 
     def test_volume_update_deprecation_key_priority(self):
         """Test current update keys have priority over deprecated keys."""
@@ -373,7 +373,7 @@ class VolumeApiTest(test.TestCase):
         }
         body = {"volume": updates}
         req = fakes.HTTPRequest.blank('/v2/volumes/1')
-        self.assertEqual(len(fake_notifier.NOTIFICATIONS), 0)
+        self.assertEqual(0, len(fake_notifier.NOTIFICATIONS))
         res_dict = self.controller.update(req, '1', body)
         expected = {
             'volume': {
@@ -412,8 +412,8 @@ class VolumeApiTest(test.TestCase):
                 ],
             }
         }
-        self.assertEqual(res_dict, expected)
-        self.assertEqual(len(fake_notifier.NOTIFICATIONS), 2)
+        self.assertEqual(expected, res_dict)
+        self.assertEqual(2, len(fake_notifier.NOTIFICATIONS))
 
     def test_volume_update_metadata(self):
         self.stubs.Set(volume_api.API, 'get', stubs.stub_volume_get)
@@ -424,7 +424,7 @@ class VolumeApiTest(test.TestCase):
         }
         body = {"volume": updates}
         req = fakes.HTTPRequest.blank('/v2/volumes/1')
-        self.assertEqual(len(fake_notifier.NOTIFICATIONS), 0)
+        self.assertEqual(0, len(fake_notifier.NOTIFICATIONS))
         res_dict = self.controller.update(req, '1', body)
         expected = {'volume': {
             'status': 'fakestatus',
@@ -461,8 +461,8 @@ class VolumeApiTest(test.TestCase):
                 }
             ],
         }}
-        self.assertEqual(res_dict, expected)
-        self.assertEqual(len(fake_notifier.NOTIFICATIONS), 2)
+        self.assertEqual(expected, res_dict)
+        self.assertEqual(2, len(fake_notifier.NOTIFICATIONS))
 
     def test_volume_update_with_admin_metadata(self):
         self.stubs.Set(volume_api.API, "update", stubs.stub_volume_update)
@@ -483,7 +483,7 @@ class VolumeApiTest(test.TestCase):
         }
         body = {"volume": updates}
         req = fakes.HTTPRequest.blank('/v2/volumes/1')
-        self.assertEqual(len(fake_notifier.NOTIFICATIONS), 0)
+        self.assertEqual(0, len(fake_notifier.NOTIFICATIONS))
         admin_ctx = context.RequestContext('admin', 'fake', True)
         req.environ['cinder.context'] = admin_ctx
         res_dict = self.controller.update(req, '1', body)
@@ -521,8 +521,8 @@ class VolumeApiTest(test.TestCase):
                 }
             ],
         }}
-        self.assertEqual(res_dict, expected)
-        self.assertEqual(len(fake_notifier.NOTIFICATIONS), 2)
+        self.assertEqual(expected, res_dict)
+        self.assertEqual(2, len(fake_notifier.NOTIFICATIONS))
 
     def test_update_empty_body(self):
         body = {}
@@ -576,7 +576,7 @@ class VolumeApiTest(test.TestCase):
                 }
             ]
         }
-        self.assertEqual(res_dict, expected)
+        self.assertEqual(expected, res_dict)
         # Finally test that we cached the returned volumes
         self.assertEqual(1, len(req.cached_resource()))
 
@@ -626,7 +626,7 @@ class VolumeApiTest(test.TestCase):
                 }
             ]
         }
-        self.assertEqual(res_dict, expected)
+        self.assertEqual(expected, res_dict)
         # Finally test that we cached the returned volumes
         self.assertEqual(1, len(req.cached_resource()))
 
@@ -686,7 +686,7 @@ class VolumeApiTest(test.TestCase):
                 }
             ]
         }
-        self.assertEqual(res_dict, expected)
+        self.assertEqual(expected, res_dict)
 
     def test_volume_index_with_marker(self):
         def stub_volume_get_all_by_project(context, project_id, marker, limit,
@@ -702,9 +702,9 @@ class VolumeApiTest(test.TestCase):
         req = fakes.HTTPRequest.blank('/v2/volumes?marker=1')
         res_dict = self.controller.index(req)
         volumes = res_dict['volumes']
-        self.assertEqual(len(volumes), 2)
-        self.assertEqual(volumes[0]['id'], 1)
-        self.assertEqual(volumes[1]['id'], 2)
+        self.assertEqual(2, len(volumes))
+        self.assertEqual(1, volumes[0]['id'])
+        self.assertEqual(2, volumes[1]['id'])
 
     def test_volume_index_limit(self):
         self.stubs.Set(db, 'volume_get_all_by_project',

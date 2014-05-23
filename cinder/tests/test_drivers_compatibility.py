@@ -61,86 +61,86 @@ class VolumeDriverCompatibility(test.TestCase):
 
     def test_nexenta_old(self):
         self._load_driver('cinder.volume.drivers.nexenta.volume.NexentaDriver')
-        self.assertEqual(self._driver_module_name(), NEXENTA_MODULE)
+        self.assertEqual(NEXENTA_MODULE, self._driver_module_name())
 
     def test_nexenta_new(self):
         self._load_driver(NEXENTA_MODULE)
-        self.assertEqual(self._driver_module_name(), NEXENTA_MODULE)
+        self.assertEqual(NEXENTA_MODULE, self._driver_module_name())
 
     def test_solidfire_old(self):
         self._load_driver('cinder.volume.drivers.solidfire.SolidFire')
-        self.assertEqual(self._driver_module_name(), SOLIDFIRE_MODULE)
+        self.assertEqual(SOLIDFIRE_MODULE, self._driver_module_name())
 
     def test_solidfire_old2(self):
         self._load_driver('cinder.volume.drivers.solidfire.SolidFire')
-        self.assertEqual(self._driver_module_name(), SOLIDFIRE_MODULE)
+        self.assertEqual(SOLIDFIRE_MODULE, self._driver_module_name())
 
     def test_solidfire_new(self):
         self._load_driver(SOLIDFIRE_MODULE)
-        self.assertEqual(self._driver_module_name(), SOLIDFIRE_MODULE)
+        self.assertEqual(SOLIDFIRE_MODULE, self._driver_module_name())
 
     def test_storwize_svc_old(self):
         self._load_driver(
             'cinder.volume.drivers.storwize_svc.StorwizeSVCDriver')
-        self.assertEqual(self._driver_module_name(), STORWIZE_MODULE)
+        self.assertEqual(STORWIZE_MODULE, self._driver_module_name())
 
     def test_storwize_svc_old2(self):
         self._load_driver('cinder.volume.drivers.storwize_svc.'
                           'StorwizeSVCDriver')
-        self.assertEqual(self._driver_module_name(), STORWIZE_MODULE)
+        self.assertEqual(STORWIZE_MODULE, self._driver_module_name())
 
     def test_storwize_svc_new(self):
         self._load_driver(STORWIZE_MODULE)
-        self.assertEqual(self._driver_module_name(), STORWIZE_MODULE)
+        self.assertEqual(STORWIZE_MODULE, self._driver_module_name())
 
     def test_windows_old(self):
         self._load_driver('cinder.volume.drivers.windows.WindowsDriver')
-        self.assertEqual(self._driver_module_name(), WINDOWS_MODULE)
+        self.assertEqual(WINDOWS_MODULE, self._driver_module_name())
 
     def test_windows_new(self):
         self._load_driver(WINDOWS_MODULE)
-        self.assertEqual(self._driver_module_name(), WINDOWS_MODULE)
+        self.assertEqual(WINDOWS_MODULE, self._driver_module_name())
 
     def test_xiv_old(self):
         self._load_driver('cinder.volume.drivers.xiv.XIVDriver')
-        self.assertEqual(self._driver_module_name(), XIV_DS8K_MODULE)
+        self.assertEqual(XIV_DS8K_MODULE, self._driver_module_name())
 
     def test_xiv_ds8k_new(self):
         self._load_driver(XIV_DS8K_MODULE)
-        self.assertEqual(self._driver_module_name(), XIV_DS8K_MODULE)
+        self.assertEqual(XIV_DS8K_MODULE, self._driver_module_name())
 
     def test_netapp_7m_iscsi_old(self):
         self._load_driver('cinder.volume.drivers.netapp.iscsi.'
                           'NetAppISCSIDriver')
-        self.assertEqual(self._driver_module_name(), NETAPP_MODULE)
+        self.assertEqual(NETAPP_MODULE, self._driver_module_name())
 
     def test_netapp_cm_iscsi_old(self):
         self._load_driver('cinder.volume.drivers.netapp.iscsi.'
                           'NetAppCmodeISCSIDriver')
-        self.assertEqual(self._driver_module_name(), NETAPP_MODULE)
+        self.assertEqual(NETAPP_MODULE, self._driver_module_name())
 
     def test_netapp_7m_nfs_old(self):
         self._load_driver('cinder.volume.drivers.netapp.nfs.NetAppNFSDriver')
-        self.assertEqual(self._driver_module_name(), NETAPP_MODULE)
+        self.assertEqual(NETAPP_MODULE, self._driver_module_name())
 
     def test_netapp_cm_nfs_old(self):
         self._load_driver('cinder.volume.drivers.netapp.nfs.'
                           'NetAppCmodeNfsDriver')
-        self.assertEqual(self._driver_module_name(), NETAPP_MODULE)
+        self.assertEqual(NETAPP_MODULE, self._driver_module_name())
 
     def test_hp_lefthand_rest_old(self):
         self._load_driver(
             'cinder.volume.drivers.san.hp_lefthand.HpSanISCSIDriver')
-        self.assertEqual(self._driver_module_name(), LEFTHAND_REST_MODULE)
+        self.assertEqual(LEFTHAND_REST_MODULE, self._driver_module_name())
 
     def test_hp_lefthand_rest_new(self):
         self._load_driver(LEFTHAND_REST_MODULE)
-        self.assertEqual(self._driver_module_name(), LEFTHAND_REST_MODULE)
+        self.assertEqual(LEFTHAND_REST_MODULE, self._driver_module_name())
 
     def test_gpfs_old(self):
         self._load_driver('cinder.volume.drivers.gpfs.GPFSDriver')
-        self.assertEqual(self._driver_module_name(), GPFS_MODULE)
+        self.assertEqual(GPFS_MODULE, self._driver_module_name())
 
     def test_gpfs_new(self):
         self._load_driver(GPFS_MODULE)
-        self.assertEqual(self._driver_module_name(), GPFS_MODULE)
+        self.assertEqual(GPFS_MODULE, self._driver_module_name())

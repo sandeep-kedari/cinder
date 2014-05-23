@@ -88,7 +88,7 @@ class DriverTestCase(test.TestCase):
         drv.do_setup('context')
         mock.VerifyAll()
 
-        self.assertEqual(nfsops, drv.nfs_ops)
+        self.assertEqual(drv.nfs_ops, nfsops)
 
     def test_create_volume(self):
         mock = mox.Mox()

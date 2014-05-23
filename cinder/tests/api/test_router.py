@@ -66,13 +66,13 @@ class VolumeRouterTestCase(test.TestCase):
         request_environment = {'PATH_INFO': '/'}
         resource = versions.Versions()
         result = resource.get_action_args(request_environment)
-        self.assertEqual(result['action'], 'index')
+        self.assertEqual('index', result['action'])
 
     def test_versions_action_args_multi(self):
         request_environment = {'PATH_INFO': '/fake/path'}
         resource = versions.Versions()
         result = resource.get_action_args(request_environment)
-        self.assertEqual(result['action'], 'multi')
+        self.assertEqual('multi', result['action'])
 
     def test_versions_get_most_recent_update(self):
         res = versions.AtomSerializer()
@@ -172,7 +172,7 @@ class VolumeRouterTestCase(test.TestCase):
         resource = versions.Versions()
         result = resource.dispatch(resource.multi, req, {})
         ids = [v['id'] for v in result['choices']]
-        self.assertEqual(set(ids), set(['v1.0', 'v2.0']))
+        self.assertEqual(set(['v1.0', 'v2.0']), set(ids))
 
     def test_versions_multi_disable_v1(self):
         self.flags(enable_v1_api=False)
@@ -182,7 +182,7 @@ class VolumeRouterTestCase(test.TestCase):
         resource = versions.Versions()
         result = resource.dispatch(resource.multi, req, {})
         ids = [v['id'] for v in result['choices']]
-        self.assertEqual(set(ids), set(['v2.0']))
+        self.assertEqual(set(['v2.0']), set(ids))
 
     def test_versions_multi_disable_v2(self):
         self.flags(enable_v2_api=False)
@@ -192,7 +192,7 @@ class VolumeRouterTestCase(test.TestCase):
         resource = versions.Versions()
         result = resource.dispatch(resource.multi, req, {})
         ids = [v['id'] for v in result['choices']]
-        self.assertEqual(set(ids), set(['v1.0']))
+        self.assertEqual(set(['v1.0']), set(ids))
 
     def test_versions_index(self):
         req = fakes.HTTPRequest.blank('/')
@@ -201,7 +201,7 @@ class VolumeRouterTestCase(test.TestCase):
         resource = versions.Versions()
         result = resource.dispatch(resource.index, req, {})
         ids = [v['id'] for v in result['versions']]
-        self.assertEqual(set(ids), set(['v1.0', 'v2.0']))
+        self.assertEqual(set(['v1.0', 'v2.0']), set(ids))
 
     def test_versions_index_disable_v1(self):
         self.flags(enable_v1_api=False)
@@ -211,7 +211,7 @@ class VolumeRouterTestCase(test.TestCase):
         resource = versions.Versions()
         result = resource.dispatch(resource.index, req, {})
         ids = [v['id'] for v in result['versions']]
-        self.assertEqual(set(ids), set(['v2.0']))
+        self.assertEqual(set(['v2.0']), set(ids))
 
     def test_versions_index_disable_v2(self):
         self.flags(enable_v2_api=False)
@@ -221,7 +221,7 @@ class VolumeRouterTestCase(test.TestCase):
         resource = versions.Versions()
         result = resource.dispatch(resource.index, req, {})
         ids = [v['id'] for v in result['versions']]
-        self.assertEqual(set(ids), set(['v1.0']))
+        self.assertEqual(set(['v1.0']), set(ids))
 
     def test_volumes(self):
         req = fakes.HTTPRequest.blank('/fake/volumes')

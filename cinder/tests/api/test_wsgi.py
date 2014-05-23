@@ -40,7 +40,7 @@ class Test(test.TestCase):
 
         application = wsgi.Debug(Application())
         result = webob.Request.blank('/').get_response(application)
-        self.assertEqual(result.body, "Test result")
+        self.assertEqual("Test result", result.body)
 
     def test_router(self):
 
@@ -60,6 +60,6 @@ class Test(test.TestCase):
                 super(Router, self).__init__(mapper)
 
         result = webob.Request.blank('/test').get_response(Router())
-        self.assertEqual(result.body, "Router result")
+        self.assertEqual("Router result", result.body)
         result = webob.Request.blank('/bad').get_response(Router())
         self.assertNotEqual(result.body, "Router result")

@@ -276,7 +276,7 @@ class TestNexentaISCSIDriver(test.TestCase):
             'prefix': self.configuration.nexenta_target_prefix,
             'volume': self.TEST_VOLUME_NAME
         }
-        self.assertEqual(retval, {'provider_location': location})
+        self.assertEqual({'provider_location': location}, retval)
 
     def __get_test(i):
         def _test_create_export_fail(self):
@@ -333,11 +333,11 @@ class TestNexentaISCSIDriver(test.TestCase):
             'health|size|used|available').AndReturn(stats)
         self.mox.ReplayAll()
         stats = self.drv.get_volume_stats(True)
-        self.assertEqual(stats['storage_protocol'], 'iSCSI')
-        self.assertEqual(stats['total_capacity_gb'], 5368709120.0)
-        self.assertEqual(stats['free_capacity_gb'], 5368709120.0)
-        self.assertEqual(stats['reserved_percentage'], 0)
-        self.assertEqual(stats['QoS_support'], False)
+        self.assertEqual('iSCSI', stats['storage_protocol'])
+        self.assertEqual(5368709120.0, stats['total_capacity_gb'])
+        self.assertEqual(5368709120.0, stats['free_capacity_gb'])
+        self.assertEqual(0, stats['reserved_percentage'])
+        self.assertEqual(False, stats['QoS_support'])
 
 
 class TestNexentaJSONRPC(test.TestCase):
@@ -374,7 +374,7 @@ class TestNexentaJSONRPC(test.TestCase):
             '{"error": null, "result": "the result"}')
         self.mox.ReplayAll()
         result = self.proxy('arg1', 'arg2')
-        self.assertEqual("the result", result)
+        self.assertEqual(result, "the result")
 
     def test_call_deep(self):
         urllib2.Request(
@@ -387,7 +387,7 @@ class TestNexentaJSONRPC(test.TestCase):
             '{"error": null, "result": "the result"}')
         self.mox.ReplayAll()
         result = self.proxy.obj1.subobj.meth('arg1', 'arg2')
-        self.assertEqual("the result", result)
+        self.assertEqual(result, "the result")
 
     def test_call_auto(self):
         urllib2.Request(
@@ -404,7 +404,7 @@ class TestNexentaJSONRPC(test.TestCase):
         urllib2.urlopen(self.REQUEST).AndReturn(self.resp_mock)
         self.mox.ReplayAll()
         result = self.proxy('arg1', 'arg2')
-        self.assertEqual("the result", result)
+        self.assertEqual(result, "the result")
 
     def test_call_error(self):
         urllib2.Request(
@@ -535,8 +535,8 @@ class TestNexentaNfsDriver(test.TestCase):
             'name': 'volume'
         }
         result = self.drv.initialize_connection(volume, None)
-        self.assertEqual(result['data']['export'],
-                         '%s/volume' % self.TEST_EXPORT1)
+        self.assertEqual('%s/volume' % self.TEST_EXPORT1,
+                          result['data']['export'])
 
     def test_do_create_volume(self):
         volume = {
@@ -605,14 +605,13 @@ class TestNexentaNfsDriver(test.TestCase):
         volume = {'provider_location': self.TEST_EXPORT1, 'name': 'volume-1'}
         path = self.drv.local_path(volume)
         self.assertEqual(
-            path,
-            '$state_path/mnt/b3f660847a52b29ac330d8555e4ad669/volume-1/volume'
-        )
+            '$state_path/mnt/b3f660847a52b29ac330d8555e4ad669/volume-1/volume',
+                          path)
 
     def test_remote_path(self):
         volume = {'provider_location': self.TEST_EXPORT1, 'name': 'volume-1'}
         path = self.drv.remote_path(volume)
-        self.assertEqual(path, '/volumes/stack/share/volume-1/volume')
+        self.assertEqual('/volumes/stack/share/volume-1/volume', path)
 
     def test_share_folder(self):
         path = 'stack/share/folder'
@@ -642,14 +641,14 @@ class TestNexentaNfsDriver(test.TestCase):
 
         self.assertIn(self.TEST_EXPORT1, self.drv.shares)
         self.assertIn(self.TEST_EXPORT2, self.drv.shares)
-        self.assertEqual(len(self.drv.shares), 2)
+        self.assertEqual(2, len(self.drv.shares))
 
         self.assertIn(self.TEST_EXPORT1, self.drv.share2nms)
         self.assertIn(self.TEST_EXPORT2, self.drv.share2nms)
-        self.assertEqual(len(self.drv.share2nms.keys()), 2)
+        self.assertEqual(2, len(self.drv.share2nms.keys()))
 
-        self.assertEqual(self.drv.shares[self.TEST_EXPORT2],
-                         self.TEST_EXPORT2_OPTIONS)
+        self.assertEqual(self.TEST_EXPORT2_OPTIONS,
+                       self.drv.shares[self.TEST_EXPORT2])
 
         self.mox.VerifyAll()
 
@@ -663,9 +662,9 @@ class TestNexentaNfsDriver(test.TestCase):
         self.mox.ReplayAll()
         total, free, allocated = self.drv._get_capacity_info(self.TEST_EXPORT1)
 
-        self.assertEqual(total, 3 * units.GiB)
-        self.assertEqual(free, units.GiB)
-        self.assertEqual(allocated, 2 * units.GiB)
+        self.assertEqual(3 * units.GiB, total)
+        self.assertEqual(units.GiB, free)
+        self.assertEqual(2 * units.GiB, allocated)
 
     def test_get_share_datasets(self):
         self.drv.share2nms = {self.TEST_EXPORT1: self.nms_mock}
@@ -675,8 +674,8 @@ class TestNexentaNfsDriver(test.TestCase):
         volume_name, folder_name = \
             self.drv._get_share_datasets(self.TEST_EXPORT1)
 
-        self.assertEqual(volume_name, 'stack')
-        self.assertEqual(folder_name, 'share')
+        self.assertEqual('stack', volume_name)
+        self.assertEqual('share', folder_name)
 
     def test_delete_snapshot(self):
         self.drv.share2nms = {self.TEST_EXPORT1: self.nms_mock}
@@ -756,17 +755,17 @@ class TestNexentaUtils(test.TestCase):
         )
 
         for value, result in values_to_test:
-            self.assertEqual(utils.str2size(value), result)
+            self.assertEqual(result, utils.str2size(value))
 
         # Invalid format value
         self.assertRaises(ValueError, utils.str2size, 'A')
 
     def test_str2gib_size(self):
-        self.assertEqual(utils.str2gib_size('1024M'), 1)
-        self.assertEqual(utils.str2gib_size('300M'),
-                         300 * units.MiB // units.GiB)
-        self.assertEqual(utils.str2gib_size('1.2T'),
-                         1.2 * units.TiB // units.GiB)
+        self.assertEqual(1, utils.str2gib_size('1024M'))
+        self.assertEqual(300 * units.MiB // units.GiB,
+                          utils.str2gib_size('300M'))
+        self.assertEqual(1.2 * units.TiB // units.GiB,
+                                utils.str2gib_size('1.2T'))
         self.assertRaises(ValueError, utils.str2gib_size, 'A')
 
     def test_parse_nms_url(self):
@@ -782,4 +781,4 @@ class TestNexentaUtils(test.TestCase):
               '/rest/nms/')),
         )
         for url, result in urls:
-            self.assertEqual(utils.parse_nms_url(url), result)
+            self.assertEqual(result, utils.parse_nms_url(url))

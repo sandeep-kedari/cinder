@@ -87,9 +87,9 @@ class VolumeTransferTestCase(test.TestCase):
                                  transfer['id'],
                                  transfer['auth_key'])
         volume = db.volume_get(self.ctxt, '1')
-        self.assertEqual(volume['project_id'], 'new_project_id',
+        self.assertEqual('new_project_id', volume['project_id'],
                          'Unexpected project id')
-        self.assertEqual(volume['user_id'], 'new_user_id',
+        self.assertEqual('new_user_id', volume['user_id'],
                          'Unexpected user id')
 
         self.assertEqual(volume['id'], response['volume_id'],
@@ -103,10 +103,10 @@ class VolumeTransferTestCase(test.TestCase):
                                      updated_at=self.updated_at)
         transfer = tx_api.create(self.ctxt, volume['id'], 'Description')
         t = tx_api.get(self.ctxt, transfer['id'])
-        self.assertEqual(t['id'], transfer['id'], 'Unexpected transfer id')
+        self.assertEqual(transfer['id'], t['id'], 'Unexpected transfer id')
 
         ts = tx_api.get_all(self.ctxt)
-        self.assertEqual(len(ts), 1, 'Unexpected number of transfers.')
+        self.assertEqual(1, len(ts), 'Unexpected number of transfers.')
 
         nctxt = context.RequestContext(user_id='new_user_id',
                                        project_id='new_project_id')
@@ -117,7 +117,7 @@ class VolumeTransferTestCase(test.TestCase):
                           transfer['id'])
 
         ts = tx_api.get_all(nctxt)
-        self.assertEqual(len(ts), 0, 'Unexpected transfers listed.')
+        self.assertEqual(0, len(ts), 'Unexpected transfers listed.')
 
     def test_delete_transfer_with_deleted_volume(self):
         #create a volume
@@ -127,7 +127,7 @@ class VolumeTransferTestCase(test.TestCase):
         tx_api = transfer_api.API()
         transfer = tx_api.create(self.ctxt, volume['id'], 'Description')
         t = tx_api.get(self.ctxt, transfer['id'])
-        self.assertEqual(t['id'], transfer['id'], 'Unexpected transfer id')
+        self.assertEqual(transfer['id'], t['id'], 'Unexpected transfer id')
         #force delete volume
         db.volume_destroy(context.get_admin_context(), volume['id'])
         #Make sure transfer has been deleted.
