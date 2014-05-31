@@ -83,9 +83,9 @@ class VolumeTypesManageApiTest(test.TestCase):
                        return_volume_types_destroy)
 
         req = fakes.HTTPRequest.blank('/v2/fake/types/1')
-        self.assertEqual(len(fake_notifier.NOTIFICATIONS), 0)
+        self.assertEqual(0, len(fake_notifier.NOTIFICATIONS))
         self.controller._delete(req, 1)
-        self.assertEqual(len(fake_notifier.NOTIFICATIONS), 1)
+        self.assertEqual(1, len(fake_notifier.NOTIFICATIONS))
 
     def test_volume_types_delete_not_found(self):
         self.stubs.Set(volume_types, 'get_volume_type',
@@ -93,11 +93,11 @@ class VolumeTypesManageApiTest(test.TestCase):
         self.stubs.Set(volume_types, 'destroy',
                        return_volume_types_destroy)
 
-        self.assertEqual(len(fake_notifier.NOTIFICATIONS), 0)
+        self.assertEqual(0, len(fake_notifier.NOTIFICATIONS))
         req = fakes.HTTPRequest.blank('/v2/fake/types/777')
         self.assertRaises(webob.exc.HTTPNotFound, self.controller._delete,
                           req, '777')
-        self.assertEqual(len(fake_notifier.NOTIFICATIONS), 1)
+        self.assertEqual(1, len(fake_notifier.NOTIFICATIONS))
 
     def test_volume_types_with_volumes_destroy(self):
         self.stubs.Set(volume_types, 'get_volume_type',
@@ -105,9 +105,9 @@ class VolumeTypesManageApiTest(test.TestCase):
         self.stubs.Set(volume_types, 'destroy',
                        return_volume_types_with_volumes_destroy)
         req = fakes.HTTPRequest.blank('/v2/fake/types/1')
-        self.assertEqual(len(fake_notifier.NOTIFICATIONS), 0)
+        self.assertEqual(0, len(fake_notifier.NOTIFICATIONS))
         self.controller._delete(req, 1)
-        self.assertEqual(len(fake_notifier.NOTIFICATIONS), 1)
+        self.assertEqual(1, len(fake_notifier.NOTIFICATIONS))
 
     def test_create(self):
         self.stubs.Set(volume_types, 'create',
@@ -119,10 +119,10 @@ class VolumeTypesManageApiTest(test.TestCase):
                                 "extra_specs": {"key1": "value1"}}}
         req = fakes.HTTPRequest.blank('/v2/fake/types')
 
-        self.assertEqual(len(fake_notifier.NOTIFICATIONS), 0)
+        self.assertEqual(0, len(fake_notifier.NOTIFICATIONS))
         res_dict = self.controller._create(req, body)
 
-        self.assertEqual(len(fake_notifier.NOTIFICATIONS), 1)
+        self.assertEqual(1, len(fake_notifier.NOTIFICATIONS))
         self.assertEqual(1, len(res_dict))
         self.assertEqual('vol_type_1', res_dict['volume_type']['name'])
 

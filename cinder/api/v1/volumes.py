@@ -307,8 +307,6 @@ class VolumeController(wsgi.Controller):
     @wsgi.serializers(xml=VolumesTemplate)
     def detail(self, req):
         """Returns a detailed list of volumes."""
-        import pdb
-        pdb.set_trace()
         return self._items(req, entity_maker=_translate_volume_detail_view)
 
     def _items(self, req, entity_maker):

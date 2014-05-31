@@ -163,7 +163,7 @@ class QoSSpecManageApiTest(test.TestCase):
             self.assertEqual('value1', item['specs']['key1'])
             names.add(item['name'])
         expected_names = ['qos_specs_1', 'qos_specs_2', 'qos_specs_3']
-        self.assertEqual(names, set(expected_names))
+        self.assertEqual(set(expected_names), names)
 
     def test_index_xml_response(self):
         self.stubs.Set(qos_specs, 'get_all_specs',
@@ -176,7 +176,7 @@ class QoSSpecManageApiTest(test.TestCase):
         req.headers['Accept'] = 'application/xml'
         res = req.get_response(fakes.wsgi_app())
 
-        self.assertEqual(res.status_int, 200)
+        self.assertEqual(200, res.status_int)
         dom = minidom.parseString(res.body)
         qos_specs_response = dom.getElementsByTagName('qos_spec')
 
@@ -186,7 +186,7 @@ class QoSSpecManageApiTest(test.TestCase):
             names.add(name)
 
         expected_names = ['qos_specs_1', 'qos_specs_2', 'qos_specs_3']
-        self.assertEqual(names, set(expected_names))
+        self.assertEqual(set(expected_names), names)
 
     def test_qos_specs_delete(self):
         self.stubs.Set(qos_specs, 'get_qos_specs',
@@ -194,9 +194,9 @@ class QoSSpecManageApiTest(test.TestCase):
         self.stubs.Set(qos_specs, 'delete',
                        return_qos_specs_delete)
         req = fakes.HTTPRequest.blank('/v2/fake/qos-specs/1')
-        self.assertEqual(len(fake_notifier.NOTIFICATIONS), 0)
+        self.assertEqual(0, len(fake_notifier.NOTIFICATIONS))
         self.controller.delete(req, 1)
-        self.assertEqual(len(fake_notifier.NOTIFICATIONS), 1)
+        self.assertEqual(1, len(fake_notifier.NOTIFICATIONS))
 
     def test_qos_specs_delete_not_found(self):
         self.stubs.Set(qos_specs, 'get_qos_specs',
@@ -204,11 +204,11 @@ class QoSSpecManageApiTest(test.TestCase):
         self.stubs.Set(qos_specs, 'delete',
                        return_qos_specs_delete)
 
-        self.assertEqual(len(fake_notifier.NOTIFICATIONS), 0)
+        self.assertEqual(0, len(fake_notifier.NOTIFICATIONS))
         req = fakes.HTTPRequest.blank('/v2/fake/qos-specs/777')
         self.assertRaises(webob.exc.HTTPNotFound, self.controller.delete,
                           req, '777')
-        self.assertEqual(len(fake_notifier.NOTIFICATIONS), 1)
+        self.assertEqual(1, len(fake_notifier.NOTIFICATIONS))
 
     def test_qos_specs_delete_inuse(self):
         self.stubs.Set(qos_specs, 'get_qos_specs',
@@ -217,10 +217,10 @@ class QoSSpecManageApiTest(test.TestCase):
                        return_qos_specs_delete)
 
         req = fakes.HTTPRequest.blank('/v2/fake/qos-specs/666')
-        self.assertEqual(len(fake_notifier.NOTIFICATIONS), 0)
+        self.assertEqual(0, len(fake_notifier.NOTIFICATIONS))
         self.assertRaises(webob.exc.HTTPBadRequest, self.controller.delete,
                           req, '666')
-        self.assertEqual(len(fake_notifier.NOTIFICATIONS), 1)
+        self.assertEqual(1, len(fake_notifier.NOTIFICATIONS))
 
     def test_qos_specs_delete_inuse_force(self):
         self.stubs.Set(qos_specs, 'get_qos_specs',
@@ -229,42 +229,42 @@ class QoSSpecManageApiTest(test.TestCase):
                        return_qos_specs_delete)
 
         req = fakes.HTTPRequest.blank('/v2/fake/qos-specs/666?force=True')
-        self.assertEqual(len(fake_notifier.NOTIFICATIONS), 0)
+        self.assertEqual(0, len(fake_notifier.NOTIFICATIONS))
         self.assertRaises(webob.exc.HTTPInternalServerError,
                           self.controller.delete,
                           req, '666')
-        self.assertEqual(len(fake_notifier.NOTIFICATIONS), 1)
+        self.assertEqual(1, len(fake_notifier.NOTIFICATIONS))
 
     def test_qos_specs_delete_keys(self):
         self.stubs.Set(qos_specs, 'delete_keys',
                        return_qos_specs_delete_keys)
         body = {"keys": ['bar', 'zoo']}
         req = fakes.HTTPRequest.blank('/v2/fake/qos-specs/666/delete_keys')
-        self.assertEqual(len(fake_notifier.NOTIFICATIONS), 0)
+        self.assertEqual(0, len(fake_notifier.NOTIFICATIONS))
         self.controller.delete_keys(req, '666', body)
-        self.assertEqual(len(fake_notifier.NOTIFICATIONS), 1)
+        self.assertEqual(1, len(fake_notifier.NOTIFICATIONS))
 
     def test_qos_specs_delete_keys_qos_notfound(self):
         self.stubs.Set(qos_specs, 'delete_keys',
                        return_qos_specs_delete_keys)
         body = {"keys": ['bar', 'zoo']}
         req = fakes.HTTPRequest.blank('/v2/fake/qos-specs/777/delete_keys')
-        self.assertEqual(len(fake_notifier.NOTIFICATIONS), 0)
+        self.assertEqual(0, len(fake_notifier.NOTIFICATIONS))
         self.assertRaises(webob.exc.HTTPNotFound,
                           self.controller.delete_keys,
                           req, '777', body)
-        self.assertEqual(len(fake_notifier.NOTIFICATIONS), 1)
+        self.assertEqual(1, len(fake_notifier.NOTIFICATIONS))
 
     def test_qos_specs_delete_keys_badkey(self):
         self.stubs.Set(qos_specs, 'delete_keys',
                        return_qos_specs_delete_keys)
         req = fakes.HTTPRequest.blank('/v2/fake/qos-specs/666/delete_keys')
         body = {"keys": ['foo', 'zoo']}
-        self.assertEqual(len(fake_notifier.NOTIFICATIONS), 0)
+        self.assertEqual(0, len(fake_notifier.NOTIFICATIONS))
         self.assertRaises(webob.exc.HTTPBadRequest,
                           self.controller.delete_keys,
                           req, '666', body)
-        self.assertEqual(len(fake_notifier.NOTIFICATIONS), 1)
+        self.assertEqual(1, len(fake_notifier.NOTIFICATIONS))
 
     def test_create(self):
         self.stubs.Set(qos_specs, 'create',
@@ -276,10 +276,10 @@ class QoSSpecManageApiTest(test.TestCase):
                               "key1": "value1"}}
         req = fakes.HTTPRequest.blank('/v2/fake/qos-specs')
 
-        self.assertEqual(len(fake_notifier.NOTIFICATIONS), 0)
+        self.assertEqual(0, len(fake_notifier.NOTIFICATIONS))
         res_dict = self.controller.create(req, body)
 
-        self.assertEqual(len(fake_notifier.NOTIFICATIONS), 1)
+        self.assertEqual(1, len(fake_notifier.NOTIFICATIONS))
         self.assertEqual('qos_specs_1', res_dict['qos_specs']['name'])
 
     def test_create_conflict(self):
@@ -292,7 +292,7 @@ class QoSSpecManageApiTest(test.TestCase):
                               "key1": "value1"}}
         req = fakes.HTTPRequest.blank('/v2/fake/qos-specs')
 
-        self.assertEqual(len(fake_notifier.NOTIFICATIONS), 0)
+        self.assertEqual(0, len(fake_notifier.NOTIFICATIONS))
         self.assertRaises(webob.exc.HTTPConflict,
                           self.controller.create, req, body)
         self.assertEqual(len(fake_notifier.NOTIFICATIONS), 1)
@@ -307,10 +307,10 @@ class QoSSpecManageApiTest(test.TestCase):
                               "key1": "value1"}}
         req = fakes.HTTPRequest.blank('/v2/fake/qos-specs')
 
-        self.assertEqual(len(fake_notifier.NOTIFICATIONS), 0)
+        self.assertEqual(0, len(fake_notifier.NOTIFICATIONS))
         self.assertRaises(webob.exc.HTTPInternalServerError,
                           self.controller.create, req, body)
-        self.assertEqual(len(fake_notifier.NOTIFICATIONS), 1)
+        self.assertEqual(1, len(fake_notifier.NOTIFICATIONS))
 
     def _create_qos_specs_bad_body(self, body):
         req = fakes.HTTPRequest.blank('/v2/fake/qos-specs')
@@ -333,51 +333,51 @@ class QoSSpecManageApiTest(test.TestCase):
         self.stubs.Set(qos_specs, 'update',
                        return_qos_specs_update)
 
-        self.assertEqual(len(fake_notifier.NOTIFICATIONS), 0)
+        self.assertEqual(0, len(fake_notifier.NOTIFICATIONS))
         req = fakes.HTTPRequest.blank('/v2/fake/qos-specs/555')
         body = {'qos_specs': {'key1': 'value1',
                               'key2': 'value2'}}
         res = self.controller.update(req, '555', body)
         self.assertDictMatch(res, body)
-        self.assertEqual(len(fake_notifier.NOTIFICATIONS), 1)
+        self.assertEqual(1, len(fake_notifier.NOTIFICATIONS))
 
     def test_update_not_found(self):
         self.stubs.Set(qos_specs, 'update',
                        return_qos_specs_update)
 
-        self.assertEqual(len(fake_notifier.NOTIFICATIONS), 0)
+        self.assertEqual(0, len(fake_notifier.NOTIFICATIONS))
         req = fakes.HTTPRequest.blank('/v2/fake/qos-specs/777')
         body = {'qos_specs': {'key1': 'value1',
                               'key2': 'value2'}}
         self.assertRaises(webob.exc.HTTPNotFound, self.controller.update,
                           req, '777', body)
-        self.assertEqual(len(fake_notifier.NOTIFICATIONS), 1)
+        self.assertEqual(1, len(fake_notifier.NOTIFICATIONS))
 
     def test_update_invalid_input(self):
         self.stubs.Set(qos_specs, 'update',
                        return_qos_specs_update)
 
-        self.assertEqual(len(fake_notifier.NOTIFICATIONS), 0)
+        self.assertEqual(0, len(fake_notifier.NOTIFICATIONS))
         req = fakes.HTTPRequest.blank('/v2/fake/qos-specs/888')
         body = {'qos_specs': {'key1': 'value1',
                               'key2': 'value2'}}
         self.assertRaises(webob.exc.HTTPBadRequest,
                           self.controller.update,
                           req, '888', body)
-        self.assertEqual(len(fake_notifier.NOTIFICATIONS), 1)
+        self.assertEqual(1, len(fake_notifier.NOTIFICATIONS))
 
     def test_update_failed(self):
         self.stubs.Set(qos_specs, 'update',
                        return_qos_specs_update)
 
-        self.assertEqual(len(fake_notifier.NOTIFICATIONS), 0)
+        self.assertEqual(0, len(fake_notifier.NOTIFICATIONS))
         req = fakes.HTTPRequest.blank('/v2/fake/qos-specs/999')
         body = {'qos_specs': {'key1': 'value1',
                               'key2': 'value2'}}
         self.assertRaises(webob.exc.HTTPInternalServerError,
                           self.controller.update,
                           req, '999', body)
-        self.assertEqual(len(fake_notifier.NOTIFICATIONS), 1)
+        self.assertEqual(1, len(fake_notifier.NOTIFICATIONS))
 
     def test_show(self):
         self.stubs.Set(qos_specs, 'get_qos_specs',
@@ -400,7 +400,7 @@ class QoSSpecManageApiTest(test.TestCase):
         req.headers['Accept'] = 'application/xml'
         res = req.get_response(fakes.wsgi_app())
 
-        self.assertEqual(res.status_int, 200)
+        self.assertEqual(200, res.status_int)
         dom = minidom.parseString(res.body)
         qos_spec_response = dom.getElementsByTagName('qos_spec')
         qos_spec = qos_spec_response.item(0)
@@ -409,9 +409,9 @@ class QoSSpecManageApiTest(test.TestCase):
         name = qos_spec.getAttribute('name')
         consumer = qos_spec.getAttribute('consumer')
 
-        self.assertEqual(id, u'1')
-        self.assertEqual(name, 'qos_specs_1')
-        self.assertEqual(consumer, 'back-end')
+        self.assertEqual(u'1', id)
+        self.assertEqual('qos_specs_1', name)
+        self.assertEqual('back-end', consumer)
 
     def test_get_associations(self):
         self.stubs.Set(qos_specs, 'get_associations',
@@ -437,7 +437,7 @@ class QoSSpecManageApiTest(test.TestCase):
         req.headers['Accept'] = 'application/xml'
         res = req.get_response(fakes.wsgi_app())
 
-        self.assertEqual(res.status_int, 200)
+        self.assertEqual(200, res.status_int)
         dom = minidom.parseString(res.body)
         associations_response = dom.getElementsByTagName('associations')
         association = associations_response.item(0)
@@ -446,9 +446,9 @@ class QoSSpecManageApiTest(test.TestCase):
         name = association.getAttribute('name')
         association_type = association.getAttribute('association_type')
 
-        self.assertEqual(id, 'FakeVolTypeID')
-        self.assertEqual(name, 'FakeVolTypeName')
-        self.assertEqual(association_type, 'volume_type')
+        self.assertEqual('FakeVolTypeID', id)
+        self.assertEqual('FakeVolTypeName', name)
+        self.assertEqual('volume_type', association_type)
 
     def test_get_associations_not_found(self):
         self.stubs.Set(qos_specs, 'get_associations',
@@ -480,7 +480,7 @@ class QoSSpecManageApiTest(test.TestCase):
             '/v2/fake/qos-specs/1/associate?vol_type_id=111')
         res = self.controller.associate(req, '1')
 
-        self.assertEqual(res.status_int, 202)
+        self.assertEqual(202, res.status_int)
 
     def test_associate_no_type(self):
         self.stubs.Set(qos_specs, 'get_qos_specs',
@@ -529,7 +529,7 @@ class QoSSpecManageApiTest(test.TestCase):
         req = fakes.HTTPRequest.blank(
             '/v2/fake/qos-specs/1/disassociate?vol_type_id=111')
         res = self.controller.disassociate(req, '1')
-        self.assertEqual(res.status_int, 202)
+        self.assertEqual(202, res.status_int)
 
     def test_disassociate_no_type(self):
         self.stubs.Set(qos_specs, 'get_qos_specs',
@@ -577,7 +577,7 @@ class QoSSpecManageApiTest(test.TestCase):
         req = fakes.HTTPRequest.blank(
             '/v2/fake/qos-specs/1/disassociate_all')
         res = self.controller.disassociate_all(req, '1')
-        self.assertEqual(res.status_int, 202)
+        self.assertEqual(202, res.status_int)
 
     def test_disassociate_all_not_found(self):
         self.stubs.Set(qos_specs, 'get_qos_specs',

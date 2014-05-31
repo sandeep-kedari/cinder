@@ -70,8 +70,8 @@ class TestGlanceSerializer(test.TestCase):
                 '{"virtual_device": "ephemeral0", '
                 '"device_name": "/dev/fake0"}]'}}
         converted = glance._convert_to_string(metadata)
-        self.assertEqual(converted, converted_expected)
-        self.assertEqual(glance._convert_from_string(converted), metadata)
+        sel.assertEqual(converted_expected, converted)
+        self.assertEqual(metadata, glance._convert_from_string(converted))
 
 
 class TestGlanceImageService(test.TestCase):
@@ -198,8 +198,8 @@ class TestGlanceImageService(test.TestCase):
         image_id = self.service.create(self.context, fixture)['id']
 
         self.assertIsNotNone(image_id)
-        self.assertEqual(num_images + 1,
-                         len(self.service.detail(self.context)))
+        self.assertEqual(len(self.service.detail(self.context)),
+                        num_images + 1)
 
     def test_create_and_show_non_existing_image(self):
         fixture = self._make_fixture(name='test image')
@@ -227,8 +227,8 @@ class TestGlanceImageService(test.TestCase):
         self.context.project_id = proj
 
         self.assertEqual(1, len(image_metas))
-        self.assertEqual(image_metas[0]['name'], 'test image')
-        self.assertEqual(image_metas[0]['is_public'], False)
+        self.assertEqual('test image', image_metas[0]['name'])
+        self.assertEqual(False, image_metas[0]['is_public'])
 
     def test_detail_marker(self):
         fixtures = []
@@ -239,7 +239,7 @@ class TestGlanceImageService(test.TestCase):
             ids.append(self.service.create(self.context, fixture)['id'])
 
         image_metas = self.service.detail(self.context, marker=ids[1])
-        self.assertEqual(len(image_metas), 8)
+        self.assertEqual(8, len(image_metas))
         i = 2
         for meta in image_metas:
             expected = {
@@ -273,7 +273,7 @@ class TestGlanceImageService(test.TestCase):
             ids.append(self.service.create(self.context, fixture)['id'])
 
         image_metas = self.service.detail(self.context, limit=5)
-        self.assertEqual(len(image_metas), 5)
+        self.assertEqual(5, len(image_metas))
 
     def test_detail_default_limit(self):
         fixtures = []
@@ -285,7 +285,7 @@ class TestGlanceImageService(test.TestCase):
 
         image_metas = self.service.detail(self.context)
         for i, meta in enumerate(image_metas):
-            self.assertEqual(meta['name'], 'TestImage %d' % (i))
+            self.assertEqual('TestImage %d' % (i), meta['name'])
 
     def test_detail_marker_and_limit(self):
         fixtures = []
@@ -296,7 +296,7 @@ class TestGlanceImageService(test.TestCase):
             ids.append(self.service.create(self.context, fixture)['id'])
 
         image_metas = self.service.detail(self.context, marker=ids[3], limit=5)
-        self.assertEqual(len(image_metas), 5)
+        self.assertEqual(5, len(image_metas))
         i = 4
         for meta in image_metas:
             expected = {
@@ -385,7 +385,7 @@ class TestGlanceImageService(test.TestCase):
             'properties': {},
             'owner': None,
         }
-        self.assertEqual(image_meta, expected)
+        self.assertEqual(expected, image_meta)
 
     def test_show_raises_when_no_authtoken_in_the_context(self):
         fixture = self._make_fixture(name='image1',
@@ -422,21 +422,21 @@ class TestGlanceImageService(test.TestCase):
                 'owner': None,
             },
         ]
-        self.assertEqual(image_metas, expected)
+        self.assertEqual(expected, image_metas)
 
     def test_show_makes_datetimes(self):
         fixture = self._make_datetime_fixture()
         image_id = self.service.create(self.context, fixture)['id']
         image_meta = self.service.show(self.context, image_id)
-        self.assertEqual(image_meta['created_at'], self.NOW_DATETIME)
-        self.assertEqual(image_meta['updated_at'], self.NOW_DATETIME)
+        self.assertEqual(self.NOW_DATETIME, image_meta['created_at'])
+        self.assertEqual(self.NOW_DATETIME, image_meta['updated_at'])
 
     def test_detail_makes_datetimes(self):
         fixture = self._make_datetime_fixture()
         self.service.create(self.context, fixture)
         image_meta = self.service.detail(self.context)[0]
-        self.assertEqual(image_meta['created_at'], self.NOW_DATETIME)
-        self.assertEqual(image_meta['updated_at'], self.NOW_DATETIME)
+        self.assertEqual(self.NOW_DATETIME, image_meta['created_at'])
+        self.assertEqual(self.NOW_DATETIME, image_meta['updated_at'])
 
     def test_download_with_retries(self):
         tries = [0]
@@ -525,7 +525,7 @@ class TestGlanceImageService(test.TestCase):
         image_id = self.service.create(self.context, fixture)['id']
         (service, same_id) = glance.get_remote_image_service(self.context,
                                                              image_id)
-        self.assertEqual(same_id, image_id)
+        self.assertEqual(image_id, same_id)
 
     def test_glance_client_image_ref(self):
         fixture = self._make_fixture(name='test image')
@@ -533,14 +533,14 @@ class TestGlanceImageService(test.TestCase):
         image_url = 'http://something-less-likely/%s' % image_id
         (service, same_id) = glance.get_remote_image_service(self.context,
                                                              image_url)
-        self.assertEqual(same_id, image_id)
-        self.assertEqual(service._client.netloc, 'something-less-likely')
+        self.assertEqual(image_id, same_id)
+        self.assertEqual('something-less-likely', service._client.netloc)
         for ipv6_url in ('[::1]', '::1', '[::1]:444'):
             image_url = 'http://%s/%s' % (ipv6_url, image_id)
             (service, same_id) = glance.get_remote_image_service(self.context,
                                                                  image_url)
-            self.assertEqual(same_id, image_id)
-            self.assertEqual(service._client.netloc, ipv6_url)
+            self.assertEqual(image_id, same_id)
+            self.assertEqual(ipv6_url, service._client.netloc)
 
 
 class TestGlanceClientVersion(test.TestCase):
@@ -565,25 +565,25 @@ class TestGlanceClientVersion(test.TestCase):
         """Test glance version set by flag is honoured."""
         client_wrapper_v1 = glance.GlanceClientWrapper('fake', 'fake_host',
                                                        9292)
-        self.assertEqual(client_wrapper_v1.client.__module__,
-                         'glanceclient.v1.client')
+        self.assertEqual('glanceclient.v1.client',
+                        client_wrapper_v1.client.__module__)
         self.flags(glance_api_version=2)
         client_wrapper_v2 = glance.GlanceClientWrapper('fake', 'fake_host',
                                                        9292)
-        self.assertEqual(client_wrapper_v2.client.__module__,
-                         'glanceclient.v2.client')
+        self.assertEqual('glanceclient.v2.client',
+                          client_wrapper_v2.client.__module__)
         CONF.reset()
 
     def test_glance_version_by_arg(self):
         """Test glance version set by arg to GlanceClientWrapper"""
         client_wrapper_v1 = glance.GlanceClientWrapper('fake', 'fake_host',
                                                        9292, version=1)
-        self.assertEqual(client_wrapper_v1.client.__module__,
-                         'glanceclient.v1.client')
+        self.assertEqual('glanceclient.v1.client',
+                          client_wrapper_v1.client.__module__)
         client_wrapper_v2 = glance.GlanceClientWrapper('fake', 'fake_host',
                                                        9292, version=2)
-        self.assertEqual(client_wrapper_v2.client.__module__,
-                         'glanceclient.v2.client')
+        self.assertEqual('glanceclient.v2.client',
+                                 client_wrapper_v2.client.__module__)
 
 
 def _create_failing_glance_client(info):

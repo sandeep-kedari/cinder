@@ -40,12 +40,12 @@ class BrickRemoteFsTestCase(test.TestCase):
     def test_get_hash_str(self):
         """_get_hash_str should calculation correct value."""
 
-        self.assertEqual(self.TEST_HASH,
-                         self._nfsclient._get_hash_str(self.TEST_EXPORT))
+        self.assertEqual(self._nfsclient._get_hash_str(self.TEST_EXPORT),
+                         self.TEST_HASH)
 
     def test_get_mount_point(self):
         mnt_point = self._nfsclient.get_mount_point(self.TEST_EXPORT)
-        self.assertEqual(mnt_point, self.TEST_MNT_POINT)
+        self.assertEqual(self.TEST_MNT_POINT, mnt_point)
 
     def test_mount_nfs_should_mount_correctly(self):
         mox = self._mox

@@ -117,8 +117,8 @@ class BrickLvmTestCase(test.TestCase):
         return (data, "")
 
     def test_create_lv_snapshot(self):
-        self.assertEqual(self.vg.create_lv_snapshot('snapshot-1', 'fake-1'),
-                         None)
+        self.assertEqual(None,
+                        self.vg.create_lv_snapshot('snapshot-1', 'fake-1'))
 
         self._mox.StubOutWithMock(self.vg, 'get_volume')
         self.vg.get_volume('fake-non-existent').AndReturn(None)
@@ -126,44 +126,44 @@ class BrickLvmTestCase(test.TestCase):
         try:
             self.vg.create_lv_snapshot('snapshot-1', 'fake-non-existent')
         except exception.VolumeDeviceNotFound as e:
-            self.assertEqual(e.kwargs['device'], 'fake-non-existent')
+            self.assertEqual('fake-non-existent', e.kwargs['device'])
         else:
             self.fail("Exception not raised")
 
     def test_vg_exists(self):
-        self.assertEqual(self.vg._vg_exists(), True)
+        self.assertEqual(True, self.vg._vg_exists())
 
     def test_get_vg_uuid(self):
-        self.assertEqual(self.vg._get_vg_uuid()[0],
-                         'kVxztV-dKpG-Rz7E-xtKY-jeju-QsYU-SLG6Z1')
+        self.assertEqual('kVxztV-dKpG-Rz7E-xtKY-jeju-QsYU-SLG6Z1',
+                                    self.vg._get_vg_uuid()[0])
 
     def test_get_all_volumes(self):
         out = self.vg.get_volumes()
 
-        self.assertEqual(out[0]['name'], 'fake-1')
-        self.assertEqual(out[0]['size'], '1.00g')
-        self.assertEqual(out[0]['vg'], 'fake-vg')
+        self.assertEqual('fake-1', out[0]['name'])
+        self.assertEqual('1.00g', out[0]['size'])
+        self.assertEqual('fake-vg', out[0]['vg'])
 
     def test_get_volume(self):
-        self.assertEqual(self.vg.get_volume('fake-1')['name'], 'fake-1')
+        self.assertEqual('fake-1', self.vg.get_volume('fake-1')['name'])
 
     def test_get_all_physical_volumes(self):
         # Filtered VG version
         pvs = self.vg.get_all_physical_volumes('sudo', 'fake-vg')
-        self.assertEqual(len(pvs), 3)
+        self.assertEqual(3, len(pvs))
 
         # Non-Filtered, all VG's
         pvs = self.vg.get_all_physical_volumes('sudo')
-        self.assertEqual(len(pvs), 4)
+        self.assertEqual(4, len(pvs))
 
     def test_get_physical_volumes(self):
         pvs = self.vg.get_physical_volumes()
-        self.assertEqual(len(pvs), 3)
+        self.assertEqual(3, len(pvs))
 
     def test_get_volume_groups(self):
-        self.assertEqual(len(self.vg.get_all_volume_groups('sudo')), 3)
-        self.assertEqual(len(self.vg.get_all_volume_groups('sudo',
-                                                           'fake-vg')), 1)
+        self.assertEqual(3, len(self.vg.get_all_volume_groups('sudo')))
+        self.assertEqual(1, len(self.vg.get_all_volume_groups('sudo',
+                                                           'fake-vg')))
 
     def test_thin_support(self):
         # lvm.supports_thin() is a static method and doesn't

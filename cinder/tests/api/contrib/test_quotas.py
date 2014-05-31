@@ -142,9 +142,9 @@ class QuotaSerializerTest(test.TestCase):
         quota_set = make_body(root=False)
         text = serializer.serialize({'quota_set': quota_set})
         tree = etree.fromstring(text)
-        self.assertEqual(tree.tag, 'quota_set')
-        self.assertEqual(tree.get('id'), quota_set['id'])
+        self.assertEqual('quota_set', tree.tag)
+        self.assertEqual(quota_set['id'], tree.get('id'))
         body = make_body(root=False, tenant_id=None)
         for node in tree:
             self.assertIn(node.tag, body)
-            self.assertEqual(str(body[node.tag]), node.text)
+            self.assertEqual(node.text, str(body[node.tag]))

@@ -121,24 +121,24 @@ class VolumesTest(integrated_helpers._IntegratedTestBase):
 
         self.assertEqual(1, len(create_actions))
         create_action = create_actions[0]
-        self.assertEqual(create_action['id'], created_volume_id)
-        self.assertEqual(create_action['availability_zone'], 'nova')
-        self.assertEqual(create_action['size'], 1)
+        self.assertEqual(created_volume_id, create_action['id'])
+        self.assertEqual('nova', create_action['availability_zone'])
+        self.assertEqual(1, create_action['size'])
 
         export_actions = fake_driver.LoggingVolumeDriver.logs_like(
             'create_export',
             id=created_volume_id)
         self.assertEqual(1, len(export_actions))
         export_action = export_actions[0]
-        self.assertEqual(export_action['id'], created_volume_id)
-        self.assertEqual(export_action['availability_zone'], 'nova')
+        self.assertEqual(created_volume_id, export_action['id'])
+        self.assertEqual('nova', export_action['availability_zone'])
 
         delete_actions = fake_driver.LoggingVolumeDriver.logs_like(
             'delete_volume',
             id=created_volume_id)
         self.assertEqual(1, len(delete_actions))
         delete_action = export_actions[0]
-        self.assertEqual(delete_action['id'], created_volume_id)
+        self.assertEqual(created_volume_id, delete_action['id'])
 
     def test_create_volume_with_metadata(self):
         """Creates a volume with metadata."""
@@ -179,15 +179,15 @@ class VolumesTest(integrated_helpers._IntegratedTestBase):
         # Create vol1
         created_volume = self.api.post_volume({'volume': {
             'size': 1, 'display_name': 'vol1'}})
-        self.assertEqual(created_volume['display_name'], 'vol1')
+        self.assertEqual('vol1', created_volume['display_name'])
         created_volume_id = created_volume['id']
 
         # update volume
         body = {'volume': {'display_name': 'vol-one'}}
         updated_volume = self.api.put_volume(created_volume_id, body)
-        self.assertEqual(updated_volume['display_name'], 'vol-one')
+        self.assertEqual('vol-one', updated_volume['display_name'])
 
         # check for update
         found_volume = self.api.get_volume(created_volume_id)
         self.assertEqual(created_volume_id, found_volume['id'])
-        self.assertEqual(found_volume['display_name'], 'vol-one')
+        self.assertEqual('vol-one', found_volume['display_name'])
