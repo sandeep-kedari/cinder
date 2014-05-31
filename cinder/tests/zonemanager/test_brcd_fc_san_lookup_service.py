@@ -113,7 +113,7 @@ class TestBrcdFCSanLookupService(brcd_lookup.BrcdFCSanLookupService,
         return_wwn_list = []
         expected_wwn_list = ['20:1a:00:05:1e:e8:e3:29']
         return_wwn_list = self._parse_ns_output(switch_data)
-        self.assertEqual(return_wwn_list, expected_wwn_list)
+        self.assertEqual(expected_wwn_list, return_wwn_list)
         self.assertRaises(exception.InvalidParameterValue,
                           self._parse_ns_output, invalid_switch_data)
 
@@ -122,7 +122,7 @@ class TestBrcdFCSanLookupService(brcd_lookup.BrcdFCSanLookupService,
         return_wwn_list = []
         expected_wwn_list = ['10:00:8c:7c:ff:52:3b:01']
         return_wwn_list.append(self.get_formatted_wwn(wwn_list[0]))
-        self.assertEqual(return_wwn_list, expected_wwn_list)
+        self.assertEqual(expected_wwn_list, return_wwn_list)
 
 
 class Channel(object):

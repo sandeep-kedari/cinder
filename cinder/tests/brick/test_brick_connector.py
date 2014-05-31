@@ -52,24 +52,24 @@ class ConnectorTestCase(test.TestCase):
 
     def test_factory(self):
         obj = connector.InitiatorConnector.factory('iscsi', None)
-        self.assertEqual(obj.__class__.__name__, "ISCSIConnector")
+        self.assertEqual("ISCSIConnector", obj.__class__.__name__)
 
         obj = connector.InitiatorConnector.factory('fibre_channel', None)
-        self.assertEqual(obj.__class__.__name__, "FibreChannelConnector")
+        self.assertEqual("FibreChannelConnector", obj.__class__.__name__)
 
         obj = connector.InitiatorConnector.factory('aoe', None)
-        self.assertEqual(obj.__class__.__name__, "AoEConnector")
+        self.assertEqual("AoEConnector", obj.__class__.__name__)
 
         obj = connector.InitiatorConnector.factory(
             'nfs', None, nfs_mount_point_base='/mnt/test')
-        self.assertEqual(obj.__class__.__name__, "RemoteFsConnector")
+        self.assertEqual("RemoteFsConnector", obj.__class__.__name__)
 
         obj = connector.InitiatorConnector.factory(
             'glusterfs', None, glusterfs_mount_point_base='/mnt/test')
-        self.assertEqual(obj.__class__.__name__, "RemoteFsConnector")
+        self.assertEqual("RemoteFsConnector", obj.__class__.__name__)
 
         obj = connector.InitiatorConnector.factory('local', None)
-        self.assertEqual(obj.__class__.__name__, "LocalConnector")
+        self.assertEqual("LocalConnector", obj.__class__.__name__)
 
         self.assertRaises(ValueError,
                           connector.InitiatorConnector.factory,
@@ -156,7 +156,7 @@ class ISCSIConnectorTestCase(ConnectorTestCase):
         self.assertIsNone(initiator)
         self.stubs.Set(self.connector, '_execute', initiator_get_text)
         initiator = self.connector.get_initiator()
-        self.assertEqual(initiator, 'iqn.1234-56.foo.bar:01:23456789abc')
+        self.assertEqual('iqn.1234-56.foo.bar:01:23456789abc', initiator)
 
     @test.testtools.skipUnless(os.path.exists('/dev/disk/by-path'),
                                'Test requires /dev/disk/by-path')
@@ -169,8 +169,8 @@ class ISCSIConnectorTestCase(ConnectorTestCase):
         connection_info = self.iscsi_connection(vol, location, iqn)
         device = self.connector.connect_volume(connection_info['data'])
         dev_str = '/dev/disk/by-path/ip-%s-iscsi-%s-lun-1' % (location, iqn)
-        self.assertEqual(device['type'], 'block')
-        self.assertEqual(device['path'], dev_str)
+        self.assertEqual('block', device['type'])
+        self.assertEqual(dev_str, device['path'])
 
         self.connector.disconnect_volume(connection_info['data'], device)
         expected_commands = [('iscsiadm -m node -T %s -p %s' %
@@ -227,7 +227,7 @@ class ISCSIConnectorTestCase(ConnectorTestCase):
             connection_properties['data'])
         expected_result = {'path': 'iqn.2010-10.org.openstack:volume-00000001',
                            'type': 'block'}
-        self.assertEqual(result, expected_result)
+        self.assertEqual(expected_result, result)
 
     def test_connect_volume_with_not_found_device(self):
         self.stubs.Set(os.path, 'exists', lambda x: False)
@@ -266,11 +266,11 @@ class ISCSIConnectorTestCase(ConnectorTestCase):
         paths = [('ip-10.0.0.1:3260-iscsi-iqn.2013-01.ro.'
                  'com.netapp:node.netapp02-lun-0')]
         self.stubs.Set(os, 'walk', lambda x: [(['.'], ['by-path'], paths)])
-        self.assertEqual(self.connector._get_iscsi_devices(), paths)
+        self.assertEqual(paths, self.connector._get_iscsi_devices())
 
     def test_get_iscsi_devices_with_empty_dir(self):
         self.stubs.Set(os, 'walk', lambda x: [])
-        self.assertEqual(self.connector._get_iscsi_devices(), [])
+        self.assertEqual([], self.connector._get_iscsi_devices())
 
     def test_get_multipath_iqn(self):
         paths = [('ip-10.0.0.1:3260-iscsi-iqn.2013-01.ro.'
@@ -280,8 +280,8 @@ class ISCSIConnectorTestCase(ConnectorTestCase):
         self.stubs.Set(self.connector, '_get_iscsi_devices', lambda: paths)
         self.stubs.Set(self.connector, '_get_multipath_device_name',
                        lambda x: paths[0])
-        self.assertEqual(self.connector._get_multipath_iqn(paths[0]),
-                         'iqn.2013-01.ro.com.netapp:node.netapp02')
+        self.assertEqual('iqn.2013-01.ro.com.netapp:node.netapp02',
+                             self.connector._get_multipath_iqn(paths[0]))
 
     def test_disconnect_volume_multipath_iscsi(self):
         result = []
@@ -335,7 +335,7 @@ class ISCSIConnectorTestCase(ConnectorTestCase):
         self.connector._disconnect_volume_multipath_iscsi(fake_property,
                                                           'fake/multipath')
         # Target not in use by other mp devices, disconnect
-        self.assertEqual([fake_property], result)
+        self.assertEqual(result, [fake_property])
 
 
 class FibreChannelConnectorTestCase(ConnectorTestCase):
@@ -421,8 +421,8 @@ class FibreChannelConnectorTestCase(ConnectorTestCase):
             exp_wwn = wwn[0] if isinstance(wwn, list) else wwn
             dev_str = ('/dev/disk/by-path/pci-0000:05:00.2-fc-0x%s-lun-1' %
                        exp_wwn)
-            self.assertEqual(dev_info['type'], 'block')
-            self.assertEqual(dev_info['path'], dev_str)
+            self.assertEqual('block', dev_info['type'])
+            self.assertEqual(dev_str, dev_info['path'])
 
             self.connector.disconnect_volume(connection_info['data'], dev_info)
             expected_commands = []
@@ -619,8 +619,8 @@ class LocalConnectorTestCase(test.TestCase):
         self.connector = connector.LocalConnector(None)
         cprops = self.connection_properties
         dev_info = self.connector.connect_volume(cprops)
-        self.assertEqual(dev_info['type'], 'local')
-        self.assertEqual(dev_info['path'], cprops['device_path'])
+        self.assertEqual('local', dev_info['type'])
+        self.assertEqual(cprops['device_path'], dev_info['path'])
 
     def test_connect_volume_with_invalid_connection_data(self):
         self.connector = connector.LocalConnector(None)

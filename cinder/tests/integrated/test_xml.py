@@ -47,4 +47,4 @@ class XmlTests(integrated_helpers._IntegratedTestBase):
         data = response.raw
         LOG.warn("data: %s" % data)
         root = etree.parse(data).getroot()
-        self.assertEqual(root.nsmap.get(None), common.XML_NS_V1)
+        self.assertEqual(common.XML_NS_V1, root.nsmap.get(None))

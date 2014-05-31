@@ -212,7 +212,7 @@ class FilterSchedulerTestCase(test_scheduler.SchedulerTestCase):
                         'volume_properties': {'project_id': 1,
                                               'size': 1}}
         ret_host = sched.host_passes_filters(ctx, 'host1', request_spec, {})
-        self.assertEqual(ret_host.host, 'host1')
+        self.assertEqual('host1', ret_host.host)
         self.assertTrue(_mock_service_get_topic.called)
 
     @mock.patch('cinder.db.service_get_all_by_topic')
@@ -247,7 +247,7 @@ class FilterSchedulerTestCase(test_scheduler.SchedulerTestCase):
         host_state = sched.find_retype_host(ctx, request_spec,
                                             filter_properties={},
                                             migration_policy='never')
-        self.assertEqual(host_state.host, 'host4')
+        self.assertEqual('host4', host_state.host)
 
     @mock.patch('cinder.db.service_get_all_by_topic')
     def test_retype_policy_never_migrate_fail(self, _mock_service_get_topic):
@@ -282,7 +282,7 @@ class FilterSchedulerTestCase(test_scheduler.SchedulerTestCase):
         host_state = sched.find_retype_host(ctx, request_spec,
                                             filter_properties={},
                                             migration_policy='on-demand')
-        self.assertEqual(host_state.host, 'host1')
+        self.assertEqual('host1', host_state.host)
 
     @mock.patch('cinder.db.service_get_all_by_topic')
     def test_retype_policy_demand_migrate_fail(self, _mock_service_get_topic):

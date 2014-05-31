@@ -68,10 +68,10 @@ class AdminActionsTest(test.TestCase):
         req.environ['cinder.context'] = ctx
         resp = req.get_response(app())
         # request is accepted
-        self.assertEqual(resp.status_int, 202)
+        self.assertEqual(202, resp.status_int)
         volume = db.volume_get(ctx, volume['id'])
         # status changed to 'error'
-        self.assertEqual(volume['status'], 'error')
+        self.assertEqual('error', volume['status'])
 
     def test_reset_status_as_non_admin(self):
         # current status is 'error'
@@ -87,10 +87,10 @@ class AdminActionsTest(test.TestCase):
         req.environ['cinder.context'] = context.RequestContext('fake', 'fake')
         resp = req.get_response(app())
         # request is not authorized
-        self.assertEqual(resp.status_int, 403)
+        self.assertEqual(403, resp.status_int)
         volume = db.volume_get(context.get_admin_context(), volume['id'])
         # status is still 'error'
-        self.assertEqual(volume['status'], 'error')
+        self.assertEqual('error', volume['status'])
 
     def test_malformed_reset_status_body(self):
         # admin context
@@ -106,10 +106,10 @@ class AdminActionsTest(test.TestCase):
         req.environ['cinder.context'] = ctx
         resp = req.get_response(app())
         # bad request
-        self.assertEqual(resp.status_int, 400)
+        self.assertEqual(400, resp.status_int)
         volume = db.volume_get(ctx, volume['id'])
         # status is still 'available'
-        self.assertEqual(volume['status'], 'available')
+        self.assertEqual('available', volume['status'])
 
     def test_invalid_status_for_volume(self):
         # admin context
@@ -125,10 +125,10 @@ class AdminActionsTest(test.TestCase):
         req.environ['cinder.context'] = ctx
         resp = req.get_response(app())
         # bad request
-        self.assertEqual(resp.status_int, 400)
+        self.assertEqual(400, resp.status_int)
         volume = db.volume_get(ctx, volume['id'])
         # status is still 'available'
-        self.assertEqual(volume['status'], 'available')
+        self.assertEqual('available', volume['status'])
 
     def test_reset_status_for_missing_volume(self):
         # admin context
@@ -145,7 +145,7 @@ class AdminActionsTest(test.TestCase):
         req.environ['cinder.context'] = ctx
         resp = req.get_response(app())
         # not found
-        self.assertEqual(resp.status_int, 404)
+        self.assertEqual(404, resp.status_int)
         self.assertRaises(exception.NotFound, db.volume_get, ctx,
                           'missing-volume-id')
 
@@ -167,12 +167,12 @@ class AdminActionsTest(test.TestCase):
         req.environ['cinder.context'] = ctx
         resp = req.get_response(app())
         # request is accepted
-        self.assertEqual(resp.status_int, 202)
+        self.assertEqual(202, resp.status_int)
         volume = db.volume_get(ctx, volume['id'])
         # attach_status changed to 'detached'
-        self.assertEqual(volume['attach_status'], 'detached')
+        self.assertEqual('detached', volume['attach_status'])
         # status un-modified
-        self.assertEqual(volume['status'], 'available')
+        self.assertEqual('available', volume['status'])
 
     def test_invalid_reset_attached_status(self):
         # admin context
@@ -192,11 +192,11 @@ class AdminActionsTest(test.TestCase):
         req.environ['cinder.context'] = ctx
         resp = req.get_response(app())
         # bad request
-        self.assertEqual(resp.status_int, 400)
+        self.assertEqual(400, resp.status_int)
         volume = db.volume_get(ctx, volume['id'])
         # status and attach_status un-modified
-        self.assertEqual(volume['status'], 'available')
-        self.assertEqual(volume['attach_status'], 'detached')
+        self.assertEqual('available', volume['status'])
+        self.assertEqual('detached', volume['attach_status'])
 
     def test_snapshot_reset_status(self):
         # admin context
@@ -216,10 +216,10 @@ class AdminActionsTest(test.TestCase):
         req.environ['cinder.context'] = ctx
         resp = req.get_response(app())
         # request is accepted
-        self.assertEqual(resp.status_int, 202)
+        self.assertEqual(202, resp.status_int)
         snapshot = db.snapshot_get(ctx, snapshot['id'])
         # status changed to 'error'
-        self.assertEqual(snapshot['status'], 'error')
+        self.assertEqual('error', snapshot['status'], 'error')
 
     def test_invalid_status_for_snapshot(self):
         # admin context
@@ -240,10 +240,10 @@ class AdminActionsTest(test.TestCase):
         req.environ['cinder.context'] = ctx
         resp = req.get_response(app())
         # request is accepted
-        self.assertEqual(resp.status_int, 400)
+        self.assertEqual(400, resp.status_int)
         snapshot = db.snapshot_get(ctx, snapshot['id'])
         # status is still 'available'
-        self.assertEqual(snapshot['status'], 'available')
+        self.assertEqual('available', snapshot['status'])
 
     def test_force_delete(self):
         # admin context
@@ -258,7 +258,7 @@ class AdminActionsTest(test.TestCase):
         req.environ['cinder.context'] = ctx
         resp = req.get_response(app())
         # request is accepted
-        self.assertEqual(resp.status_int, 202)
+        self.assertEqual(202, resp.status_int)
         # volume is deleted
         self.assertRaises(exception.NotFound, db.volume_get, ctx, volume['id'])
 
@@ -276,7 +276,7 @@ class AdminActionsTest(test.TestCase):
         # attach admin context to request
         req.environ['cinder.context'] = ctx
         resp = req.get_response(app())
-        self.assertEqual(resp.status_int, 202)
+        self.assertEqual(202, resp.status_int)
 
     def test_force_detach_instance_attached_volume(self):
         # admin context
@@ -293,20 +293,20 @@ class AdminActionsTest(test.TestCase):
                                mountpoint, 'rw')
         # volume is attached
         volume = db.volume_get(ctx, volume['id'])
-        self.assertEqual(volume['status'], 'in-use')
-        self.assertEqual(volume['instance_uuid'], stubs.FAKE_UUID)
+        self.assertEqual('in-use', volume['status'])
+        self.assertEqual(stubs.FAKE_UUID, volume['instance_uuid'])
         self.assertIsNone(volume['attached_host'])
-        self.assertEqual(volume['mountpoint'], mountpoint)
-        self.assertEqual(volume['attach_status'], 'attached')
+        self.assertEqual(mountpoint, volume['mountpoint'])
+        self.assertEqual('attached', volume['attach_status'])
         admin_metadata = volume['volume_admin_metadata']
-        self.assertEqual(len(admin_metadata), 2)
-        self.assertEqual(admin_metadata[0]['key'], 'readonly')
-        self.assertEqual(admin_metadata[0]['value'], 'False')
-        self.assertEqual(admin_metadata[1]['key'], 'attached_mode')
-        self.assertEqual(admin_metadata[1]['value'], 'rw')
+        self.assertEqual(2, len(admin_metadata))
+        self.assertEqual('readonly', admin_metadata[0]['key'])
+        self.assertEqual('False', admin_metadata[0]['value'])
+        self.assertEqual('attached_mode', admin_metadata[1]['key'])
+        self.assertEqual('rw', admin_metadata[1]['value'])
         conn_info = self.volume_api.initialize_connection(ctx,
                                                           volume, connector)
-        self.assertEqual(conn_info['data']['access_mode'], 'rw')
+        self.assertEqual('rw', conn_info['data']['access_mode'])
         # build request to force detach
         req = webob.Request.blank('/v2/fake/volumes/%s/action' % volume['id'])
         req.method = 'POST'
@@ -318,18 +318,18 @@ class AdminActionsTest(test.TestCase):
         # make request
         resp = req.get_response(app())
         # request is accepted
-        self.assertEqual(resp.status_int, 202)
+        self.assertEqual(202, resp.status_int)
         volume = db.volume_get(ctx, volume['id'])
         # status changed to 'available'
-        self.assertEqual(volume['status'], 'available')
+        self.assertEqual('available', volume['status'])
         self.assertIsNone(volume['instance_uuid'])
         self.assertIsNone(volume['attached_host'])
         self.assertIsNone(volume['mountpoint'])
-        self.assertEqual(volume['attach_status'], 'detached')
+        self.assertEqual('detached', volume['attach_status'])
         admin_metadata = volume['volume_admin_metadata']
-        self.assertEqual(len(admin_metadata), 1)
-        self.assertEqual(admin_metadata[0]['key'], 'readonly')
-        self.assertEqual(admin_metadata[0]['value'], 'False')
+        self.assertEqual(1, len(admin_metadata))
+        self.assertEqual('readonly', admin_metadata[0]['key'])
+        self.assertEqual('False', admin_metadata[0]['value'])
         # cleanup
         svc.stop()
 
@@ -348,20 +348,20 @@ class AdminActionsTest(test.TestCase):
         self.volume_api.attach(ctx, volume, None, host_name, mountpoint, 'ro')
         # volume is attached
         volume = db.volume_get(ctx, volume['id'])
-        self.assertEqual(volume['status'], 'in-use')
+        self.assertEqual('in-use', volume['status'])
         self.assertIsNone(volume['instance_uuid'])
-        self.assertEqual(volume['attached_host'], host_name)
-        self.assertEqual(volume['mountpoint'], mountpoint)
-        self.assertEqual(volume['attach_status'], 'attached')
+        self.assertEqual(host_name, volume['attached_host'])
+        self.assertEqual(mountpoint, volume['mountpoint'])
+        self.assertEqual('attached', volume['attach_status'])
         admin_metadata = volume['volume_admin_metadata']
-        self.assertEqual(len(admin_metadata), 2)
-        self.assertEqual(admin_metadata[0]['key'], 'readonly')
-        self.assertEqual(admin_metadata[0]['value'], 'False')
-        self.assertEqual(admin_metadata[1]['key'], 'attached_mode')
-        self.assertEqual(admin_metadata[1]['value'], 'ro')
+        self.assertEqual(2, len(admin_metadata))
+        self.assertEqual('readonly', admin_metadata[0]['key'])
+        self.assertEqual('False', admin_metadata[0]['value'])
+        self.assertEqual('attached_mode', admin_metadata[1]['key'])
+        self.assertEqual('ro', admin_metadata[1]['value'])
         conn_info = self.volume_api.initialize_connection(ctx,
                                                           volume, connector)
-        self.assertEqual(conn_info['data']['access_mode'], 'ro')
+        self.assertEqual('ro', conn_info['data']['access_mode'])
         # build request to force detach
         req = webob.Request.blank('/v2/fake/volumes/%s/action' % volume['id'])
         req.method = 'POST'
@@ -373,18 +373,18 @@ class AdminActionsTest(test.TestCase):
         # make request
         resp = req.get_response(app())
         # request is accepted
-        self.assertEqual(resp.status_int, 202)
+        self.assertEqual(202, resp.status_int)
         volume = db.volume_get(ctx, volume['id'])
         # status changed to 'available'
-        self.assertEqual(volume['status'], 'available')
+        self.assertEqual('available', volume['status'])
         self.assertIsNone(volume['instance_uuid'])
         self.assertIsNone(volume['attached_host'])
         self.assertIsNone(volume['mountpoint'])
-        self.assertEqual(volume['attach_status'], 'detached')
+        self.assertEqual('detached', volume['attach_status'])
         admin_metadata = volume['volume_admin_metadata']
-        self.assertEqual(len(admin_metadata), 1)
-        self.assertEqual(admin_metadata[0]['key'], 'readonly')
-        self.assertEqual(admin_metadata[0]['value'], 'False')
+        self.assertEqual(1, len(admin_metadata))
+        self.assertEqual('readonly', admin_metadata[0]['key'])
+        self.assertEqual('False', admin_metadata[0]['value'])
         # cleanup
         svc.stop()
 
@@ -404,7 +404,7 @@ class AdminActionsTest(test.TestCase):
                                mountpoint, 'rw')
         conn_info = self.volume_api.initialize_connection(ctx,
                                                           volume, connector)
-        self.assertEqual(conn_info['data']['access_mode'], 'rw')
+        self.assertEqual('rw', conn_info['data']['access_mode'])
         self.assertRaises(exception.InvalidVolume,
                           self.volume_api.attach,
                           ctx,
@@ -557,7 +557,7 @@ class AdminActionsTest(test.TestCase):
         req.environ['cinder.context'] = ctx
         resp = req.get_response(app())
         # verify status
-        self.assertEqual(resp.status_int, expected_status)
+        self.assertEqual(expected_status, resp.status_int)
         volume = db.volume_get(admin_ctx, volume['id'])
         return volume
 
@@ -567,7 +567,7 @@ class AdminActionsTest(test.TestCase):
         ctx = context.RequestContext('admin', 'fake', True)
         volume = self._migrate_volume_prep()
         volume = self._migrate_volume_exec(ctx, volume, host, expected_status)
-        self.assertEqual(volume['migration_status'], 'starting')
+        self.assertEqual('starting', volume['migration_status'])
 
     def test_migrate_volume_as_non_admin(self):
         expected_status = 403
@@ -591,7 +591,7 @@ class AdminActionsTest(test.TestCase):
         req.environ['cinder.context'] = ctx
         resp = req.get_response(app())
         # verify status
-        self.assertEqual(resp.status_int, expected_status)
+        self.assertEqual(expected_status, resp.status_int)
 
     def test_migrate_volume_host_no_exist(self):
         expected_status = 400
@@ -654,9 +654,9 @@ class AdminActionsTest(test.TestCase):
         resp = req.get_response(app())
         resp_dict = ast.literal_eval(resp.body)
         # verify status
-        self.assertEqual(resp.status_int, expected_status)
+        self.assertEqual(expected_status, resp.status_int)
         if expected_id:
-            self.assertEqual(resp_dict['save_volume_id'], expected_id)
+            self.assertEqual(expected_id, resp_dict['save_volume_id'])
         else:
             self.assertNotIn('save_volume_id', resp_dict)
 
