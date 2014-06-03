@@ -122,8 +122,8 @@ class IBMNASDriverTestCase(test.TestCase):
         volume['id'] = '123'
 
         mock.drv._get_provider_location.return_value = self.TEST_NFS_EXPORT
-        self.assertEqual(self.TEST_NFS_EXPORT,
-                         mock.drv._get_provider_location(volume['id']))
+        self.assertEqual(mock.drv._get_provider_location(volume['id']),
+                         self.TEST_NFS_EXPORT)
 
     def test_get_export_path(self):
         """Check export path for the given volume."""
@@ -135,8 +135,8 @@ class IBMNASDriverTestCase(test.TestCase):
 
         mock.drv._get_export_path.return_value = self.TEST_NFS_EXPORT.\
             split(':')[1]
-        self.assertEqual(self.TEST_NFS_EXPORT.split(':')[1],
-                         mock.drv._get_export_path(volume['id']))
+        self.assertEqual(mock.drv._get_export_path(volume['id']),
+                                 self.TEST_NFS_EXPORT.split(':')[1])
 
     def test_create_ibmnas_snap_mount_point_provided(self):
         """Create ibmnas snap if mount point is provided."""
@@ -147,11 +147,11 @@ class IBMNASDriverTestCase(test.TestCase):
         drv._create_ibmnas_snap = mock.drv._run_ssh.return_value.\
             drv._execute.return_value.drv._create_ibmnas_snap
         drv._create_ibmnas_snap.return_value = True
-        self.assertEqual(True, mock.drv._run_ssh().
+        self.assertEqual(mock.drv._run_ssh().
                          drv._execute().
                          drv._create_ibmnas_snap(self.TEST_VOLUME_PATH,
                                                  self.TEST_SNAP_PATH,
-                                                 self.TEST_MNT_POINT))
+                                                 self.TEST_MNT_POINT), True)
 
     def test_create_ibmnas_snap_no_mount_point_provided(self):
         """Create ibmnas snap if no mount point is provided."""
@@ -195,10 +195,10 @@ class IBMNASDriverTestCase(test.TestCase):
         drv._resize_volume_file = mock.image_utils.resize_image.return_value.\
             drv._resize_volume_file
         drv._resize_volume_file.return_value = True
-        self.assertEqual(True, mock.image_utils.resize_image().
+        self.assertEqual(mock.image_utils.resize_image().
                          drv._resize_volume_file(
                              self.TEST_LOCAL_PATH,
-                             self.TEST_EXTEND_SIZE_IN_GB))
+                             self.TEST_EXTEND_SIZE_IN_GB), True)
 
     def test_extend_volume(self):
         """Extend volume to greater size test case."""
@@ -257,11 +257,11 @@ class IBMNASDriverTestCase(test.TestCase):
         drv.delete_volume = mock.drv._get_export_path.return_value.\
             drv._delete_snapfiles.return_value.drv.delete_volume
         drv.delete_volume.return_value = True
-        self.assertEqual(True, mock.drv._get_export_path(volume['id']).
+        self.assertEqual(mock.drv._get_export_path(volume['id']).
                          drv._delete_snapfiles(
                              self.TEST_VOLUME_PATH,
                              self.TEST_MNT_POINT).
-                         drv.delete_volume(volume))
+                         drv.delete_volume(volume), True)
 
     def test_create_snapshot(self):
         """Create snapshot simple test case."""
@@ -341,15 +341,14 @@ class IBMNASDriverTestCase(test.TestCase):
             drv._resize_volume_file.return_value.\
             drv.create_cloned_volume
         drv.create_cloned_volume.return_value = self.TEST_NFS_EXPORT
-        self.assertEqual(self.TEST_NFS_EXPORT,
-                         mock.drv._get_export_path(volume_src['id']).
+        self.assertEqual(mock.drv._get_export_path(volume_src['id']).
                          drv._create_ibmnas_copy().
                          drv._find_share().
                          drv._set_rw_permissions_for_all().
                          drv._resize_volume_file().
                          drv.create_cloned_volume(
                              volume_dest,
-                             volume_src))
+                             volume_src), self.TEST_NFS_EXPORT)
 
     def test_create_volume_from_snapshot(self):
         """Create volume from snapshot test case."""
@@ -375,10 +374,10 @@ class IBMNASDriverTestCase(test.TestCase):
             drv._resize_volume_file.return_value.\
             drv.create_volume_from_snapshot
         drv.create_volume_from_snapshot.return_value = self.TEST_NFS_EXPORT
-        self.assertEqual(self.TEST_NFS_EXPORT,
-                         mock.drv._get_export_path(volume['id']).
+        self.assertEqual(mock.drv._get_export_path(volume['id']).
                          drv._create_ibmnas_snap().
                          drv._find_share().
                          drv._set_rw_permissions_for_all().
                          drv._resize_volume_file().
-                         drv.create_volume_from_snapshot(snapshot))
+                         drv.create_volume_from_snapshot(snapshot),
+                                 self.TEST_NFS_EXPORT)

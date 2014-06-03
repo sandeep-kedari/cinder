@@ -68,13 +68,12 @@ class ExtensionControllerTest(ExtensionTestCase):
         # Make sure that at least Fox in Sox is correct.
         (fox_ext, ) = [
             x for x in data['extensions'] if x['alias'] == 'FOXNSOX']
-        self.assertEqual(
-            fox_ext, {'namespace': 'http://www.fox.in.socks/api/ext/pie/v1.0',
+        self.assertEqual({'namespace': 'http://www.fox.in.socks/api/ext/pie/v1.0',
                       'name': 'Fox In Socks',
                       'updated': '2011-01-22T13:25:27-06:00',
                       'description': 'The Fox In Socks Extension.',
                       'alias': 'FOXNSOX',
-                      'links': []}, )
+                      'links': []}, fox_ext)
 
         for ext in data['extensions']:
             url = '/fake/extensions/%s' % ext['alias']
@@ -113,7 +112,7 @@ class ExtensionControllerTest(ExtensionTestCase):
         self.assertEqual(200, response.status_int)
 
         root = etree.XML(response.body)
-        self.assertEqual(root.tag.split('extensions')[0], NS)
+        self.assertEqual(NS, root.tag.split('extensions')[0])
 
         # Make sure we have all the extensions, extras extensions being OK.
         exts = root.findall('{0}extension'.format(NS))
@@ -121,14 +120,12 @@ class ExtensionControllerTest(ExtensionTestCase):
 
         # Make sure that at least Fox in Sox is correct.
         (fox_ext, ) = [x for x in exts if x.get('alias') == 'FOXNSOX']
-        self.assertEqual(fox_ext.get('name'), 'Fox In Socks')
-        self.assertEqual(
-            fox_ext.get('namespace'),
-            'http://www.fox.in.socks/api/ext/pie/v1.0')
-        self.assertEqual(fox_ext.get('updated'), '2011-01-22T13:25:27-06:00')
-        self.assertEqual(
-            fox_ext.findtext('{0}description'.format(NS)),
-            'The Fox In Socks Extension.')
+        self.assertEqual('Fox In Socks', fox_ext.get('name'))
+        self.assertEqual('http://www.fox.in.socks/api/ext/pie/v1.0',
+            fox_ext.get('namespace'))
+        self.assertEqual('2011-01-22T13:25:27-06:00', fox_ext.get('updated'))
+        self.assertEqual('The Fox In Socks Extension.',
+            fox_ext.findtext('{0}description'.format(NS)))
 
         xmlutil.validate_schema(root, 'extensions')
 
@@ -141,15 +138,13 @@ class ExtensionControllerTest(ExtensionTestCase):
         xml = response.body
 
         root = etree.XML(xml)
-        self.assertEqual(root.tag.split('extension')[0], NS)
-        self.assertEqual(root.get('alias'), 'FOXNSOX')
-        self.assertEqual(root.get('name'), 'Fox In Socks')
-        self.assertEqual(
-            root.get('namespace'),
-            'http://www.fox.in.socks/api/ext/pie/v1.0')
-        self.assertEqual(root.get('updated'), '2011-01-22T13:25:27-06:00')
-        self.assertEqual(
-            root.findtext('{0}description'.format(NS)),
-            'The Fox In Socks Extension.')
+        self.assertEqual(NS, root.tag.split('extension')[0])
+        self.assertEqual('FOXNSOX', root.get('alias'))
+        self.assertEqual('Fox In Socks', root.get('name'))
+        self.assertEqual('http://www.fox.in.socks/api/ext/pie/v1.0',
+            root.get('namespace'))
+        self.assertEqual('2011-01-22T13:25:27-06:00', root.get('updated'))
+        self.assertEqual('The Fox In Socks Extension.',
+            root.findtext('{0}description'.format(NS)))
 
         xmlutil.validate_schema(root, 'extension')

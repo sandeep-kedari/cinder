@@ -60,8 +60,8 @@ class AllocatedCapacityWeigherTestCase(test.TestCase):
 
         # so, host1 should win:
         weighed_host = self._get_weighed_host(hostinfo_list)
-        self.assertEqual(weighed_host.weight, 0)
-        self.assertEqual(weighed_host.obj.host, 'host1')
+        self.assertEqual(0, weighed_host.weight)
+        self.assertEqual('host1', weighed_host.obj.host)
 
     def test_capacity_weight_multiplier1(self):
         self.flags(allocated_capacity_weight_multiplier=1.0)
@@ -74,8 +74,8 @@ class AllocatedCapacityWeigherTestCase(test.TestCase):
 
         # so, host4 should win:
         weighed_host = self._get_weighed_host(hostinfo_list)
-        self.assertEqual(weighed_host.weight, 1848.0)
-        self.assertEqual(weighed_host.obj.host, 'host4')
+        self.assertEqual(1848.0, weighed_host.weight)
+        self.assertEqual('host4', weighed_host.obj.host)
 
     def test_capacity_weight_multiplier2(self):
         self.flags(allocated_capacity_weight_multiplier=-2.0)
@@ -88,5 +88,5 @@ class AllocatedCapacityWeigherTestCase(test.TestCase):
 
         # so, host1 should win:
         weighed_host = self._get_weighed_host(hostinfo_list)
-        self.assertEqual(weighed_host.weight, 0)
-        self.assertEqual(weighed_host.obj.host, 'host1')
+        self.assertEqual(0, weighed_host.weight)
+        self.assertEqual('host1', weighed_host.obj.host)

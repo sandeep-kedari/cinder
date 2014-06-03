@@ -1215,7 +1215,7 @@ class EMCSMISFCDriverTestCase(test.TestCase):
         connection_info = self.driver.initialize_connection(
             self.data.test_volume,
             self.data.connector)
-        self.assertEqual(connection_info, output)
+        self.assertEqual(output, connection_info)
 
         connection_info = self.driver.terminate_connection(
             self.data.test_volume,
@@ -1250,7 +1250,7 @@ class EMCSMISFCDriverTestCase(test.TestCase):
                                          ['1234567890123', '0987654321321'],
                                          }}}
 
-        self.assertEqual(connection_info, output)
+        self.assertEqual(output, connection_info)
 
         self.driver.delete_volume(self.data.test_volume)
 

@@ -37,7 +37,7 @@ class SnapshotActionsTest(test.TestCase):
         req.headers["content-type"] = "application/json"
 
         res = req.get_response(fakes.wsgi_app())
-        self.assertEqual(res.status_int, 202)
+        self.assertEqual(202, res.status_int)
 
     def test_update_snapshot_status_invalid_status(self):
         self.stubs.Set(db, 'snapshot_get', stub_snapshot_get)
@@ -48,7 +48,7 @@ class SnapshotActionsTest(test.TestCase):
         req.headers["content-type"] = "application/json"
 
         res = req.get_response(fakes.wsgi_app())
-        self.assertEqual(res.status_int, 400)
+        self.assertEqual(400, res.status_int)
 
     def test_update_snapshot_status_without_status(self):
         self.stubs.Set(db, 'snapshot_get', stub_snapshot_get)
@@ -59,7 +59,7 @@ class SnapshotActionsTest(test.TestCase):
         req.headers["content-type"] = "application/json"
 
         res = req.get_response(fakes.wsgi_app())
-        self.assertEqual(res.status_int, 400)
+        self.assertEqual(400, res.status_int)
 
 
 def stub_snapshot_get(context, snapshot_id):

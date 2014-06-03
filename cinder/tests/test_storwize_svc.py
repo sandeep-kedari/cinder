@@ -1523,7 +1523,7 @@ class StorwizeSVCDriverTestCase(test.TestCase):
 
     def _assert_vol_exists(self, name, exists):
         is_vol_defined = self.driver._helpers.is_vdisk_defined(name)
-        self.assertEqual(is_vol_defined, exists)
+        self.assertEqual(exists, is_vol_defined)
 
     def test_storwize_svc_connectivity(self):
         # Make sure we detect if the pool doesn't exist
@@ -1765,9 +1765,9 @@ class StorwizeSVCDriverTestCase(test.TestCase):
         # Make sure volume attributes are as they should be
         attributes = self.driver._helpers.get_vdisk_attributes(volume['name'])
         attr_size = float(attributes['capacity']) / units.GiB  # bytes to GB
-        self.assertEqual(attr_size, float(volume['size']))
+        self.assertEqual(float(volume['size']), attr_size)
         pool = self.driver.configuration.local_conf.storwize_svc_volpool_name
-        self.assertEqual(attributes['mdisk_grp_name'], pool)
+        self.assertEqual(pool, attributes['mdisk_grp_name'])
 
         # Try to create the volume again (should fail)
         self.assertRaises(exception.VolumeBackendAPIException,
@@ -1833,7 +1833,7 @@ class StorwizeSVCDriverTestCase(test.TestCase):
                         k = k[1:]
                         self.assertNotEqual(attrs[k], v)
                     else:
-                        self.assertEqual(attrs[k], v)
+                        self.assertEqual(v, attrs[k])
                 except processutils.ProcessExecutionError as e:
                     if 'CMMVC7050E' not in e.stderr:
                         raise
@@ -1958,17 +1958,17 @@ class StorwizeSVCDriverTestCase(test.TestCase):
 
             # Initialize connection from the first volume to a host
             ret = self.driver.initialize_connection(volume1, self._connector)
-            self.assertEqual(ret['driver_volume_type'],
-                             expected[protocol]['driver_volume_type'])
+            self.assertEqual(expected[protocol]['driver_volume_type'],
+                               ret['driver_volume_type'])
             for k, v in expected[protocol]['data'].iteritems():
-                self.assertEqual(ret['data'][k], v)
+                self.assertEqual(v, ret['data'][k])
 
             # Initialize again, should notice it and do nothing
             ret = self.driver.initialize_connection(volume1, self._connector)
-            self.assertEqual(ret['driver_volume_type'],
-                             expected[protocol]['driver_volume_type'])
+            self.assertEqual(expected[protocol]['driver_volume_type'],
+                               ret['driver_volume_type'])
             for k, v in expected[protocol]['data'].iteritems():
-                self.assertEqual(ret['data'][k], v)
+                self.assertEqual(v, ret['data'][k])
 
             # Try to delete the 1st volume (should fail because it is mapped)
             self.assertRaises(exception.VolumeBackendAPIException,
@@ -2217,11 +2217,11 @@ class StorwizeSVCDriverTestCase(test.TestCase):
         stats = self.driver.get_volume_stats()
         self.assertLessEqual(stats['free_capacity_gb'],
                              stats['total_capacity_gb'])
-        self.assertEqual(stats['reserved_percentage'], 25)
+        self.assertEqual(25, stats['reserved_percentage'])
         pool = self.driver.configuration.local_conf.storwize_svc_volpool_name
         if self.USESIM:
             expected = 'storwize-svc-sim_' + pool
-            self.assertEqual(stats['volume_backend_name'], expected)
+            self.assertEqual(expected, stats['volume_backend_name'])
             self.assertAlmostEqual(stats['total_capacity_gb'], 3328.0)
             self.assertAlmostEqual(stats['free_capacity_gb'], 3287.5)
 
@@ -2246,8 +2246,8 @@ class StorwizeSVCDriverTestCase(test.TestCase):
         vol = {'name': 'test', 'id': 1, 'size': 1}
         ctxt = context.get_admin_context()
         moved, model_update = self.driver.migrate_volume(ctxt, vol, host)
-        self.assertEqual(moved, expected['moved'])
-        self.assertEqual(model_update, expected['model_update'])
+        self.assertEqual(expected['moved'], moved)
+        self.assertEqual(expected['model_update'], model_update)
 
     def test_storwize_svc_migrate_bad_loc_info(self):
         self._check_loc_info({}, {'moved': False, 'model_update': None})
@@ -2379,8 +2379,8 @@ class StorwizeSVCDriverTestCase(test.TestCase):
                                                  self.driver.configuration)
         self.driver._add_vdisk_copy_op(ctxt, volume, new_ops)
         admin_metadata = self.db.volume_admin_metadata_get(ctxt, volume['id'])
-        self.assertEqual(":".join(x for x in new_ops),
-                         admin_metadata['vdiskcopyops'],
+        self.assertEqual(admin_metadata['vdiskcopyops'],
+                          ":".join(x for x in new_ops),
                          'Storwize driver add vdisk copy error.')
         self.driver._check_volume_copy_ops()
         self.driver._rm_vdisk_copy_op(ctxt, volume, new_ops[0], new_ops[1])
@@ -2431,7 +2431,7 @@ class StorwizeSVCDriverTestCase(test.TestCase):
                               }
                      }
 
-        self.assertEqual(init_data, init_ret)
+        self.assertEqual(init_ret, init_data)
 
         # Terminate connection
         term_ret = self.driver.terminate_connection(volume, connector)
@@ -2444,7 +2444,7 @@ class StorwizeSVCDriverTestCase(test.TestCase):
                               }
                      }
 
-        self.assertEqual(term_data, term_ret)
+        self.assertEqual(term_ret, term_data)
 
     def _get_vdisk_uid(self, vdisk_name):
         """Return vdisk_UID for given vdisk.
@@ -2516,7 +2516,7 @@ class StorwizeSVCDriverTestCase(test.TestCase):
         # Submit the request to manage it.
         ref = {'vdisk_UID': uid}
         size = self.driver.manage_existing_get_size(new_volume, ref)
-        self.assertEqual(size, 10)
+        self.assertEqual(10, size)
         self.driver.manage_existing(new_volume, ref)
 
         # Assert that there is a disk named after the new volume that has the
@@ -2577,7 +2577,7 @@ class StorwizeSVCDriverTestCase(test.TestCase):
         # manage a volume that is already attached.
         ref = {'vdisk_UID': uid, 'manage_if_in_use': True}
         size = self.driver.manage_existing_get_size(new_volume, ref)
-        self.assertEqual(size, 10)
+        self.assertEqual(10, size)
         self.driver.manage_existing(new_volume, ref)
 
         # Assert that there is a disk named after the new volume that has the
@@ -2617,10 +2617,10 @@ home address!s3
 home address!s4
 '''
         resp = ssh.CLIResponse(raw, with_header=False)
-        self.assertEqual(list(resp.select('home address', 'name',
-                                          'home address')),
-                         [('s1', 'Bill', 's1'), ('s2', 'Bill2', 's2'),
-                          ('s3', 'John', 's3'), ('s4', 'John2', 's4')])
+        self.assertEqual([('s1', 'Bill', 's1'), ('s2', 'Bill2', 's2'),
+                          ('s3', 'John', 's3'), ('s4', 'John2', 's4')],
+                              list(resp.select('home address', 'name',
+                                          'home address')))
 
     def test_lsnode_all(self):
         raw = r'''id!name!UPS_serial_number!WWNN!status
@@ -2646,9 +2646,9 @@ port_speed!8Gb
         resp = ssh.CLIResponse(raw, with_header=False)
         self.assertEqual(1, len(resp))
         self.assertEqual('1', resp[0]['id'])
-        self.assertEqual(list(resp.select('port_id', 'port_status')),
-                         [('500507680210C744', 'active'),
-                          ('500507680240C744', 'inactive')])
+        self.assertEqual([('500507680210C744', 'active'),
+                          ('500507680240C744', 'inactive')],
+                           list(resp.select('port_id', 'port_status')))
 
 
 class StorwizeHelpersTestCase(test.TestCase):

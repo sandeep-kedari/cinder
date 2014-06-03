@@ -35,13 +35,13 @@ class RetryTest(test.TestCase):
         def func(*args, **kwargs):
             return result
 
-        self.assertEqual(result, func())
+        self.assertEqual(func(), result)
 
         def func2(*args, **kwargs):
             return result
 
         retry = api.Retry()
-        self.assertEqual(result, retry(func2)())
+        self.assertEqual(retry(func2)(), result)
         self.assertTrue(retry._retry_count == 0)
 
     def test_retry_with_expected_exceptions(self):
@@ -60,9 +60,9 @@ class RetryTest(test.TestCase):
         retry_count = 2
         retry = api.Retry(10, sleep_time_incr, 10,
                           (error_util.SessionOverLoadException,))
-        self.assertEqual(result, retry(func)())
+        self.assertEqual(retry(func)(), result)
         self.assertTrue(retry._retry_count == retry_count)
-        self.assertEqual(retry_count * sleep_time_incr, retry._sleep_time)
+        self.assertEqual(retry._sleep_time, retry_count * sleep_time_incr)
 
     def test_retry_with_max_retries(self):
         responses = [error_util.SessionOverLoadException(None),
@@ -128,7 +128,7 @@ class VMwareAPISessionTest(test.TestCase):
             session_manager, userName=VMwareAPISessionTest.USERNAME,
             password=VMwareAPISessionTest.PASSWORD)
         self.assertFalse(vim_obj.TerminateSession.called)
-        self.assertEqual(session.key, api_session._session_id)
+        self.assertEqual(api_session._session_id, session.key)
         pbm_client.set_cookie.assert_called_once_with()
 
     def test_create_session_with_existing_session(self):
@@ -148,7 +148,7 @@ class VMwareAPISessionTest(test.TestCase):
             password=VMwareAPISessionTest.PASSWORD)
         vim_obj.TerminateSession.assert_called_once_with(
             session_manager, sessionId=[old_session_key])
-        self.assertEqual(new_session_key, api_session._session_id)
+        self.assertEqual(api_session._session_id, new_session_key)
 
     def test_invoke_api(self):
         api_session = self._create_api_session(True)
@@ -160,7 +160,7 @@ class VMwareAPISessionTest(test.TestCase):
         module = mock.Mock()
         module.api = api
         ret = api_session.invoke_api(module, 'api')
-        self.assertEqual(response, ret)
+        self.assertEqual(ret, response)
 
     def test_invoke_api_with_expected_exception(self):
         api_session = self._create_api_session(True)
@@ -176,7 +176,7 @@ class VMwareAPISessionTest(test.TestCase):
         module = mock.Mock()
         module.api = api
         with mock.patch.object(greenthread, 'sleep'):
-            self.assertEqual(ret, api_session.invoke_api(module, 'api'))
+            self.assertEqual(api_session.invoke_api(module, 'api'), ret)
 
     def test_invoke_api_with_vim_fault_exception(self):
         api_session = self._create_api_session(True)

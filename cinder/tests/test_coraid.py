@@ -317,7 +317,7 @@ class CoraidDriverApplianceTestCase(CoraidDriverLoginSuccessTestCase):
         real_reply = self.driver.appliance.resize_volume(fake_volume_name,
                                                          new_volume_size)
 
-        self.assertEqual(reply['configState'], real_reply['configState'])
+        self.assertEqual(real_reply['configState'], reply['configState'])
 
 
 class CoraidDriverIntegrationalTestCase(CoraidDriverLoginSuccessTestCase):
@@ -554,9 +554,9 @@ class CoraidDriverIntegrationalTestCase(CoraidDriverLoginSuccessTestCase):
 
         self.mox.VerifyAll()
 
-        self.assertEqual(connection['driver_volume_type'], 'aoe')
-        self.assertEqual(connection['data']['target_shelf'], fake_shelf)
-        self.assertEqual(connection['data']['target_lun'], fake_lun)
+        self.assertEqual('aoe', connection['driver_volume_type'])
+        self.assertEqual(fake_shelf, connection['data']['target_shelf'])
+        self.assertEqual(fake_lun, connection['data']['target_lun'])
 
     def test_get_repository_capabilities(self):
         reply = [[{}, {'reply': [
@@ -577,8 +577,8 @@ class CoraidDriverIntegrationalTestCase(CoraidDriverLoginSuccessTestCase):
         self.mox.VerifyAll()
 
         self.assertEqual(
-            capabilities[fake_coraid_repository_key],
-            'Bronze-Bronze:Profile1:repo1 Bronze-Bronze:Profile2:repo2')
+          'Bronze-Bronze:Profile1:repo1 Bronze-Bronze:Profile2:repo2'
+            capabilities[fake_coraid_repository_key])
 
     def test_create_cloned_volume(self):
         self.mock_volume_types([fake_repository_name])
@@ -861,7 +861,7 @@ class CoraidResetConnectionTestCase(CoraidDriverTestCase):
                                mox.IgnoreArg()).AndReturn('fake_app2')
         self.mox.ReplayAll()
 
-        self.assertEqual(self.driver.appliance, 'fake_app1')
-        self.assertEqual(self.driver.appliance, 'fake_app2')
+        self.assertEqual('fake_app1', self.driver.appliance)
+        self.assertEqual('fake_app2', self.driver.appliance)
 
         self.mox.VerifyAll()

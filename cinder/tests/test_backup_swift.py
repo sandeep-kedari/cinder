@@ -109,7 +109,7 @@ class BackupSwiftTestCase(test.TestCase):
         backup = db.backup_get(self.ctxt, 123)
         service.backup(backup, self.volume_file)
         backup = db.backup_get(self.ctxt, 123)
-        self.assertEqual(backup['container'], 'volumebackups')
+        self.assertEqual('volumebackups', backup['container'])
 
     def test_backup_custom_container(self):
         container_name = 'fake99'
@@ -119,7 +119,7 @@ class BackupSwiftTestCase(test.TestCase):
         backup = db.backup_get(self.ctxt, 123)
         service.backup(backup, self.volume_file)
         backup = db.backup_get(self.ctxt, 123)
-        self.assertEqual(backup['container'], container_name)
+        self.assertEqual(container_name, backup['container'])
 
     def test_create_backup_put_object_wraps_socket_error(self):
         container_name = 'socket_error_on_put'
@@ -181,7 +181,7 @@ class BackupSwiftTestCase(test.TestCase):
         compressor = service._get_compressor('None')
         self.assertIsNone(compressor)
         compressor = service._get_compressor('zlib')
-        self.assertEqual(compressor, zlib)
+        self.assertEqual(zlib, compressor)
         compressor = service._get_compressor('bz2')
-        self.assertEqual(compressor, bz2)
+        self.assertEqual(bz2, compressor)
         self.assertRaises(ValueError, service._get_compressor, 'fake')

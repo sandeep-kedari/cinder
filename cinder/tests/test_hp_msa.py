@@ -119,7 +119,7 @@ class TestHPMSAClient(test.TestCase):
         m.read.side_effect = [resp_login]
         mock_url_open.return_value = m
         self.client.login()
-        self.assertEqual(self.client._session_key, session_key)
+        self.assertEqual(session_key, self.client._session_key)
 
         m.read.side_effect = [resp_badlogin]
         self.assertRaises(msa.HPMSAAuthenticationError,
@@ -127,16 +127,16 @@ class TestHPMSAClient(test.TestCase):
 
     def test_build_request_url(self):
         url = self.client._build_request_url('/path', None)
-        self.assertEqual(url, 'http://10.0.0.1/api/path')
+        self.assertEqual('http://10.0.0.1/api/path', url)
         url = self.client._build_request_url('/path', None, arg1='val1')
-        self.assertEqual(url, 'http://10.0.0.1/api/path/arg1/val1')
+        self.assertEqual('http://10.0.0.1/api/path/arg1/val1', url)
         url = self.client._build_request_url('/path', 'arg1')
-        self.assertEqual(url, 'http://10.0.0.1/api/path/arg1')
+        self.assertEqual('http://10.0.0.1/api/path/arg1', url)
         url = self.client._build_request_url('/path', 'arg1', arg2='val2')
-        self.assertEqual(url, 'http://10.0.0.1/api/path/arg2/val2/arg1')
+        self.assertEqual('http://10.0.0.1/api/path/arg2/val2/arg1', url)
         url = self.client._build_request_url('/path', ['arg1', 'arg3'],
                                              arg2='val2')
-        self.assertEqual(url, 'http://10.0.0.1/api/path/arg2/val2/arg1/arg3')
+        self.assertEqual('http://10.0.0.1/api/path/arg2/val2/arg1/arg3', url)
 
     @mock.patch('urllib2.urlopen')
     def test_request(self, mock_url_open):
@@ -158,7 +158,7 @@ class TestHPMSAClient(test.TestCase):
         not_ok_tree = etree.XML(response_not_ok)
         invalid_tree = etree.XML(invalid_xml)
         ret = self.client._assert_response_ok(ok_tree)
-        self.assertEqual(ret, None)
+        self.assertEqual(None, ret)
         self.assertRaises(msa.HPMSARequestError,
                           self.client._assert_response_ok, not_ok_tree)
         self.assertRaises(msa.HPMSARequestError,
@@ -169,15 +169,15 @@ class TestHPMSAClient(test.TestCase):
         mock_request.side_effect = [msa.HPMSARequestError,
                                     fake_xml]
 
-        self.assertEqual(self.client.vdisk_exists('vdisk'), False)
-        self.assertEqual(self.client.vdisk_exists('vdisk'), True)
+        self.assertEqual(False, self.client.vdisk_exists('vdisk'))
+        self.assertEqual(True, self.client.vdisk_exists('vdisk'))
 
     @mock.patch.object(msa.HPMSAClient, '_request')
     def test_vdisk_stats(self, mock_request):
         mock_request.return_value = etree.XML(response_stats)
         ret = self.client.vdisk_stats('OpenStack')
-        self.assertEqual(ret, {'free_capacity_gb': 387,
-                               'total_capacity_gb': 899})
+        self.assertEqual({'free_capacity_gb': 387,
+                               'total_capacity_gb': 899}, ret)
         mock_request.assert_called_with('/show/vdisks', 'OpenStack')
 
     @mock.patch.object(msa.HPMSAClient, '_request')
@@ -185,26 +185,26 @@ class TestHPMSAClient(test.TestCase):
         mock_request.side_effect = [etree.XML(response_no_lun),
                                     etree.XML(response_lun)]
         ret = self.client._get_first_available_lun_for_host("fakehost")
-        self.assertEqual(ret, 1)
+        self.assertEqual(1, ret)
         ret = self.client._get_first_available_lun_for_host("fakehost")
-        self.assertEqual(ret, 2)
+        self.assertEqual(2, ret)
 
     @mock.patch.object(msa.HPMSAClient, '_request')
     def test_get_ports(self, mock_request):
         mock_request.side_effect = [etree.XML(response_ports)]
         ret = self.client.get_active_target_ports()
-        self.assertEqual(ret, [{'port-type': 'FC',
+        self.assertEqual([{'port-type': 'FC',
                                 'target-id': 'id1',
                                 'status': 'Up'},
                                {'port-type': 'iSCSI',
                                 'target-id': 'id3',
-                                'status': 'Up'}])
+                                'status': 'Up'}], ret)
 
     @mock.patch.object(msa.HPMSAClient, '_request')
     def test_get_fc_ports(self, mock_request):
         mock_request.side_effect = [etree.XML(response_ports)]
         ret = self.client.get_active_fc_target_ports()
-        self.assertEqual(ret, ['id1'])
+        self.assertEqual(['id1'], ret)
 
 
 class FakeConfiguration(object):
@@ -240,14 +240,14 @@ class TestHPMSACommon(test.TestCase):
         self.assertRaises(exception.HPMSAInvalidVDisk, self.common.do_setup,
                           None)
         mock_vdisk_exists.assert_called_with(self.config.msa_vdisk)
-        self.assertEqual(self.common.do_setup(None), None)
+        self.assertEqual(None, self.common.do_setup(None))
         mock_vdisk_exists.assert_called_with(self.config.msa_vdisk)
         mock_logout.assert_called_with()
 
     def test_vol_name(self):
-        self.assertEqual(self.common._get_vol_name(vol_id), encoded_volid)
-        self.assertEqual(self.common._get_snap_name(vol_id),
-                         encoded_snapid)
+        self.assertEqual(encoded_volid, self.common._get_vol_name(vol_id))
+        self.assertEqual(encoded_snapid,
+                            self.common._get_snap_name(vol_id))
 
     def test_check_flags(self):
         class FakeOptions():
@@ -258,11 +258,11 @@ class TestHPMSACommon(test.TestCase):
         options = FakeOptions({'opt1': 'val1', 'opt2': 'val2'})
         required_flags = ['opt1', 'opt2']
         ret = self.common.check_flags(options, required_flags)
-        self.assertEqual(ret, None)
+        self.assertEqual(None, ret)
 
         options = FakeOptions({'opt1': 'val1', 'opt3': 'val3'})
         required_flags = ['opt1', 'opt2']
-        self.assertEqual(ret, None)
+        self.assertEqual(None, ret)
 
         options = FakeOptions({'opt1': 'val1', 'opt2': 'val2'})
         required_flags = ['opt1', 'opt2', 'opt3']
@@ -282,16 +282,15 @@ class TestHPMSACommon(test.TestCase):
         self.assertRaises(exception.Invalid, self.common._update_volume_stats)
         mock_stats.assert_called_with(self.config.msa_vdisk)
         ret = self.common._update_volume_stats()
-        self.assertEqual(ret, None)
-        self.assertEqual(self.common.stats,
-                         {'storage_protocol': None,
+        self.assertEqual(None, ret)
+        self.assertEqual({'storage_protocol': None,
                           'vendor_name': 'Hewlett-Packard',
                           'driver_version': self.common.VERSION,
                           'volume_backend_name': None,
                           'free_capacity_gb': 90,
                           'reserved_percentage': 0,
                           'total_capacity_gb': 100,
-                          'QoS_support': False})
+                          'QoS_support': False}, self.common.stats)
 
     @mock.patch.object(msa.HPMSAClient, 'create_volume')
     def test_create_volume(self, mock_create):
@@ -300,7 +299,7 @@ class TestHPMSACommon(test.TestCase):
         self.assertRaises(exception.Invalid, self.common.create_volume,
                           test_volume)
         ret = self.common.create_volume(test_volume)
-        self.assertEqual(ret, None)
+        self.assertEqual(None, ret)
         mock_create.assert_called_with(self.common.config.msa_vdisk,
                                        encoded_volid,
                                        "%sGB" % test_volume['size'])
@@ -312,10 +311,10 @@ class TestHPMSACommon(test.TestCase):
         mock_delete.side_effect = [not_found_e, msa.HPMSARequestError,
                                    None]
 
-        self.assertEqual(self.common.delete_volume(test_volume), None)
+        self.assertEqual(None, self.common.delete_volume(test_volume))
         self.assertRaises(exception.Invalid, self.common.delete_volume,
                           test_volume)
-        self.assertEqual(self.common.delete_volume(test_volume), None)
+        self.assertEqual(None, self.common.delete_volume(test_volume))
         mock_delete.assert_called_with(encoded_volid)
 
     @mock.patch.object(msa.HPMSAClient, 'copy_volume')
@@ -335,7 +334,7 @@ class TestHPMSACommon(test.TestCase):
                           dest_volume, detached_volume)
 
         ret = self.common.create_cloned_volume(dest_volume, detached_volume)
-        self.assertEqual(ret, None)
+        self.assertEqual(None, ret)
 
         mock_copy.assert_called_with(encoded_volid,
                                      'vqqqqqqqqqqqqqqqqqqq',
@@ -357,7 +356,7 @@ class TestHPMSACommon(test.TestCase):
                           dest_volume, test_snap)
 
         ret = self.common.create_volume_from_snapshot(dest_volume, test_snap)
-        self.assertEqual(ret, None)
+        self.assertEqual(None, ret)
         mock_copy.assert_called_with('sqqqqqqqqqqqqqqqqqqq',
                                      'vqqqqqqqqqqqqqqqqqqq',
                                      self.common.config.msa_vdisk)
@@ -369,7 +368,7 @@ class TestHPMSACommon(test.TestCase):
         self.assertRaises(exception.Invalid, self.common.extend_volume,
                           test_volume, 20)
         ret = self.common.extend_volume(test_volume, 20)
-        self.assertEqual(ret, None)
+        self.assertEqual(None, ret)
         mock_extend.assert_called_with(encoded_volid, '10GB')
 
     @mock.patch.object(msa.HPMSAClient, 'create_snapshot')
@@ -379,7 +378,7 @@ class TestHPMSACommon(test.TestCase):
         self.assertRaises(exception.Invalid, self.common.create_snapshot,
                           test_snap)
         ret = self.common.create_snapshot(test_snap)
-        self.assertEqual(ret, None)
+        self.assertEqual(None, ret)
         mock_create.assert_called_with(encoded_volid, 'sqqqqqqqqqqqqqqqqqqq')
 
     @mock.patch.object(msa.HPMSAClient, 'delete_snapshot')
@@ -389,10 +388,10 @@ class TestHPMSACommon(test.TestCase):
         mock_delete.side_effect = [not_found_e, msa.HPMSARequestError,
                                    None]
 
-        self.assertEqual(self.common.delete_snapshot(test_snap), None)
+        self.assertEqual(None, self.common.delete_snapshot(test_snap))
         self.assertRaises(exception.Invalid, self.common.delete_snapshot,
                           test_snap)
-        self.assertEqual(self.common.delete_snapshot(test_snap), None)
+        self.assertEqual(None, self.common.delete_snapshot(test_snap))
         mock_delete.assert_called_with('sqqqqqqqqqqqqqqqqqqq')
 
     @mock.patch.object(msa.HPMSAClient, 'map_volume')
@@ -402,7 +401,7 @@ class TestHPMSACommon(test.TestCase):
         self.assertRaises(exception.Invalid, self.common.map_volume,
                           test_volume, connector)
         lun = self.common.map_volume(test_volume, connector)
-        self.assertEqual(lun, 10)
+        self.assertEqual(10, lun)
         mock_map.assert_called_with(encoded_volid, connector['wwpns'])
 
     @mock.patch.object(msa.HPMSAClient, 'unmap_volume')
@@ -412,7 +411,7 @@ class TestHPMSACommon(test.TestCase):
         self.assertRaises(exception.Invalid, self.common.unmap_volume,
                           test_volume, connector)
         ret = self.common.unmap_volume(test_volume, connector)
-        self.assertEqual(ret, None)
+        self.assertEqual(None, ret)
         mock_unmap.assert_called_with(encoded_volid, connector['wwpns'])
 
 
@@ -438,7 +437,7 @@ class TestHPMSAFC(test.TestCase):
         func = getattr(self.driver, method)
         mock.side_effect = [exception.Invalid(), None]
         self.assertRaises(exception.Invalid, func, *args)
-        self.assertEqual(expected, func(*args))
+        self.assertEqual(func(*args), expected)
 
     @mock.patch.object(hp_msa_common.HPMSACommon, 'create_volume')
     def test_create_volume(self, mock_create):
@@ -491,10 +490,10 @@ class TestHPMSAFC(test.TestCase):
         mock_map.assert_called_with(test_volume, connector)
 
         ret = self.driver.initialize_connection(test_volume, connector)
-        self.assertEqual(ret, {'driver_volume_type': 'fibre_channel',
+        self.assertEqual({'driver_volume_type': 'fibre_channel',
                                'data': {'target_wwn': ['id1'],
                                         'target_lun': 1,
-                                        'target_discovered': True}})
+                                        'target_discovered': True}}, ret)
         mock_ports.assert_called_once()
 
     @mock.patch.object(hp_msa_common.HPMSACommon, 'client_logout')
@@ -511,7 +510,7 @@ class TestHPMSAFC(test.TestCase):
         mock_unmap.assert_called_with(test_volume, connector)
 
         ret = self.driver.terminate_connection(test_volume, connector)
-        self.assertEqual(ret, None)
+        self.assertEqual(None, ret)
 
     @mock.patch.object(hp_msa_common.HPMSACommon, 'client_logout')
     @mock.patch.object(hp_msa_common.HPMSACommon, 'get_volume_stats')
@@ -529,20 +528,20 @@ class TestHPMSAFC(test.TestCase):
         self.assertRaises(exception.Invalid, self.driver.get_volume_stats,
                           False)
         ret = self.driver.get_volume_stats(False)
-        self.assertEqual(ret, {'storage_protocol': 'FC',
+        self.assertEqual({'storage_protocol': 'FC',
                                'driver_version': self.driver.VERSION,
                                'volume_backend_name': 'fakevalue',
                                'free_capacity_gb': 90,
                                'reserved_percentage': 0,
                                'total_capacity_gb': 100,
-                               'QoS_support': False})
+                               'QoS_support': False}, ret)
 
         ret = self.driver.get_volume_stats(True)
-        self.assertEqual(ret, {'storage_protocol': 'FC',
+        self.assertEqual({'storage_protocol': 'FC',
                                'driver_version': self.driver.VERSION,
                                'volume_backend_name': 'fakevalue',
                                'free_capacity_gb': 90,
                                'reserved_percentage': 0,
                                'total_capacity_gb': 100,
-                               'QoS_support': False})
+                               'QoS_support': False}, ret)
         mock_stats.assert_called_with(True)

@@ -348,7 +348,7 @@ class EMCVNXCLIDriverISCSITestCase(test.TestCase):
                  'driver_version': '02.00.00', 'total_capacity_gb': 10000.0,
                  'reserved_percentage': 0, 'vendor_name': 'EMC',
                  'storage_protocol': 'iSCSI'}
-        self.assertEqual(rc, stats)
+        self.assertEqual(stats, rc)
         expected = [mock.call('storagepool', '-list', '-name',
                               'unit_test_pool', '-state'),
                     mock.call('storagepool', '-list', '-name',
@@ -385,7 +385,7 @@ class EMCVNXCLIDriverISCSITestCase(test.TestCase):
                          'cx.apm00123907237.b8',
                          'target_discovered': True,
                          'target_portal': '10.0.0.4:3260'}}
-        self.assertEqual(rc, connect_info)
+        self.assertEqual(connect_info, rc)
         expected = [mock.call('storagepool', '-list', '-name',
                               'unit_test_pool', '-state'),
                     mock.call('storagegroup', '-list', '-gname', 'fakehost'),

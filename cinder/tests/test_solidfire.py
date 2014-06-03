@@ -196,8 +196,8 @@ class SolidFireVolumeTestCase(test.TestCase):
         self.configuration.sf_emulate_512 = False
         sfv = SolidFireDriver(configuration=self.configuration)
         model_update = sfv.create_volume(testvol)
-        self.assertEqual(model_update.get('provider_geometry', None),
-                         '4096 4096')
+        self.assertEqual('4096 4096',
+                     model_update.get('provider_geometry', None))
         self.configuration.sf_emulate_512 = True
 
     def test_create_snapshot(self):
@@ -264,8 +264,8 @@ class SolidFireVolumeTestCase(test.TestCase):
 
         sfv = SolidFireDriver(configuration=self.configuration)
         properties = sfv.initialize_connection(testvol, connector)
-        self.assertEqual(properties['data']['physical_block_size'], '4096')
-        self.assertEqual(properties['data']['logical_block_size'], '4096')
+        self.assertEqual('4096', properties['data']['physical_block_size'])
+        self.assertEqual('4096', properties['data']['logical_block_size'])
 
     def test_create_volume_with_qos(self):
         preset_qos = {}
@@ -451,7 +451,7 @@ class SolidFireVolumeTestCase(test.TestCase):
                                           qos_ref['id'],
                                           type_ref['id'])
         qos = sfv._set_qos_by_volume_type(self.ctxt, type_ref['id'])
-        self.assertEqual(qos, self.expected_qos_results)
+        self.assertEqual(self.expected_qos_results, qos)
 
     def test_set_by_qos_spec(self):
         sfv = SolidFireDriver(configuration=self.configuration)
@@ -467,7 +467,7 @@ class SolidFireVolumeTestCase(test.TestCase):
                                           qos_ref['id'],
                                           type_ref['id'])
         qos = sfv._set_qos_by_volume_type(self.ctxt, type_ref['id'])
-        self.assertEqual(qos, self.expected_qos_results)
+        self.assertEqual(self.expected_qos_results, qos)
 
     def test_set_by_qos_by_type_only(self):
         sfv = SolidFireDriver(configuration=self.configuration)
@@ -476,9 +476,9 @@ class SolidFireVolumeTestCase(test.TestCase):
                                                  "qos:burstIOPS": "300",
                                                  "qos:maxIOPS": "200"})
         qos = sfv._set_qos_by_volume_type(self.ctxt, type_ref['id'])
-        self.assertEqual(qos, {'minIOPS': 100,
+        self.assertEqual({'minIOPS': 100,
                                'maxIOPS': 200,
-                               'burstIOPS': 300})
+                               'burstIOPS': 300}, qos)
 
     def test_retype(self):
         sfv = SolidFireDriver(configuration=self.configuration)

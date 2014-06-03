@@ -30,7 +30,7 @@ class fake_scheduler_rpc_api(object):
                       image_id=None, request_spec=None,
                       filter_properties=None):
 
-        self.test_inst.assertEqual(self.expected_spec, request_spec)
+        self.test_inst.assertEqual(request_spec, self.expected_spec)
 
 
 class fake_volume_api(object):
@@ -44,10 +44,10 @@ class fake_volume_api(object):
                       snapshot_id=None, image_id=None,
                       source_volid=None):
 
-        self.test_inst.assertEqual(self.expected_spec, request_spec)
-        self.test_inst.assertEqual(request_spec['source_volid'], source_volid)
-        self.test_inst.assertEqual(request_spec['snapshot_id'], snapshot_id)
-        self.test_inst.assertEqual(request_spec['image_id'], image_id)
+        self.test_inst.assertEqual(request_spec, self.expected_spec)
+        self.test_inst.assertEqual(source_volid, request_spec['source_volid'])
+        self.test_inst.assertEqual(snapshot_id, request_spec['snapshot_id'])
+        self.test_inst.assertEqual(image_id, request_spec['image_id'])
 
 
 class fake_db(object):

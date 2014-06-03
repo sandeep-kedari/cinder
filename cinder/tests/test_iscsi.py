@@ -76,7 +76,7 @@ class TargetAdminTestCase(object):
         self.cmds = []
 
     def verify_cmds(self, cmds):
-        self.assertEqual(len(cmds), len(self.cmds))
+        self.assertEqual(len(self.cmds), len(cmds))
         for cmd in self.cmds:
             self.assertTrue(cmd in cmds)
 

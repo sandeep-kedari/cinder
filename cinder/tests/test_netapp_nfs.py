@@ -128,7 +128,7 @@ class NetappDirectCmodeNfsDriverTestCase(test.TestCase):
 
         loc = drv.create_volume_from_snapshot(volume, snapshot)
 
-        self.assertEqual(loc, expected_result)
+        self.assertEqual(expected_result, loc)
 
         mox.VerifyAll()
 
@@ -824,8 +824,8 @@ class NetappDirectCmodeNfsDriverOnlyTestCase(test.TestCase):
                                    return_value=['localhost:myshare']):
                 with mock.patch.object(drv, '_do_create_volume'):
                     volume_info = self._driver.create_volume(FakeVolume(1))
-                    self.assertEqual(volume_info.get('provider_location'),
-                                     fake_share)
+                    self.assertEqual(fake_share,
+                                         volume_info.get('provider_location'))
 
     @mock.patch.object(netapp_nfs, 'get_volume_extra_specs')
     def test_create_volume_with_qos_policy(self, mock_volume_extra_specs):
@@ -845,8 +845,7 @@ class NetappDirectCmodeNfsDriverOnlyTestCase(test.TestCase):
                                            '_set_qos_policy_group_on_volume'
                                            ) as mock_set_qos:
                         volume_info = self._driver.create_volume(fake_volume)
-                        self.assertEqual(volume_info.get('provider_location'),
-                                         'localhost:myshare')
+                        self.assertEqual('localhost:myshare', volume_info.get('provider_location'))
                         mock_set_qos.assert_called_once_with(fake_volume,
                                                              fake_share,
                                                              fake_qos_policy)
