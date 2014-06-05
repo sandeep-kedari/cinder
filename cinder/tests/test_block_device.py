@@ -45,10 +45,8 @@ class TestBlockDeviceDriver(cinder.test.TestCase):
         self.drv.local_path(TEST_VOLUME1).AndReturn('/dev/loop1')
         self.mox.ReplayAll()
         data = self.drv.initialize_connection(TEST_VOLUME1, TEST_CONNECTOR)
-        self.assertEqual({
-            'driver_volume_type': 'local',
-            'data': {'device_path': '/dev/loop1'}
-              }, data)
+        self.assertEqual({'driver_volume_type': 'local',
+                         'data': {'device_path': '/dev/loop1'}}, data)
 
     def test_initialize_connection_different_hosts(self):
         TEST_CONNECTOR = {'host': 'localhost1'}
@@ -143,7 +141,7 @@ class TestBlockDeviceDriver(cinder.test.TestCase):
                              execute=self.drv._execute)
         self.mox.ReplayAll()
         self.assertEqual({'provider_location': '/dev/loop2'},
-                 self.drv.create_cloned_volume(TEST_VOLUME, TEST_SRC))
+                         self.drv.create_cloned_volume(TEST_VOLUME, TEST_SRC))
 
     def test_copy_image_to_volume(self):
         TEST_VOLUME = {'provider_location': '1 2 3 /dev/loop1', 'size': 1}
@@ -204,7 +202,7 @@ class TestBlockDeviceDriver(cinder.test.TestCase):
             self.drv._get_device_size(dev).AndReturn(1)
         self.mox.ReplayAll()
         self.assertEqual({'/dev/loop1': 1, '/dev/loop2': 1},
-                                   self.drv._devices_sizes())
+                         self.drv._devices_sizes())
 
     def test_find_appropriate_size_device_no_free_disks(self):
         size = 1
@@ -238,4 +236,4 @@ class TestBlockDeviceDriver(cinder.test.TestCase):
         self.drv._get_used_devices().AndReturn(set())
         self.mox.ReplayAll()
         self.assertEqual('/dev/loop2',
-                      self.drv.find_appropriate_size_device(size))
+                         self.drv.find_appropriate_size_device(size))

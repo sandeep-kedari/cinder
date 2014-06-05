@@ -136,7 +136,7 @@ class IBMNASDriverTestCase(test.TestCase):
         mock.drv._get_export_path.return_value = self.TEST_NFS_EXPORT.\
             split(':')[1]
         self.assertEqual(mock.drv._get_export_path(volume['id']),
-                                 self.TEST_NFS_EXPORT.split(':')[1])
+                         self.TEST_NFS_EXPORT.split(':')[1])
 
     def test_create_ibmnas_snap_mount_point_provided(self):
         """Create ibmnas snap if mount point is provided."""
@@ -380,4 +380,4 @@ class IBMNASDriverTestCase(test.TestCase):
                          drv._set_rw_permissions_for_all().
                          drv._resize_volume_file().
                          drv.create_volume_from_snapshot(snapshot),
-                                 self.TEST_NFS_EXPORT)
+                         self.TEST_NFS_EXPORT)

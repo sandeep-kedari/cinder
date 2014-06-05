@@ -140,9 +140,9 @@ class SchedulerManagerTestCase(test.TestCase):
         self.assertTrue(isinstance(self.manager.driver,
                                    filter_scheduler.FilterScheduler))
         self.assertEqual(default_filters,
-                               CONF.scheduler_default_filters)
+                         CONF.scheduler_default_filters)
         self.assertEqual(['ChanceWeigher'],
-                               CONF.scheduler_default_weighers)
+                         CONF.scheduler_default_weighers)
 
         self.flags(scheduler_driver=simple,
                    scheduler_default_filters=['CapacityFilter'],
@@ -151,9 +151,9 @@ class SchedulerManagerTestCase(test.TestCase):
         self.assertTrue(isinstance(self.manager.driver,
                                    filter_scheduler.FilterScheduler))
         self.assertEqual(default_filters,
-                               CONF.scheduler_default_filters)
+                         CONF.scheduler_default_filters)
         self.assertEqual(['AllocatedCapacityWeigher'],
-                                 CONF.scheduler_default_weighers)
+                         CONF.scheduler_default_weighers)
 
     @mock.patch('cinder.db.volume_update')
     @mock.patch('cinder.db.volume_get')

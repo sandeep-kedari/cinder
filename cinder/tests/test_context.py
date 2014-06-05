@@ -93,4 +93,4 @@ class ContextTestCase(test.TestCase):
                                      user_domain="user-domain",
                                      project_domain="project-domain")
         self.assertEqual(ctx.to_dict()["user_identity"],
-                      'user tenant domain user-domain project-domain')
+                         'user tenant domain user-domain project-domain')

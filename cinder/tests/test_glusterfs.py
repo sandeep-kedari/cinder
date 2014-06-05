@@ -132,8 +132,9 @@ class GlusterFsDriverTestCase(test.TestCase):
         volume['provider_location'] = self.TEST_EXPORT1
         volume['name'] = 'volume-123'
 
-        self.assertEqual(drv.local_path(volume),
-            '/mnt/test/ab03ab34eaca46a5fb81878f7e9b91fc/volume-123')
+        self.assertEqual(
+            '/mnt/test/ab03ab34eaca46a5fb81878f7e9b91fc/volume-123',
+            drv.local_path(volume))
 
     def test_mount_glusterfs_should_mount_correctly(self):
         """_mount_glusterfs common case usage."""
@@ -219,7 +220,7 @@ class GlusterFsDriverTestCase(test.TestCase):
         drv = self._driver
 
         self.assertEqual(drv._get_hash_str(self.TEST_EXPORT1),
-                           'ab03ab34eaca46a5fb81878f7e9b91fc')
+                         'ab03ab34eaca46a5fb81878f7e9b91fc')
 
     def test_get_mount_point_for_share(self):
         """_get_mount_point_for_share should call RemoteFsClient."""
@@ -265,7 +266,7 @@ class GlusterFsDriverTestCase(test.TestCase):
         mox.ReplayAll()
 
         self.assertEqual(drv._get_available_capacity(self.TEST_EXPORT1),
-                          (df_avail, df_total_size))
+                         (df_avail, df_total_size))
 
         mox.VerifyAll()
 
@@ -374,7 +375,7 @@ class GlusterFsDriverTestCase(test.TestCase):
 
         drv._ensure_shares_mounted()
 
-        self.assertEqual(len(drv._mounted_shares), 0)
+        self.assertEqual(0, len(drv._mounted_shares))
 
         mox.VerifyAll()
 
@@ -479,7 +480,7 @@ class GlusterFsDriverTestCase(test.TestCase):
         mox.ReplayAll()
 
         self.assertEqual(drv._find_share(self.TEST_SIZE_IN_GB),
-                              self.TEST_EXPORT2)
+                         self.TEST_EXPORT2)
 
         mox.VerifyAll()
 
@@ -1080,7 +1081,7 @@ class GlusterFsDriverTestCase(test.TestCase):
         info = drv._read_info_file(info_path)
 
         self.assertEqual('volume-%s' % self.VOLUME_UUID,
-                                 info[self.VOLUME_UUID])
+                         info[self.VOLUME_UUID])
 
         mox.VerifyAll()
 
@@ -1711,13 +1712,13 @@ class GlusterFsDriverTestCase(test.TestCase):
         self.assertEqual('glusterfs', conn_info['driver_volume_type'])
         self.assertEqual(volume['name'], conn_info['data']['name'])
         self.assertEqual(self.TEST_MNT_POINT_BASE,
-                          conn_info['mount_point_base'])
+                         conn_info['mount_point_base'])
 
     def test_get_mount_point_base(self):
         (mox, drv) = self._mox, self._driver
 
         self.assertEqual(self.TEST_MNT_POINT_BASE,
-                          drv._get_mount_point_base())
+                         drv._get_mount_point_base())
 
     def test_backup_volume(self):
         """Backup a volume with no snapshots."""

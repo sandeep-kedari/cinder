@@ -265,7 +265,7 @@ class RBDTestCase(test.TestCase):
                     self.mock_rbd.RBD.remove.assert_called_once()
                     # Make sure the exception was raised
                     self.assertEqual([self.mock_rbd.ImageBusy],
-                                        RAISED_EXCEPTIONS)
+                                     RAISED_EXCEPTIONS)
 
     @common_mocks
     def test_create_snapshot(self):
@@ -964,7 +964,7 @@ class ManagedRBDTestCase(DriverTestCase):
             self.assertEqual(actual, ({}, False))
 
         self.assertEqual(driver.clone_image(object(), None, None, {}),
-                           ({}, False))
+                         ({}, False))
 
     def test_clone_success(self):
         expected = ({'provider_location': None}, True)

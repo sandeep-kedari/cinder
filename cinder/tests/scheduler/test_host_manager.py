@@ -188,7 +188,7 @@ class HostManagerTestCase(test.TestCase):
             volume_node = services[i]
             host = volume_node['host']
             self.assertEqual(volume_node,
-                           host_state_map[host].service)
+                             host_state_map[host].service)
 
 
 class HostStateTestCase(test.TestCase):

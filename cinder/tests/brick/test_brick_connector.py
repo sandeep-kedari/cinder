@@ -281,7 +281,7 @@ class ISCSIConnectorTestCase(ConnectorTestCase):
         self.stubs.Set(self.connector, '_get_multipath_device_name',
                        lambda x: paths[0])
         self.assertEqual('iqn.2013-01.ro.com.netapp:node.netapp02',
-                             self.connector._get_multipath_iqn(paths[0]))
+                         self.connector._get_multipath_iqn(paths[0]))
 
     def test_disconnect_volume_multipath_iscsi(self):
         result = []

@@ -187,7 +187,7 @@ class TestUtils(test.TestCase):
         self.assertEqual('1.7G', inf.snapshots[0]['vm_size'])
         self.assertEqual('2011-10-04', inf.snapshots[0]['date'])
         self.assertEqual('19:04:00 32:06:34.974',
-                          inf.snapshots[0]['vm_clock'])
+                         inf.snapshots[0]['vm_clock'])
 
         self.assertEqual(TEST_STR, str(inf))
 
@@ -637,8 +637,8 @@ class TestDiscoverChain(test.TestCase):
         result = image_utils.discover_vhd_chain('some/path')
         mox.VerifyAll()
 
-        self.assertEqual(
-                  result, ['some/path/0.vhd', 'some/path/1.vhd'])
+        self.assertEqual(result,
+                         ['some/path/0.vhd', 'some/path/1.vhd'])
 
 
 class TestXenServerImageToCoalescedVhd(test.TestCase):

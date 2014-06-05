@@ -629,7 +629,7 @@ class NetAppEseriesIscsiDriverTestCase(test.TestCase):
         driver = common.NetAppDriver(configuration=configuration)
         driver.do_setup(context='context')
         self.assertEqual('1fa6efb5-f07b-4de4-9f0e-52e5f7ff5d1b',
-                          driver._client.get_system_id())
+                         driver._client.get_system_id())
 
     def test_check_system_pwd_not_sync(self):
         def list_system():
@@ -676,7 +676,8 @@ class NetAppEseriesIscsiDriverTestCase(test.TestCase):
         connector_new = {'initiator': 'iqn.1993-08.org.debian:01:1001'}
         connection_info = self.driver.initialize_connection(self.volume,
                                                             connector_new)
-        self.assertEqual('iscsi', connection_info['driver_volume_type'], 'iscsi')
+        self.assertEqual('iscsi', connection_info['driver_volume_type'],
+                         'iscsi')
         properties = connection_info.get('data')
         self.assertIsNotNone(properties, 'Target portal is none')
 

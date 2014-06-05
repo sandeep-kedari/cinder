@@ -536,7 +536,7 @@ class TestNexentaNfsDriver(test.TestCase):
         }
         result = self.drv.initialize_connection(volume, None)
         self.assertEqual('%s/volume' % self.TEST_EXPORT1,
-                          result['data']['export'])
+                         result['data']['export'])
 
     def test_do_create_volume(self):
         volume = {
@@ -606,7 +606,7 @@ class TestNexentaNfsDriver(test.TestCase):
         path = self.drv.local_path(volume)
         self.assertEqual(
             '$state_path/mnt/b3f660847a52b29ac330d8555e4ad669/volume-1/volume',
-                          path)
+            path)
 
     def test_remote_path(self):
         volume = {'provider_location': self.TEST_EXPORT1, 'name': 'volume-1'}
@@ -648,7 +648,7 @@ class TestNexentaNfsDriver(test.TestCase):
         self.assertEqual(2, len(self.drv.share2nms.keys()))
 
         self.assertEqual(self.TEST_EXPORT2_OPTIONS,
-                       self.drv.shares[self.TEST_EXPORT2])
+                         self.drv.shares[self.TEST_EXPORT2])
 
         self.mox.VerifyAll()
 
@@ -763,9 +763,9 @@ class TestNexentaUtils(test.TestCase):
     def test_str2gib_size(self):
         self.assertEqual(1, utils.str2gib_size('1024M'))
         self.assertEqual(300 * units.MiB // units.GiB,
-                          utils.str2gib_size('300M'))
+                         utils.str2gib_size('300M'))
         self.assertEqual(1.2 * units.TiB // units.GiB,
-                                utils.str2gib_size('1.2T'))
+                         utils.str2gib_size('1.2T'))
         self.assertRaises(ValueError, utils.str2gib_size, 'A')
 
     def test_parse_nms_url(self):

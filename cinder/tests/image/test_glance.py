@@ -70,7 +70,7 @@ class TestGlanceSerializer(test.TestCase):
                 '{"virtual_device": "ephemeral0", '
                 '"device_name": "/dev/fake0"}]'}}
         converted = glance._convert_to_string(metadata)
-        sel.assertEqual(converted_expected, converted)
+        self.assertEqual(converted_expected, converted)
         self.assertEqual(metadata, glance._convert_from_string(converted))
 
 
@@ -199,7 +199,7 @@ class TestGlanceImageService(test.TestCase):
 
         self.assertIsNotNone(image_id)
         self.assertEqual(len(self.service.detail(self.context)),
-                        num_images + 1)
+                         num_images + 1)
 
     def test_create_and_show_non_existing_image(self):
         fixture = self._make_fixture(name='test image')
@@ -566,12 +566,12 @@ class TestGlanceClientVersion(test.TestCase):
         client_wrapper_v1 = glance.GlanceClientWrapper('fake', 'fake_host',
                                                        9292)
         self.assertEqual('glanceclient.v1.client',
-                        client_wrapper_v1.client.__module__)
+                         client_wrapper_v1.client.__module__)
         self.flags(glance_api_version=2)
         client_wrapper_v2 = glance.GlanceClientWrapper('fake', 'fake_host',
                                                        9292)
         self.assertEqual('glanceclient.v2.client',
-                          client_wrapper_v2.client.__module__)
+                         client_wrapper_v2.client.__module__)
         CONF.reset()
 
     def test_glance_version_by_arg(self):
@@ -579,11 +579,11 @@ class TestGlanceClientVersion(test.TestCase):
         client_wrapper_v1 = glance.GlanceClientWrapper('fake', 'fake_host',
                                                        9292, version=1)
         self.assertEqual('glanceclient.v1.client',
-                          client_wrapper_v1.client.__module__)
+                         client_wrapper_v1.client.__module__)
         client_wrapper_v2 = glance.GlanceClientWrapper('fake', 'fake_host',
                                                        9292, version=2)
         self.assertEqual('glanceclient.v2.client',
-                                 client_wrapper_v2.client.__module__)
+                         client_wrapper_v2.client.__module__)
 
 
 def _create_failing_glance_client(info):

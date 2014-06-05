@@ -577,7 +577,7 @@ class CoraidDriverIntegrationalTestCase(CoraidDriverLoginSuccessTestCase):
         self.mox.VerifyAll()
 
         self.assertEqual(
-          'Bronze-Bronze:Profile1:repo1 Bronze-Bronze:Profile2:repo2'
+            'Bronze-Bronze:Profile1:repo1 Bronze-Bronze:Profile2:repo2',
             capabilities[fake_coraid_repository_key])
 
     def test_create_cloned_volume(self):

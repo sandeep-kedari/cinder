@@ -173,14 +173,14 @@ class ScalityDriverTestCase(test.TestCase):
     def test_local_path(self):
         """Expected behaviour for local_path."""
         self.assertEqual(self.TEST_VOLPATH,
-                        self._driver.local_path(self.TEST_VOLUME))
+                         self._driver.local_path(self.TEST_VOLUME))
 
     def test_create_volume(self):
         """Expected behaviour for create_volume."""
         ret = self._driver.create_volume(self.TEST_VOLUME)
         self.assertEqual(os.path.join(self.TEST_VOLDIR,
-                                      self.TEST_VOLNAME),
-                                      ret['provider_location'])
+                         self.TEST_VOLNAME),
+                         ret['provider_location'])
         self.assertTrue(os.path.isfile(self.TEST_VOLPATH))
         self.assertEqual(100 * units.MiB,
                          os.stat(self.TEST_VOLPATH).st_size)
@@ -228,8 +228,8 @@ class ScalityDriverTestCase(test.TestCase):
         ret = self._driver.initialize_connection(self.TEST_VOLUME, None)
         self.assertEqual('scality', ret['driver_volume_type'])
         self.assertEqual(os.path.join(self.TEST_VOLDIR,
-                                      self.TEST_VOLNAME),
-                             ret['data']['sofs_path'])
+                         self.TEST_VOLNAME),
+                         ret['data']['sofs_path'])
 
     def test_copy_image_to_volume(self):
         """Expected behaviour for copy_image_to_volume."""

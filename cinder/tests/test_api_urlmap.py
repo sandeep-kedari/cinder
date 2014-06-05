@@ -55,21 +55,23 @@ class TestAccept(test.TestCase):
     def test_best_match(self):
         arg = '*/*; q=0.7, application/json; q=0.7, text/html; q=-0.8'
         accept = urlmap.Accept(arg)
-        self.assertEqual(('application/json', {'q': '0.7'}), 
-                                   accept.best_match(['application/json',
-                                        'application/xml', 'text/html']))
+        self.assertEqual(('application/json',
+                         {'q': '0.7'}),
+                         accept.best_match(
+                         ['application/json', 'application/xml',
+                          'text/html']))
 
     def test_match_mask_one_asterisk(self):
         arg = 'text/*; q=0.7'
         accept = urlmap.Accept(arg)
         self.assertEqual(('text/html', {'q': '0.7'}),
-                          accept.best_match(['text/html']))
+                         accept.best_match(['text/html']))
 
     def test_match_mask_two_asterisk(self):
         arg = '*/*; q=0.7'
         accept = urlmap.Accept(arg)
         self.assertEqual(('text/html', {'q': '0.7'}),
-                                  accept.best_match(['text/html']))
+                         accept.best_match(['text/html']))
 
     def test_match_mask_no_asterisk(self):
         arg = 'application/json; q=0.7'
@@ -81,7 +83,7 @@ class TestAccept(test.TestCase):
               " text/html; q=0.3"
         accept = urlmap.Accept(arg)
         self.assertEqual({'q': '0.2'},
-                      accept.content_type_params('application/json'))
+                         accept.content_type_params('application/json'))
 
     def test_content_type_params_wrong_content_type(self):
         arg = 'application/xml; q=0.1, text/html; q=0.1'
@@ -106,10 +108,9 @@ class TestUrlMapFactory(test.TestCase):
         self.mox.ReplayAll()
         expected_urlmap = urlmap.URLMap(not_found_app='app_local_loader')
         expected_urlmap['http://foobar.com:20'] = 'some_app_loader'
-        self.assertEqual(expected_urlmap,
-                          urlmap.urlmap_factory(self.loader, self.global_conf,
-                                               **local_conf))
-    
+        self.assertEqual(expected_urlmap, urlmap.urlmap_factory(
+                         self.loader, self.global_conf, **local_conf))
+
     def test_not_found_app_not_in_local_conf(self):
         local_conf = {'domain foobar.com port 20 /': 'some_app_local'}
         self.loader.get_app('app_global', global_conf=self.global_conf).\
@@ -133,9 +134,8 @@ class TestUrlMapFactory(test.TestCase):
         expected_urlmap = urlmap.URLMap(not_found_app=None)
         expected_urlmap['http://foobar.com:20'] = 'some_app_returned'\
                                                   '_by_loader'
-        self.assertEqual(expected_urlmap,
-                            urlmap.urlmap_factory(self.loader, self.global_conf,
-                                               **local_conf))
+        self.assertEqual(expected_urlmap, urlmap.urlmap_factory(
+                         self.loader, self.global_conf, **local_conf))
 
 
 class TestURLMap(test.TestCase):
@@ -155,19 +155,17 @@ class TestURLMap(test.TestCase):
 
     def test_match_with_applications(self):
         self.urlmap[('http://10.20.30.40:50', '/path/somepath')] = 'app'
-        self.assertEqual((None, None),
-                               self.urlmap._match('20.30.40.50', '20',
-                                            'path/somepath'))
+        self.assertEqual((None, None), self.urlmap._match(
+                         '20.30.40.50', '20', 'path/somepath'))
 
     def test_match_without_applications(self):
-        self.assertEqual((None, None),
-                   self.urlmap._match('host', 20, 'app_url/somepath'))
+        self.assertEqual((None, None), self.urlmap._match(
+                         'host', 20, 'app_url/somepath'))
 
     def test_match_path_info_equals_app_url(self):
         self.urlmap[('http://20.30.40.50:60', '/app_url/somepath')] = 'app'
-        self.assertEqual(('app', '/app_url/somepath'),
-                            self.urlmap._match('http://20.30.40.50', '60',
-                                            '/app_url/somepath'))
+        self.assertEqual(('app', '/app_url/somepath'), self.urlmap._match(
+                         'http://20.30.40.50', '60', '/app_url/somepath'))
 
     def test_match_path_info_equals_app_url_many_app(self):
         self.urlmap[('http://20.30.40.50:60', '/path')] = 'app1'
@@ -175,7 +173,7 @@ class TestURLMap(test.TestCase):
         self.urlmap[('http://20.30.40.50:60', '/path/somepath/elsepath')] = \
             'app3'
         self.assertEqual(('app3', '/path/somepath/elsepath'),
-                               self.urlmap._match('http://20.30.40.50', '60',
+                         self.urlmap._match('http://20.30.40.50', '60',
                                             '/path/somepath/elsepath'))
 
     def test_set_script_name(self):
@@ -196,8 +194,8 @@ class TestURLMap(test.TestCase):
         self.assertEqual('value', wrap(self.input_environ, start_response))
 
     def test_content_type_strategy_without_version(self):
-        self.assertEqual(None, self.urlmap._content_type_strategy('host', 20,
-                                                            self.environ))
+        self.assertEqual(None, self.urlmap._content_type_strategy(
+                         'host', 20, self.environ))
 
     def test_content_type_strategy_with_version(self):
         environ = {'HTTP_ACCEPT': "application/vnd.openstack.melange+xml;"
@@ -209,17 +207,16 @@ class TestURLMap(test.TestCase):
         self.urlmap._set_script_name('app', '/v2.0').AndReturn('value')
         self.mox.ReplayAll()
         self.assertEqual('value', self.urlmap._content_type_strategy(
-            'http://10.20.30.40', '50', environ))
+                         'http://10.20.30.40', '50', environ))
 
     def test_path_strategy_wrong_path_info(self):
-        self.assertEqual((None, None, None),
-                      self.urlmap._path_strategy('http://10.20.30.40', '50',
-                                                    '/resource'))
+        self.assertEqual((None, None, None), self.urlmap._path_strategy(
+                         'http://10.20.30.40', '50', '/resource'))
 
     def test_path_strategy_mime_type_only(self):
         self.assertEqual(('application/xml', None, None),
-                       self.urlmap._path_strategy('http://10.20.30.40', '50',
-                                                    '/resource.xml'))
+                         self.urlmap._path_strategy(
+                         'http://10.20.30.40', '50', '/resource.xml'))
 
     def test_path_strategy(self):
         self.urlmap[('http://10.20.30.40:50', '/path/elsepath/')] = 'app'
@@ -228,8 +225,8 @@ class TestURLMap(test.TestCase):
                                 '/path/elsepath').AndReturn('value')
         self.mox.ReplayAll()
         self.assertEqual(('application/xml', 'value', '/path/elsepath'),
-                                            self.urlmap._path_strategy(
-            'http://10.20.30.40', '50', '/path/elsepath/resource.xml'))
+                         self.urlmap._path_strategy('http://10.20.30.40',
+                         '50', '/path/elsepath/resource.xml'))
 
     def test_path_strategy_wrong_mime_type(self):
         self.urlmap[('http://10.20.30.40:50', '/path/elsepath/')] = 'app'
@@ -238,8 +235,8 @@ class TestURLMap(test.TestCase):
                                 '/path/elsepath').AndReturn('value')
         self.mox.ReplayAll()
         self.assertEqual((None, 'value', '/path/elsepath'),
-                                            self.urlmap._path_strategy(
-            'http://10.20.30.40', '50', '/path/elsepath/resource.abc'))
+                         self.urlmap._path_strategy('http://10.20.30.40',
+                         '50', '/path/elsepath/resource.abc'))
 
     def test_accept_strategy_version_not_in_params(self):
         environ = {'HTTP_ACCEPT': "application/xml; q=0.1, application/json; "
@@ -247,8 +244,8 @@ class TestURLMap(test.TestCase):
                    'PATH_INFO': "/resource.xml",
                    'CONTENT_TYPE': 'application/xml; version=2.0'}
         self.assertEqual(('application/xml', None),
-                                     self.urlmap._accept_strategy(
-            'http://10.20.30.40', '50', environ, ['application/xml']))
+                         self.urlmap._accept_strategy('http://10.20.30.40',
+                         '50', environ, ['application/xml']))
 
     def test_accept_strategy_version(self):
         environ = {'HTTP_ACCEPT': "application/xml; q=0.1; version=1.0,"
@@ -260,5 +257,5 @@ class TestURLMap(test.TestCase):
         self.urlmap._set_script_name('app', '/v1.0').AndReturn('value')
         self.mox.ReplayAll()
         self.assertEqual(('application/xml', 'value'),
-                                          self.urlmap._accept_strategy(
-            'http://10.20.30.40', '50', environ, ['application/xml']))
+                         self.urlmap._accept_strategy('http://10.20.30.40',
+                         '50', environ, ['application/xml']))

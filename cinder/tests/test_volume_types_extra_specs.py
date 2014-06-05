@@ -120,7 +120,7 @@ class VolumeTypeExtraSpecsTestCase(test.TestCase):
         types = db.volume_type_get_all(context.get_admin_context())
 
         self.assertEqual(expected_specs,
-                     types[self.vol_type1['name']]['extra_specs'])
+                         types[self.vol_type1['name']]['extra_specs'])
 
         self.assertEqual({},
-                  types[self.vol_type2_noextra['name']]['extra_specs'])
+                         types[self.vol_type2_noextra['name']]['extra_specs'])

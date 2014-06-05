@@ -155,8 +155,9 @@ class NfsDriverTestCase(test.TestCase):
         volume['provider_location'] = self.TEST_NFS_EXPORT1
         volume['name'] = 'volume-123'
 
-        self.assertEqual(drv.local_path(volume),
-            '/mnt/test/2f4f60214cf43c595666dd815f0360a4/volume-123')
+        self.assertEqual(
+            '/mnt/test/2f4f60214cf43c595666dd815f0360a4/volume-123',
+            drv.local_path(volume))
 
     def test_copy_image_to_volume(self):
         """resize_image common case usage."""
@@ -198,8 +199,8 @@ class NfsDriverTestCase(test.TestCase):
         self.configuration.nfs_mount_point_base = self.TEST_MNT_POINT_BASE
 
         self.assertEqual(drv._get_mount_point_for_share(
-                                         self.TEST_NFS_EXPORT1),
-                             '/mnt/test/2f4f60214cf43c595666dd815f0360a4')
+                         self.TEST_NFS_EXPORT1),
+                         '/mnt/test/2f4f60214cf43c595666dd815f0360a4')
 
     def test_get_capacity_info(self):
         """_get_capacity_info should calculate correct value."""
@@ -230,7 +231,7 @@ class NfsDriverTestCase(test.TestCase):
         mox.ReplayAll()
 
         self.assertEqual(drv._get_capacity_info(self.TEST_NFS_EXPORT1),
-                          (stat_total_size, stat_avail, du_used))
+                         (stat_total_size, stat_avail, du_used))
 
         mox.VerifyAll()
 
@@ -263,7 +264,7 @@ class NfsDriverTestCase(test.TestCase):
         mox.ReplayAll()
 
         self.assertEqual(drv._get_capacity_info(self.TEST_NFS_EXPORT_SPACES),
-                              (stat_total_size, stat_avail, du_used))
+                         (stat_total_size, stat_avail, du_used))
 
         mox.VerifyAll()
 
@@ -292,7 +293,7 @@ class NfsDriverTestCase(test.TestCase):
         self.assertEqual(2, len(drv.shares))
 
         self.assertEqual(self.TEST_NFS_EXPORT2_OPTIONS,
-                        drv.shares[self.TEST_NFS_EXPORT2])
+                         drv.shares[self.TEST_NFS_EXPORT2])
 
         mox.VerifyAll()
 

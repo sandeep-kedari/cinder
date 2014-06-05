@@ -36,7 +36,7 @@ class SelectorTest(test.TestCase):
         self.assertEqual(1, len(sel.chain))
         self.assertEqual('test', sel.chain[0])
         self.assertEqual(self.obj_for_test['test'],
-                             sel(self.obj_for_test))
+                         sel(self.obj_for_test))
 
     def test_datum_selector(self):
         sel = xmlutil.Selector('test', 'name')
@@ -107,7 +107,7 @@ class TemplateElementTest(test.TestCase):
         self.assertEqual('a', elem.attrib['a'].chain[0])
         self.assertEqual(1, len(elem.attrib['b'].chain))
         self.assertEqual('foo', elem.attrib['b'].chain[0])
-        self.assertEqual( attrs['c'], elem.attrib['c'])
+        self.assertEqual(attrs['c'], elem.attrib['c'])
 
     def test_element_attribute_keys(self):
         attrs = dict(a=1, b=2, c=3, d=4)
@@ -460,7 +460,7 @@ class TemplateTest(test.TestCase):
         elem = xmlutil.TemplateElement('test')
         tmpl = xmlutil.Template(elem)
         self.assertEqual(elem, tmpl.unwrap())
-        self.assertEqual(tmp1, tmpl.wrap())
+        self.assertEqual(tmpl, tmpl.wrap())
 
     def test__siblings(self):
         # Set up a basic template
@@ -622,7 +622,7 @@ class TemplateTest(test.TestCase):
         idx += 1
         self.assertEqual('image', result[idx].tag)
         self.assertEqual(str(obj['test']['image']['id']),
-                                  result[idx].get('id'))
+                         result[idx].get('id'))
         self.assertEqual(obj['test']['image']['name'], result[idx].text)
 
     def test_serialize_with_delimiter(self):

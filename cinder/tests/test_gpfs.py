@@ -174,7 +174,7 @@ class GPFSDriverTestCase(test.TestCase):
                                   'mmlsconfig::0:1:::clusterId:%s::'
                                   % self.driver._cluster_id, '')
         self.assertEqual(self.driver._get_gpfs_cluster_id(),
-                          self.driver._cluster_id)
+                         self.driver._cluster_id)
 
     @patch('cinder.utils.execute')
     def test_get_gpfs_cluster_id_fail_id(self, mock_exec):
@@ -323,7 +323,7 @@ class GPFSDriverTestCase(test.TestCase):
                                   'Supported:14.03 (4.1.0.0):', '')
         mock_fs_from_path.return_value = '/dev/gpfs'
         self.assertEqual(self.driver._get_gpfs_fs_release_level(''),
-                          ('/dev/gpfs', 1403))
+                         ('/dev/gpfs', 1403))
 
     @patch('cinder.volume.drivers.ibm.gpfs.GPFSDriver.'
            '_get_filesystem_from_path')
@@ -763,7 +763,7 @@ class GPFSDriverTestCase(test.TestCase):
         volume = {}
         volume['size'] = 1000
         self.assertEqual({'size': 5.0},
-                     self.driver.create_volume_from_snapshot(volume, ''))
+                         self.driver.create_volume_from_snapshot(volume, ''))
 
     @patch('cinder.volume.drivers.ibm.gpfs.GPFSDriver._resize_volume_file')
     @patch('cinder.volume.drivers.ibm.gpfs.GPFSDriver._set_rw_permission')
@@ -778,7 +778,7 @@ class GPFSDriverTestCase(test.TestCase):
         volume = {}
         volume['size'] = 1000
         self.assertEqual({'size': 5.0},
-                  self.driver.create_cloned_volume(volume, ''))
+                         self.driver.create_cloned_volume(volume, ''))
 
     @patch('cinder.utils.execute')
     def test_delete_gpfs_file_ok(self, mock_exec):
@@ -958,8 +958,9 @@ class GPFSDriverTestCase(test.TestCase):
         data = self.driver.initialize_connection(volume, '')
         self.assertEqual('test', data['data']['name'])
         self.assertEqual(data['data']['device_path'],
-                                    os.path.join(
-            self.driver.configuration.gpfs_mount_point_base, 'test'))
+                         os.path.join(
+                         self.driver.configuration.gpfs_mount_point_base,
+                         'test'))
 
     def test_terminate_connection(self):
         self.assertEqual(None, self.driver.terminate_connection('', ''))
@@ -997,10 +998,9 @@ class GPFSDriverTestCase(test.TestCase):
         org_value_dir = CONF.gpfs_images_dir
         CONF.gpfs_images_dir = self.images_dir
         mock_is_gpfs_path.return_value = None
-        self.assertEqual((os.path.join(CONF.gpfs_images_dir,
-                                                   '12345')),
-                         self.driver._is_cloneable('12345'),
-                             True, None)
+        self.assertEqual(self.driver._is_cloneable('12345'),
+                         (True, None, os.path.join(CONF.gpfs_images_dir,
+                                                   '12345')))
 
     @patch('cinder.volume.drivers.ibm.gpfs.GPFSDriver._is_gpfs_path')
     def test_is_cloneable_fail_config(self, mock_is_gpfs_path):
@@ -1053,8 +1053,8 @@ class GPFSDriverTestCase(test.TestCase):
         volume = {}
         volume['id'] = 'test'
         volume['size'] = 1000
-        self.assertEqual(elf.driver._clone_image(volume, '', 1),
-                                {'provider_location': None}, True))
+        self.assertEqual(({'provider_location': None}, True),
+                         self.driver._clone_image(volume, '', 1))
 
     @patch('cinder.volume.drivers.ibm.gpfs.GPFSDriver._is_cloneable')
     @patch('cinder.volume.drivers.ibm.gpfs.GPFSDriver._verify_gpfs_path_state')
@@ -1066,7 +1066,7 @@ class GPFSDriverTestCase(test.TestCase):
         volume['id'] = 'test'
         volume['size'] = 1000
         self.assertEqual(self.driver._clone_image(volume, '', 1),
-                               (None, False))
+                         (None, False))
 
     @patch('cinder.volume.drivers.ibm.gpfs.GPFSDriver._resize_volume_file')
     @patch('cinder.volume.drivers.ibm.gpfs.GPFSDriver._set_rw_permission')
@@ -1101,17 +1101,17 @@ class GPFSDriverTestCase(test.TestCase):
         self.flags(volume_driver=self.driver_name,
                    gpfs_images_share_mode='copy_on_write')
         self.assertEqual(self.driver._clone_image(volume, '', 1),
-                             ({'provider_location': None}, True))
+                         ({'provider_location': None}, True))
 
         self.flags(volume_driver=self.driver_name,
                    gpfs_images_share_mode='copy')
         self.assertEqual(self.driver._clone_image(volume, '', 1),
-                               ({'provider_location': None}, True))
+                         ({'provider_location': None}, True))
 
         self.flags(volume_driver=self.driver_name,
                    gpfs_images_share_mode='copy_on_read')
         self.assertEqual(self.driver._clone_image(volume, '', 1),
-                             ({'provider_location': None}, True))
+                         ({'provider_location': None}, True))
         self.flags(volume_driver=self.driver_name,
                    gpfs_images_share_mode=org_value)
 
@@ -1140,7 +1140,7 @@ class GPFSDriverTestCase(test.TestCase):
         volume['id'] = 'test'
         mock_qemu_img_info.return_value = self._fake_qemu_qcow2_image_info('')
         self.assertEqual(self.driver._resize_volume_file(volume, 2000),
-                                self._fake_qemu_qcow2_image_info('').virtual_size)
+                         self._fake_qemu_qcow2_image_info('').virtual_size)
 
     @patch('cinder.image.image_utils.qemu_img_info')
     @patch('cinder.image.image_utils.resize_image')
@@ -1220,7 +1220,7 @@ class GPFSDriverTestCase(test.TestCase):
         mock_local.return_value = (self.driver.configuration.
                                    gpfs_mount_point_base + '_')
         self.assertEqual(self.driver._migrate_volume(volume, host),
-                          (True, None))
+                         (True, None))
 
     @patch('cinder.utils.execute')
     @patch('cinder.volume.drivers.ibm.gpfs.GPFSDriver._can_migrate_locally')
@@ -1245,7 +1245,7 @@ class GPFSDriverTestCase(test.TestCase):
         mock_exec.side_effect = (
             processutils.ProcessExecutionError(stdout='test', stderr='test'))
         self.assertEqual(self.driver._migrate_volume(volume, host),
-                           (True, None))
+                         (True, None))
 
     @patch('cinder.utils.execute')
     @patch('cinder.volume.drivers.ibm.gpfs.GPFSDriver._can_migrate_locally')
@@ -1259,7 +1259,7 @@ class GPFSDriverTestCase(test.TestCase):
         mock_exec.side_effect = (
             processutils.ProcessExecutionError(stdout='test', stderr='test'))
         self.assertEqual(self.driver._migrate_volume(volume, host),
-                            (False, None))
+                         (False, None))
 
     @patch('cinder.volume.drivers.ibm.gpfs.GPFSDriver._migrate_volume')
     def test_migrate_volume_ok_pub(self, mock_migrate_volume):
@@ -1371,7 +1371,7 @@ class GPFSDriverTestCase(test.TestCase):
                                   '/dev/gpfs            10737418240 544735232 '
                                   '10192683008       6%% /gpfs0', '')
         self.assertEqual(self.driver._get_available_capacity('/gpfs0'),
-                            (10192683008, 10737418240))
+                         (10192683008, 10737418240))
 
     @patch('cinder.volume.drivers.ibm.gpfs.GPFSDriver._verify_gpfs_path_state')
     @patch('cinder.utils.execute')

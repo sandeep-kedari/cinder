@@ -111,7 +111,7 @@ class VolumeTransferAPITestCase(test.TestCase):
         self.assertEqual(404, res.status_int)
         self.assertEqual(404, res_dict['itemNotFound']['code'])
         self.assertEqual('Transfer 1234 could not be found.',
-                                     res_dict['itemNotFound']['message'])
+                         res_dict['itemNotFound']['message'])
 
     def test_list_transfers_json(self):
         volume_id_1 = self._create_volume(size=5)
@@ -154,10 +154,10 @@ class VolumeTransferAPITestCase(test.TestCase):
         transfer_list = dom.getElementsByTagName('transfer')
         self.assertEqual(3, transfer_list.item(0).attributes.length)
         self.assertEqual(transfer1['id'],
-                       transfer_list.item(0).getAttribute('id'))
+                         transfer_list.item(0).getAttribute('id'))
         self.assertEqual(3, transfer_list.item(1).attributes.length)
-        self.assertEqual(transfer1['id'],
-                      transfer_list.item(1).getAttribute('id'))
+        self.assertEqual(transfer2['id'],
+                         transfer_list.item(1).getAttribute('id'))
 
         db.transfer_destroy(context.get_admin_context(), transfer2['id'])
         db.transfer_destroy(context.get_admin_context(), transfer1['id'])
@@ -180,8 +180,8 @@ class VolumeTransferAPITestCase(test.TestCase):
         self.assertEqual(200, res.status_int)
         self.assertEqual(5, len(res_dict['transfers'][0]))
         self.assertEqual('test_transfer',
-                        res_dict['transfers'][0]['name'])
-        self.assertEqual('transfer1['id']', res_dict['transfers'][0]['id'])
+                         res_dict['transfers'][0]['name'])
+        self.assertEqual(transfer1['id'], res_dict['transfers'][0]['id'])
         self.assertEqual(volume_id_1, res_dict['transfers'][0]['volume_id'])
 
         self.assertEqual(5, len(res_dict['transfers'][1]))
@@ -212,19 +212,19 @@ class VolumeTransferAPITestCase(test.TestCase):
 
         self.assertEqual(4, transfer_detail.item(0).attributes.length)
         self.assertEqual('test_transfer',
-            transfer_detail.item(0).getAttribute('name'))
+                         transfer_detail.item(0).getAttribute('name'))
         self.assertEqual(transfer1['id'],
-            transfer_detail.item(0).getAttribute('id'))
+                         transfer_detail.item(0).getAttribute('id'))
         self.assertEqual(volume_id_1,
                          transfer_detail.item(0).getAttribute('volume_id'))
 
         self.assertEqual(4, transfer_detail.item(1).attributes.length)
         self.assertEqual('test_transfer',
-            transfer_detail.item(1).getAttribute('name'))
+                         transfer_detail.item(1).getAttribute('name'))
         self.assertEqual(transfer2['id'],
-            transfer_detail.item(1).getAttribute('id'))
+                         transfer_detail.item(1).getAttribute('id'))
         self.assertEqual(volume_id_2,
-                          transfer_detail.item(1).getAttribute('volume_id'))
+                         transfer_detail.item(1).getAttribute('volume_id'))
 
         db.transfer_destroy(context.get_admin_context(), transfer2['id'])
         db.transfer_destroy(context.get_admin_context(), transfer1['id'])
@@ -288,8 +288,8 @@ class VolumeTransferAPITestCase(test.TestCase):
         self.assertEqual(400, res.status_int)
         self.assertEqual(400, res_dict['badRequest']['code'])
         self.assertEqual('The server could not comply with the request since'
-                         ' it is either malformed or otherwise incorrect.'
-                                        ,res_dict['badRequest']['message'])
+                         ' it is either malformed or otherwise incorrect.',
+                         res_dict['badRequest']['message'])
 
     def test_create_transfer_with_body_KeyError(self):
         body = {"transfer": {"display_name": "transfer1"}}
@@ -303,7 +303,7 @@ class VolumeTransferAPITestCase(test.TestCase):
         self.assertEqual(400, res.status_int)
         self.assertEqual(400, res_dict['badRequest']['code'])
         self.assertEqual('Incorrect request body format',
-                                  res_dict['badRequest']['message'])
+                         res_dict['badRequest']['message'])
 
     def test_create_transfer_with_VolumeNotFound(self):
         body = {"transfer": {"display_name": "transfer1",
@@ -319,7 +319,7 @@ class VolumeTransferAPITestCase(test.TestCase):
         self.assertEqual(404, res.status_int)
         self.assertEqual(404, res_dict['itemNotFound']['code'])
         self.assertEqual('Volume 1234 could not be found.',
-                                  res_dict['itemNotFound']['message'])
+                         res_dict['itemNotFound']['message'])
 
     def test_create_transfer_with_InvalidVolume(self):
         volume_id = self._create_volume(status='attached')
@@ -335,7 +335,7 @@ class VolumeTransferAPITestCase(test.TestCase):
         self.assertEqual(400, res.status_int, 400)
         self.assertEqual(400, res_dict['badRequest']['code'], 400)
         self.assertEqual('Invalid volume: status must be available',
-                          res_dict['badRequest']['message'])
+                         res_dict['badRequest']['message'])
 
         db.volume_destroy(context.get_admin_context(), volume_id)
 
@@ -361,8 +361,9 @@ class VolumeTransferAPITestCase(test.TestCase):
         self.assertEqual(404, res.status_int, 404)
         self.assertEqual(404, res_dict['itemNotFound']['code'], 404)
         self.assertEqual('Transfer %s could not be found.' % transfer['id'],
-                             res_dict['itemNotFound']['message'])
-        self.assertEqual('available', db.volume_get(context.get_admin_context(),
+                         res_dict['itemNotFound']['message'])
+        self.assertEqual('available', db.volume_get(
+                         context.get_admin_context(),
                          volume_id)['status'])
 
         db.volume_destroy(context.get_admin_context(), volume_id)
@@ -377,7 +378,7 @@ class VolumeTransferAPITestCase(test.TestCase):
         self.assertEqual(404, res.status_int)
         self.assertEqual(404, res_dict['itemNotFound']['code'])
         self.assertEqual('Transfer 9999 could not be found.',
-                           res_dict['itemNotFound']['message'])
+                         res_dict['itemNotFound']['message'])
 
     def test_accept_transfer_volume_id_specified_json(self):
         volume_id = self._create_volume()
@@ -413,7 +414,7 @@ class VolumeTransferAPITestCase(test.TestCase):
         dom = minidom.parseString(res.body)
         accept = dom.getElementsByTagName('transfer')
         self.assertEqual(transfer['id'],
-                             accept.item(0).getAttribute('id'))
+                         accept.item(0).getAttribute('id'))
         self.assertEqual(volume_id, accept.item(0).getAttribute('volume_id'))
 
         db.volume_destroy(context.get_admin_context(), volume_id)
@@ -435,7 +436,7 @@ class VolumeTransferAPITestCase(test.TestCase):
         self.assertEqual(400, res_dict['badRequest']['code'])
         self.assertEqual('The server could not comply with the request since'
                          ' it is either malformed or otherwise incorrect.',
-                                       res_dict['badRequest']['message'])
+                         res_dict['badRequest']['message'])
 
         db.volume_destroy(context.get_admin_context(), volume_id)
 
@@ -458,7 +459,7 @@ class VolumeTransferAPITestCase(test.TestCase):
         self.assertEqual(400, res_dict['badRequest']['code'])
         self.assertEqual('The server could not comply with the request since'
                          ' it is either malformed or otherwise incorrect.',
-                                       res_dict['badRequest']['message'])
+                         res_dict['badRequest']['message'])
 
     def test_accept_transfer_invalid_id_auth_key(self):
         volume_id = self._create_volume()
@@ -478,7 +479,7 @@ class VolumeTransferAPITestCase(test.TestCase):
         self.assertEqual(400, res_dict['badRequest']['code'])
         self.assertEqual('Invalid auth key: Attempt to transfer %s with '
                          'invalid auth key.' % transfer['id'],
-                                      res_dict['badRequest']['message'])
+                         res_dict['badRequest']['message'])
 
         db.transfer_destroy(context.get_admin_context(), transfer['id'])
         db.volume_destroy(context.get_admin_context(), volume_id)
@@ -499,7 +500,7 @@ class VolumeTransferAPITestCase(test.TestCase):
         self.assertEqual(404, res.status_int)
         self.assertEqual(404, res_dict['itemNotFound']['code'])
         self.assertEqual('TransferNotFound: Transfer 1 could not be found.',
-                              res_dict['itemNotFound']['message'])
+                         res_dict['itemNotFound']['message'])
 
         db.transfer_destroy(context.get_admin_context(), transfer['id'])
         db.volume_destroy(context.get_admin_context(), volume_id)
@@ -536,7 +537,7 @@ class VolumeTransferAPITestCase(test.TestCase):
         self.assertEqual('Requested volume or snapshot exceeds allowed '
                          'Gigabytes quota. Requested 2G, quota is 3G and '
                          '2G has been consumed.',
-                               res_dict['overLimit']['message'])
+                         res_dict['overLimit']['message'])
 
     def test_accept_transfer_with_VolumeLimitExceeded(self):
 
@@ -567,4 +568,4 @@ class VolumeTransferAPITestCase(test.TestCase):
         self.assertEqual(413, res_dict['overLimit']['code'])
         self.assertEqual('VolumeLimitExceeded: Maximum number of volumes '
                          'allowed (1) exceeded',
-                      res_dict['overLimit']['message'])
+                         res_dict['overLimit']['message'])

@@ -92,7 +92,7 @@ class TestHPLeftHandCLIQISCSIDriver(HPLeftHandBaseDriver, test.TestCase):
                 <response description="Operation succeeded."
                           name="CliqSuccess" processingTime="181" result="0"/>
                 </gauche>"""
-            self.assertEqual(elf.volume_name, liq_args['volumeName'])
+            self.assertEqual(self.volume_name, cliq_args['volumeName'])
             self.assertEqual('1', cliq_args['thinProvision'])
             self.assertEqual('1GB', cliq_args['size'])
             return output, None
@@ -648,7 +648,7 @@ class TestHPLeftHandRESTISCSIDriver(HPLeftHandBaseDriver, test.TestCase):
         volume_info = self.driver.create_volume(self.volume)
 
         self.assertEqual(volume_info['provider_location'],
-                        '10.0.1.6:3260,1 iqn.1993-08.org.debian:01:222 0')
+                         '10.0.1.6:3260,1 iqn.1993-08.org.debian:01:222 0')
 
         expected = self.driver_startup_call_stack + [
             mock.call.createVolume(
@@ -686,7 +686,7 @@ class TestHPLeftHandRESTISCSIDriver(HPLeftHandBaseDriver, test.TestCase):
         volume_info = self.driver.create_volume(volume_with_vt)
 
         self.assertEqual(volume_info['provider_location'],
-                          '10.0.1.6:3260,1 iqn.1993-08.org.debian:01:222 0')
+                         '10.0.1.6:3260,1 iqn.1993-08.org.debian:01:222 0')
 
         expected = self.driver_startup_call_stack + [
             mock.call.createVolume(
@@ -1183,7 +1183,7 @@ class TestHPLeftHandRESTISCSIDriver(HPLeftHandBaseDriver, test.TestCase):
         mock_client.assert_has_calls(self.driver_startup_call_stack)
         # and nothing else
         self.assertEqual(len(mock_client.method_calls),
-            len(self.driver_startup_call_stack))
+                         len(self.driver_startup_call_stack))
 
     def test_migrate_incorrect_vip(self):
         # setup drive with default configuration
@@ -1215,7 +1215,7 @@ class TestHPLeftHandRESTISCSIDriver(HPLeftHandBaseDriver, test.TestCase):
         mock_client.assert_has_calls(expected)
         # and nothing else
         self.assertEqual(len(mock_client.method_calls),
-                          len(expected))
+                         len(expected))
 
     def test_migrate_with_location(self):
         # setup drive with default configuration
@@ -1255,7 +1255,7 @@ class TestHPLeftHandRESTISCSIDriver(HPLeftHandBaseDriver, test.TestCase):
         mock_client.assert_has_calls(expected)
         # and nothing else
         self.assertEqual(len(mock_client.method_calls),
-                          len(expected))
+                         len(expected))
 
     def test_migrate_with_Snapshots(self):
         # setup drive with default configuration
@@ -1295,7 +1295,7 @@ class TestHPLeftHandRESTISCSIDriver(HPLeftHandBaseDriver, test.TestCase):
         mock_client.assert_has_calls(expected)
         # and nothing else
         self.assertEqual(len(mock_client.method_calls),
-                          len(expected))
+                         len(expected))
 
     @mock.patch.object(volume_types, 'get_volume_type',
                        return_value={'extra_specs': {'hplh:ao': 'true'}})
@@ -1315,7 +1315,7 @@ class TestHPLeftHandRESTISCSIDriver(HPLeftHandBaseDriver, test.TestCase):
         volume_info = self.driver.create_volume(volume_with_vt)
 
         self.assertEqual(volume_info['provider_location'],
-                    '10.0.1.6:3260,1 iqn.1993-08.org.debian:01:222 0')
+                         '10.0.1.6:3260,1 iqn.1993-08.org.debian:01:222 0')
 
         # make sure createVolume is called without
         # isAdaptiveOptimizationEnabled == true
@@ -1346,7 +1346,7 @@ class TestHPLeftHandRESTISCSIDriver(HPLeftHandBaseDriver, test.TestCase):
         volume_info = self.driver.create_volume(volume_with_vt)
 
         self.assertEqual(volume_info['provider_location'],
-                      '10.0.1.6:3260,1 iqn.1993-08.org.debian:01:222 0')
+                         '10.0.1.6:3260,1 iqn.1993-08.org.debian:01:222 0')
 
         # make sure createVolume is called with
         # isAdaptiveOptimizationEnabled == false

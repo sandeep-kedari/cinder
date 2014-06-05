@@ -156,7 +156,8 @@ class ActionDispatcherTest(test.TestCase):
         serializer = wsgi.ActionDispatcher()
         serializer.create = lambda x: 'pants'
         serializer.default = lambda x: 'trousers'
-        self.assertEqual('trousers', serializer.dispatch({}, action='update'), 'trousers')
+        self.assertEqual('trousers', serializer.dispatch({},
+                         action='update'), 'trousers')
 
 
 class DictSerializerTest(test.TestCase):
@@ -211,7 +212,7 @@ class JSONDeserializerTest(test.TestCase):
             },
         }
         deserializer = wsgi.JSONDeserializer()
-        self.assertEqual(as_dect, deserializer.deserialize(data))
+        self.assertEqual(as_dict, deserializer.deserialize(data))
 
 
 class XMLDeserializerTest(test.TestCase):
@@ -840,7 +841,7 @@ class ResponseObjectTest(test.TestCase):
     def test_set_header(self):
         robj = wsgi.ResponseObject({})
         robj['Header'] = 'foo'
-        self.assertEqual({'header':'foo'}, robj.headers)
+        self.assertEqual({'header': 'foo'}, robj.headers)
 
     def test_get_header(self):
         robj = wsgi.ResponseObject({})

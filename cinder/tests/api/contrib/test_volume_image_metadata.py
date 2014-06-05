@@ -98,13 +98,13 @@ class VolumeImageMetadataTest(test.TestCase):
         res = self._make_request('/v2/fake/volumes/%s' % self.UUID)
         self.assertEqual(200, res.status_int)
         self.assertEqual(fake_image_metadata,
-                          self._get_image_metadata(res.body))
+                         self._get_image_metadata(res.body))
 
     def test_list_detail_volumes(self):
         res = self._make_request('/v2/fake/volumes/detail')
         self.assertEqual(200, res.status_int)
         self.assertEqual(fake_image_metadata,
-                          self._get_image_metadata_list(res.body)[0])
+                         self._get_image_metadata_list(res.body)[0])
 
 
 class ImageMetadataXMLDeserializer(common.MetadataXMLDeserializer):
