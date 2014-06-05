@@ -230,10 +230,10 @@ class OSCompatibilityTestCase(test.TestCase):
                 launcher = service.get_launcher()
                 if fake_os == 'nt':
                     self.assertEqual(service.Launcher,
-                                           type(launcher))
+                                     type(launcher))
                 else:
                     self.assertEqual(fake_process_launcher(),
-                                      launcher)
+                                     launcher)
 
     def test_process_launcher_on_windows(self):
         self._test_service_launcher('nt')

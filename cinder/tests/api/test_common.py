@@ -67,7 +67,7 @@ class LimiterTest(test.TestCase):
         self.assertEqual([], common.limited(self.small, req))
         self.assertEqual([], common.limited(self.medium, req))
         self.assertEqual(self.large[1001:2001],
-                          common.limited(self.large, req))
+                         common.limited(self.large, req))
 
     def test_limiter_offset_blank(self):
         """Test offset key works with a blank offset."""
@@ -136,13 +136,13 @@ class LimiterTest(test.TestCase):
         items = range(2000)
         req = webob.Request.blank('/?offset=1&limit=3')
         self.assertEqual(items[1:4],
-                           common.limited(items, req, max_limit=2000))
+                         common.limited(items, req, max_limit=2000))
         req = webob.Request.blank('/?offset=3&limit=0')
         self.assertEqual(items[3:],
-                           common.limited(items, req, max_limit=2000))
+                         common.limited(items, req, max_limit=2000))
         req = webob.Request.blank('/?offset=3&limit=2500')
         self.assertEqual(items[3:],
-                           common.limited(items, req, max_limit=2000))
+                         common.limited(items, req, max_limit=2000))
         req = webob.Request.blank('/?offset=3000&limit=10')
         self.assertEqual([], common.limited(items, req, max_limit=2000))
 
@@ -182,7 +182,7 @@ class PaginationParamsTest(test.TestCase):
         req = webob.Request.blank(
             '/?marker=263abb28-1de6-412f-b00b-f0ee0c4333c2')
         self.assertEqual({'marker': '263abb28-1de6-412f-b00b-f0ee0c4333c2'},
-                                         common.get_pagination_params(req))
+                         common.get_pagination_params(req))
 
     def test_valid_limit(self):
         """Test valid limit param."""
@@ -200,7 +200,7 @@ class PaginationParamsTest(test.TestCase):
         marker = '263abb28-1de6-412f-b00b-f0ee0c4333c2'
         req = webob.Request.blank('/?limit=20&marker=%s' % marker)
         self.assertEqual({'marker': marker, 'limit': 20},
-                                   common.get_pagination_params(req))
+                         common.get_pagination_params(req))
 
 
 class MiscFunctionsTest(test.TestCase):

@@ -882,8 +882,8 @@ class HP3PARBaseDriver(object):
         type_ref = volume_types.get_volume_type(self.ctxt, type_ref['id'])
         qos = self.driver.common._get_qos_by_volume_type(type_ref)
         self.assertEqual({'maxIOPS': '1000', 'maxBWS': '50',
-                               'minIOPS': '100', 'minBWS': '25',
-                               'latency': '25', 'priority': 'low'}, qos)
+                         'minIOPS': '100', 'minBWS': '25',
+                         'latency': '25', 'priority': 'low'}, qos)
 
     def test_get_by_qos_spec(self):
         self.setup_driver()
@@ -901,8 +901,8 @@ class HP3PARBaseDriver(object):
         type_ref = volume_types.get_volume_type(self.ctxt, type_ref['id'])
         qos = self.driver.common._get_qos_by_volume_type(type_ref)
         self.assertEqual({'maxIOPS': '1000', 'maxBWS': '50',
-                               'minIOPS': '100', 'minBWS': '25',
-                               'latency': '25', 'priority': 'low'}, qos)
+                         'minIOPS': '100', 'minBWS': '25',
+                         'latency': '25', 'priority': 'low'}, qos)
 
     def test_get_by_qos_by_type_only(self):
         self.setup_driver()
@@ -916,8 +916,8 @@ class HP3PARBaseDriver(object):
         type_ref = volume_types.get_volume_type(self.ctxt, type_ref['id'])
         qos = self.driver.common._get_qos_by_volume_type(type_ref)
         self.assertEqual({'maxIOPS': '100', 'maxBWS': '50',
-                               'minIOPS': '10', 'minBWS': '20',
-                               'latency': '5', 'priority': 'high'}, qos)
+                         'minIOPS': '10', 'minBWS': '20',
+                         'latency': '5', 'priority': 'high'}, qos)
 
 
 class TestHP3PARFCDriver(HP3PARBaseDriver, test.TestCase):

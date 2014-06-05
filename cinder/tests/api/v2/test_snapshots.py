@@ -125,9 +125,9 @@ class SnapshotApiTest(test.TestCase):
 
         self.assertIn('snapshot', resp_dict)
         self.assertEqual(snapshot_name,
-                      resp_dict['snapshot']['name'])
+                         resp_dict['snapshot']['name'])
         self.assertEqual(snapshot_description,
-                      resp_dict['snapshot']['description'])
+                         resp_dict['snapshot']['description'])
 
         snapshot = {
             "volume_id": "12",

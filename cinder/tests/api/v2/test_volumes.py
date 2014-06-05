@@ -942,7 +942,7 @@ class VolumeApiTest(test.TestCase):
         # Non-admin, project function should be called with no_migration_status
         def stub_volume_get_all_by_project(context, project_id, marker, limit,
                                            sort_key, sort_dir, filters=None):
-            self.assertEqual('True', filters['no_migration_targets'])
+            self.assertEqual(True, filters['no_migration_targets'])
             self.assertFalse('all_tenants' in filters)
             return [stubs.stub_volume(1, display_name='vol1')]
 
@@ -1269,7 +1269,7 @@ class VolumeApiTest(test.TestCase):
         self.assertEqual([{"key": "key", "value": "value"},
                           {"key": "readonly", "value": "visible"},
                           {"key": "attached_mode", "value": "visible"}],
-                                  volume['volume_metadata'])
+                         volume['volume_metadata'])
 
         admin_metadata = {"invisible_key": "invisible_value",
                           "readonly": "visible",
@@ -1283,7 +1283,7 @@ class VolumeApiTest(test.TestCase):
         self.assertEqual({'key': 'value',
                           'attached_mode': 'visible',
                           'readonly': 'visible'},
-                            volume['metadata'])
+                         volume['metadata'])
 
 
 class VolumeSerializerTest(test.TestCase):
@@ -1310,7 +1310,7 @@ class VolumeSerializerTest(test.TestCase):
                 for gr_child in child:
                     self.assertIn(gr_child.get("key"), not_seen)
                     self.assertEqual(gr_child.text,
-                             str(vol['metadata'][gr_child.get("key")]))
+                                     str(vol['metadata'][gr_child.get("key")]))
                     not_seen.remove(gr_child.get('key'))
                 self.assertEqual(0, len(not_seen))
 

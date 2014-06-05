@@ -65,4 +65,4 @@ class UsedLimitsTestCase(test.TestCase):
         abs_limits = res.obj['limits']['absolute']
         for used_limit, value in abs_limits.iteritems():
             self.assertEqual(limits[quota_map[used_limit]]['in_use'],
-                              value)
+                             value)

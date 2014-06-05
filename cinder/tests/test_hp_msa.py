@@ -177,7 +177,7 @@ class TestHPMSAClient(test.TestCase):
         mock_request.return_value = etree.XML(response_stats)
         ret = self.client.vdisk_stats('OpenStack')
         self.assertEqual({'free_capacity_gb': 387,
-                               'total_capacity_gb': 899}, ret)
+                         'total_capacity_gb': 899}, ret)
         mock_request.assert_called_with('/show/vdisks', 'OpenStack')
 
     @mock.patch.object(msa.HPMSAClient, '_request')
@@ -193,12 +193,9 @@ class TestHPMSAClient(test.TestCase):
     def test_get_ports(self, mock_request):
         mock_request.side_effect = [etree.XML(response_ports)]
         ret = self.client.get_active_target_ports()
-        self.assertEqual([{'port-type': 'FC',
-                                'target-id': 'id1',
-                                'status': 'Up'},
-                               {'port-type': 'iSCSI',
-                                'target-id': 'id3',
-                                'status': 'Up'}], ret)
+        self.assertEqual([{'port-type': 'FC', 'target-id': 'id1',
+                         'status': 'Up'}, {'port-type': 'iSCSI',
+                         'target-id': 'id3', 'status': 'Up'}], ret)
 
     @mock.patch.object(msa.HPMSAClient, '_request')
     def test_get_fc_ports(self, mock_request):
@@ -247,7 +244,7 @@ class TestHPMSACommon(test.TestCase):
     def test_vol_name(self):
         self.assertEqual(encoded_volid, self.common._get_vol_name(vol_id))
         self.assertEqual(encoded_snapid,
-                            self.common._get_snap_name(vol_id))
+                         self.common._get_snap_name(vol_id))
 
     def test_check_flags(self):
         class FakeOptions():
@@ -284,13 +281,13 @@ class TestHPMSACommon(test.TestCase):
         ret = self.common._update_volume_stats()
         self.assertEqual(None, ret)
         self.assertEqual({'storage_protocol': None,
-                          'vendor_name': 'Hewlett-Packard',
-                          'driver_version': self.common.VERSION,
-                          'volume_backend_name': None,
-                          'free_capacity_gb': 90,
-                          'reserved_percentage': 0,
-                          'total_capacity_gb': 100,
-                          'QoS_support': False}, self.common.stats)
+                         'vendor_name': 'Hewlett-Packard',
+                         'driver_version': self.common.VERSION,
+                         'volume_backend_name': None,
+                         'free_capacity_gb': 90,
+                         'reserved_percentage': 0,
+                         'total_capacity_gb': 100,
+                         'QoS_support': False}, self.common.stats)
 
     @mock.patch.object(msa.HPMSAClient, 'create_volume')
     def test_create_volume(self, mock_create):
@@ -491,9 +488,9 @@ class TestHPMSAFC(test.TestCase):
 
         ret = self.driver.initialize_connection(test_volume, connector)
         self.assertEqual({'driver_volume_type': 'fibre_channel',
-                               'data': {'target_wwn': ['id1'],
-                                        'target_lun': 1,
-                                        'target_discovered': True}}, ret)
+                         'data': {'target_wwn': ['id1'],
+                         'target_lun': 1,
+                         'target_discovered': True}}, ret)
         mock_ports.assert_called_once()
 
     @mock.patch.object(hp_msa_common.HPMSACommon, 'client_logout')
@@ -529,19 +526,19 @@ class TestHPMSAFC(test.TestCase):
                           False)
         ret = self.driver.get_volume_stats(False)
         self.assertEqual({'storage_protocol': 'FC',
-                               'driver_version': self.driver.VERSION,
-                               'volume_backend_name': 'fakevalue',
-                               'free_capacity_gb': 90,
-                               'reserved_percentage': 0,
-                               'total_capacity_gb': 100,
-                               'QoS_support': False}, ret)
+                         'driver_version': self.driver.VERSION,
+                         'volume_backend_name': 'fakevalue',
+                         'free_capacity_gb': 90,
+                         'reserved_percentage': 0,
+                         'total_capacity_gb': 100,
+                         'QoS_support': False}, ret)
 
         ret = self.driver.get_volume_stats(True)
         self.assertEqual({'storage_protocol': 'FC',
-                               'driver_version': self.driver.VERSION,
-                               'volume_backend_name': 'fakevalue',
-                               'free_capacity_gb': 90,
-                               'reserved_percentage': 0,
-                               'total_capacity_gb': 100,
-                               'QoS_support': False}, ret)
+                         'driver_version': self.driver.VERSION,
+                         'volume_backend_name': 'fakevalue',
+                         'free_capacity_gb': 90,
+                         'reserved_percentage': 0,
+                         'total_capacity_gb': 100,
+                         'QoS_support': False}, ret)
         mock_stats.assert_called_with(True)

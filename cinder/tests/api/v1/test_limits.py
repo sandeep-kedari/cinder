@@ -870,14 +870,15 @@ class LimitsXMLSerializationTest(test.TestCase):
         for i, rate in enumerate(rates):
             for key in ['uri', 'regex']:
                 self.assertEqual(str(fixture['limits']['rate'][i][key]),
-                                     rate.get(key))
+                                 rate.get(key))
             rate_limits = rate.xpath('ns:limit', namespaces=NS)
             self.assertEqual(1, len(rate_limits))
             for j, limit in enumerate(rate_limits):
                 for key in ['verb', 'value', 'remaining', 'unit',
                             'next-available']:
-                    self.assertEqual(str(fixture['limits']['rate'][i]['limit'][j][key]),
-                               limit.get(key))
+                    self.assertEqual(str(fixture['limits']['rate'][i][
+                                     'limit'][j][key]),
+                                     limit.get(key))
 
     def test_index_no_limits(self):
         serializer = limits.LimitsTemplate()

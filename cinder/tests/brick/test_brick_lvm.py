@@ -118,7 +118,7 @@ class BrickLvmTestCase(test.TestCase):
 
     def test_create_lv_snapshot(self):
         self.assertEqual(None,
-                        self.vg.create_lv_snapshot('snapshot-1', 'fake-1'))
+                         self.vg.create_lv_snapshot('snapshot-1', 'fake-1'))
 
         self._mox.StubOutWithMock(self.vg, 'get_volume')
         self.vg.get_volume('fake-non-existent').AndReturn(None)
@@ -135,7 +135,7 @@ class BrickLvmTestCase(test.TestCase):
 
     def test_get_vg_uuid(self):
         self.assertEqual('kVxztV-dKpG-Rz7E-xtKY-jeju-QsYU-SLG6Z1',
-                                    self.vg._get_vg_uuid()[0])
+                         self.vg._get_vg_uuid()[0])
 
     def test_get_all_volumes(self):
         out = self.vg.get_volumes()
@@ -163,7 +163,7 @@ class BrickLvmTestCase(test.TestCase):
     def test_get_volume_groups(self):
         self.assertEqual(3, len(self.vg.get_all_volume_groups('sudo')))
         self.assertEqual(1, len(self.vg.get_all_volume_groups('sudo',
-                                                           'fake-vg')))
+                         'fake-vg')))
 
     def test_thin_support(self):
         # lvm.supports_thin() is a static method and doesn't

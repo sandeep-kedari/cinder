@@ -343,7 +343,8 @@ class VolumeTestCase(BaseVolumeTestCase):
                                    1,
                                    'name',
                                    'description')
-        self.assertEqual('default-az', volume['availability_zone'], 'default-az')
+        self.assertEqual('default-az', volume['availability_zone'],
+                         'default-az')
 
     def test_create_volume_with_volume_type(self):
         """Test volume creation with default volume type."""
@@ -478,9 +479,9 @@ class VolumeTestCase(BaseVolumeTestCase):
             self.assertTrue(mock_loads.called)
             volume_stats = manager.last_capabilities
             self.assertEqual(fake_capabilities['key1'],
-                                 volume_stats['key1'])
+                             volume_stats['key1'])
             self.assertEqual(fake_capabilities['key2'],
-                                     volume_stats['key2'])
+                             volume_stats['key2'])
 
     def test_extra_capabilities_fail(self):
         with mock.patch.object(jsonutils, 'loads') as mock_loads:
@@ -533,12 +534,12 @@ class VolumeTestCase(BaseVolumeTestCase):
                                                **self.volume_params)
         self.volume.create_volume(self.context, volume_dst['id'], snapshot_id)
         self.assertEqual(db.volume_get(
-                             context.get_admin_context(),
-                             volume_dst['id']).id,
-                              volume_dst['id'])
+                         context.get_admin_context(),
+                         volume_dst['id']).id,
+                         volume_dst['id'])
         self.assertEqual(db.volume_get(context.get_admin_context(),
-                                       volume_dst['id']).snapshot_id,
-                                       snapshot_id)
+                         volume_dst['id']).snapshot_id,
+                         snapshot_id)
 
         self.volume.delete_volume(self.context, volume_dst['id'])
         self.volume.delete_snapshot(self.context, snapshot_id)
@@ -729,7 +730,7 @@ class VolumeTestCase(BaseVolumeTestCase):
         self.assertEqual(2, len(self.called))
         self.assertEqual(db.volume_get(admin_ctxt, dst_vol_id).id, dst_vol_id)
         self.assertEqual(db.volume_get(admin_ctxt, dst_vol_id).snapshot_id,
-                            snap_id)
+                         snap_id)
 
         # locked
         self.volume.delete_volume(self.context, dst_vol_id)
@@ -751,7 +752,7 @@ class VolumeTestCase(BaseVolumeTestCase):
                           'unlock-%s' % ('%s-delete_snapshot' % (snap_id)),
                           'lock-%s' % ('%s-delete_volume' % (src_vol_id)),
                           'unlock-%s' % ('%s-delete_volume' % (src_vol_id))],
-                             self.called)
+                         self.called)
 
     def test_create_volume_from_volume_check_locks(self):
         # mock the synchroniser so we can record events
@@ -788,7 +789,7 @@ class VolumeTestCase(BaseVolumeTestCase):
         self.assertEqual(2, len(self.called))
         self.assertEqual(db.volume_get(admin_ctxt, dst_vol_id).id, dst_vol_id)
         self.assertEqual(db.volume_get(admin_ctxt, dst_vol_id).source_volid,
-                                    src_vol_id)
+                         src_vol_id)
 
         # locked
         self.volume.delete_volume(self.context, dst_vol_id)
@@ -799,12 +800,12 @@ class VolumeTestCase(BaseVolumeTestCase):
         self.assertEqual(6, len(self.called))
 
         self.assertEqual(['lock-%s' % ('%s-delete_volume' % (src_vol_id)),
-                          'unlock-%s' % ('%s-delete_volume' % (src_vol_id)),
-                          'lock-%s' % ('%s-delete_volume' % (dst_vol_id)),
-                          'unlock-%s' % ('%s-delete_volume' % (dst_vol_id)),
-                          'lock-%s' % ('%s-delete_volume' % (src_vol_id)),
-                          'unlock-%s' % ('%s-delete_volume' % (src_vol_id))],
-                           self.called)
+                         'unlock-%s' % ('%s-delete_volume' % (src_vol_id)),
+                         'lock-%s' % ('%s-delete_volume' % (dst_vol_id)),
+                         'unlock-%s' % ('%s-delete_volume' % (dst_vol_id)),
+                         'lock-%s' % ('%s-delete_volume' % (src_vol_id)),
+                         'unlock-%s' % ('%s-delete_volume' % (src_vol_id))],
+                         self.called)
 
     def test_create_volume_from_volume_delete_lock_taken(self):
         # create source volume
@@ -941,12 +942,12 @@ class VolumeTestCase(BaseVolumeTestCase):
                                        'description',
                                        snapshot=snapshot_ref)
         self.assertEqual(db.volume_get(
-                             context.get_admin_context(),
-                             volume_dst['id']).id,
-                              volume_dst['id'])
+                         context.get_admin_context(),
+                         volume_dst['id']).id,
+                         volume_dst['id'])
         self.assertEqual(db.volume_get(context.get_admin_context(),
-                                       volume_dst['id']).snapshot_id,
-                                         snapshot_ref['id'])
+                         volume_dst['id']).snapshot_id,
+                         snapshot_ref['id'])
 
         # ensure encryption keys match
         self.assertIsNotNone(volume_src['encryption_key_id'])
@@ -989,11 +990,11 @@ class VolumeTestCase(BaseVolumeTestCase):
                                        'description',
                                        source_volume=volume_src)
         self.assertEqual(db.volume_get(context.get_admin_context(),
-                                       volume_dst['id']).id,
-                                volume_dst['id'])
+                         volume_dst['id']).id,
+                         volume_dst['id'])
         self.assertEqual(db.volume_get(context.get_admin_context(),
-                                       volume_dst['id']).source_volid,
-                                    volume_src['id'])
+                         volume_dst['id']).source_volid,
+                         volume_src['id'])
 
         # ensure encryption keys match
         self.assertIsNotNone(volume_src['encryption_key_id'])
@@ -1189,7 +1190,7 @@ class VolumeTestCase(BaseVolumeTestCase):
         self.assertEqual(mountpoint, vol['mountpoint'])
         self.assertIsNone(vol['instance_uuid'])
         # sanitized, conforms to RFC-952 and RFC-1123 specs.
-        self.assertEqual('fake-host' vol['attached_host'])
+        self.assertEqual('fake-host', vol['attached_host'])
         admin_metadata = vol['volume_admin_metadata']
         self.assertEqual(2, len(admin_metadata))
         self.assertEqual('readonly', admin_metadata[0]['key'])
@@ -1280,7 +1281,7 @@ class VolumeTestCase(BaseVolumeTestCase):
         self.volume.detach_volume(self.context, volume_id)
         vol = db.volume_get(self.context, volume_id)
         self.assertEqual("available", vol['status'])
-        self.assertEqual("deatched", vol['attach_status'])
+        self.assertEqual("detached", vol['attach_status'])
         self.assertIsNone(vol['mountpoint'])
         self.assertIsNone(vol['instance_uuid'])
         self.assertIsNone(vol['attached_host'])
@@ -1481,8 +1482,7 @@ class VolumeTestCase(BaseVolumeTestCase):
         snapshot_id = self._create_snapshot(volume['id'])['id']
         self.volume.create_snapshot(self.context, volume['id'], snapshot_id)
         self.assertEqual(db.snapshot_get(context.get_admin_context(),
-                                         snapshot_id).id,
-                                              snapshot_id)
+                         snapshot_id).id, snapshot_id)
         self.assertEqual(4, len(fake_notifier.NOTIFICATIONS))
         msg = fake_notifier.NOTIFICATIONS[2]
         self.assertEqual('snapshot.create.start', msg['event_type'])
@@ -1611,8 +1611,7 @@ class VolumeTestCase(BaseVolumeTestCase):
         snapshot_id = self._create_snapshot(volume['id'])['id']
         self.volume.create_snapshot(self.context, volume['id'], snapshot_id)
         self.assertEqual(db.snapshot_get(context.get_admin_context(),
-                                         snapshot_id).id,
-                                       snapshot_id)
+                         snapshot_id).id, snapshot_id)
 
         volume['status'] = 'available'
         volume['host'] = 'fakehost'

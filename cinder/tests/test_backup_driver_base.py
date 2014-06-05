@@ -182,7 +182,7 @@ class BackupMetadataAPITestCase(test.TestCase):
                 self.bak_meta_api.TYPE_TAG_VOL_GLANCE_META]
 
         self.assertEqual(set([]),
-                    set(keys).symmetric_difference(set(fact.keys())))
+                         set(keys).symmetric_difference(set(fact.keys())))
 
         for f in fact:
             func = fact[f][0]
@@ -218,11 +218,11 @@ class BackupMetadataAPITestCase(test.TestCase):
 
     def test_filter(self):
         metadata = {'a': 1, 'b': 2, 'c': 3}
-        self.assertEqual(self.bak_meta_api._filter(metadata, []), metadata)
-        self.assertEqual(self.bak_meta_api._filter(metadata, ['b']), {'b': 2})
-        self.assertEqual(self.bak_meta_api._filter(metadata, ['d']), {})
-        self.assertEqual(self.bak_meta_api._filter(metadata, ['a', 'b']),
-                           {'a': 1, 'b': 2})
+        self.assertEqual(metadata, self.bak_meta_api._filter(metadata, []))
+        self.assertEqual({'b': 2}, self.bak_meta_api._filter(metadata, ['b']))
+        self.assertEqual({}, self.bak_meta_api._filter(metadata, ['d']))
+        self.assertEqual({'a': 1, 'b': 2},
+                         self.bak_meta_api._filter(metadata, ['a', 'b']))
 
     def test_save_vol_glance_meta(self):
         container = {}

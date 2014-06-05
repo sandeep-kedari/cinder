@@ -724,7 +724,7 @@ class HVSRESTFCDriverTestCase(test.TestCase):
     def test_create_volume_success(self):
         self.driver.common.login()
         self.driver.create_volume(test_volume)
-        self.assertEqual("0", self.driver.common.lun_id
+        self.assertEqual("0", self.driver.common.lun_id)
 
     def test_extend_volume_success(self):
         self.driver.common.login()

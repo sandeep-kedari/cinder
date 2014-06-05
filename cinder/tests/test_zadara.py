@@ -553,7 +553,7 @@ class ZadaraVPSADriverTestCase(test.TestCase):
         data = props['data']
         self.assertEqual('1.1.1.1:3260', data['target_portal'])
         self.assertEqual('iqn.2011-04.com.zadarastorage:vsa-xxx:1',
-                      data['target_iqn'])
+                         data['target_iqn'])
         self.assertEqual('0', data['target_lun'], '0')
         self.assertEqual(123, data['volume_id'], 123)
         self.assertEqual('CHAP', data['auth_method'], 'CHAP')

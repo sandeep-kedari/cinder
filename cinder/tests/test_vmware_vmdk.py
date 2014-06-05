@@ -226,7 +226,7 @@ class VMwareEsxVmdkDriverTestCase(test.TestCase):
         self.assertEqual(self._driver.VERSION, stats['driver_version'])
         self.assertEqual('LSI Logic SCSI', stats['storage_protocol'])
         self.assertEqual(0, stats['reserved_percentage'])
-        self.assertEqual('umknown', stats['total_capacity_gb'])
+        self.assertEqual('unknown', stats['total_capacity_gb'])
         self.assertEqual('unknown', stats['free_capacity_gb'])
 
     def test_create_volume(self):
@@ -388,7 +388,8 @@ class VMwareEsxVmdkDriverTestCase(test.TestCase):
         conn_info = self._driver.initialize_connection(volume, connector)
         self.assertEqual('vmdk', conn_info['driver_volume_type'])
         self.assertEqual('my_back', conn_info['data']['volume'], 'my_back')
-        self.assertEqual('volume_id', conn_info['data']['volume_id'], 'volume_id')
+        self.assertEqual('volume_id', conn_info['data']['volume_id'],
+                         'volume_id')
         m.UnsetStubs()
         m.VerifyAll()
 
@@ -487,10 +488,10 @@ class VMwareEsxVmdkDriverTestCase(test.TestCase):
         (folder, datastore_summary) = driver._get_folder_ds_summary(volume,
                                                                     rp, dss)
         # verify returned values and calls made
-        self.assertEqual("Folder returned is wrong.",
-                              mock.sentinel.folder, folder)
-        self.assertEqual("Datastore summary returned is wrong.",
-                             mock.sentinel.summary, datastore_summary)
+        self.assertEqual(folder, mock.sentinel.folder,
+                         "Folder returned is wrong.")
+        self.assertEqual(datastore_summary, mock.sentinel.summary,
+                         "Datastore summary returned is wrong.")
         volumeops.get_dc.assert_called_once_with(rp)
         volumeops.get_vmfolder.assert_called_once_with(mock.sentinel.dc)
         driver._get_storage_profile.assert_called_once_with(volume)
@@ -502,7 +503,7 @@ class VMwareEsxVmdkDriverTestCase(test.TestCase):
         volume = FakeObject()
         volume['volume_type_id'] = None
         self.assertEqual('thin',
-                           vmdk.VMwareEsxVmdkDriver._get_disk_type(volume))
+                         vmdk.VMwareEsxVmdkDriver._get_disk_type(volume))
 
     def test_init_conn_with_instance_no_backing(self):
         """Test initialize_connection with instance and without backing."""

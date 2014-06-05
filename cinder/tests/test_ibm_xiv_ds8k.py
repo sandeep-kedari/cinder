@@ -138,13 +138,17 @@ class XIVDS8KVolumeDriverTest(test.TestCase):
         """Test that the san flags are passed to the IBM proxy."""
 
         self.assertEqual(self.driver.configuration.san_login,
-            self.driver.xiv_ds8k_proxy.xiv_ds8k_info['xiv_ds8k_user'])
+                         self.driver.xiv_ds8k_proxy.xiv_ds8k_info[
+                         'xiv_ds8k_user'])
         self.assertEqual(self.driver.configuration.san_password,
-            self.driver.xiv_ds8k_proxy.xiv_ds8k_info['xiv_ds8k_pass'])
+                         self.driver.xiv_ds8k_proxy.xiv_ds8k_info[
+                         'xiv_ds8k_pass'])
         self.assertEqual(self.driver.configuration.san_ip,
-            self.driver.xiv_ds8k_proxy.xiv_ds8k_info['xiv_ds8k_address'])
+                         self.driver.xiv_ds8k_proxy.xiv_ds8k_info[
+                         'xiv_ds8k_address'])
         self.assertEqual(self.driver.configuration.san_clustername,
-            self.driver.xiv_ds8k_proxy.xiv_ds8k_info['xiv_ds8k_vol_pool'])
+                         self.driver.xiv_ds8k_proxy.xiv_ds8k_info[
+                         'xiv_ds8k_vol_pool'])
 
     def test_setup_should_fail_if_credentials_are_invalid(self):
         """Test that the xiv_ds8k_proxy validates credentials."""

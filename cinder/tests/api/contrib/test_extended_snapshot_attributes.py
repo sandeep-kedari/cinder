@@ -74,7 +74,7 @@ class ExtendedSnapshotAttributesTest(test.TestCase):
 
     def assertSnapshotAttributes(self, snapshot, project_id, progress):
         self.assertEqual(project_id,
-                                snapshot.get('%sproject_id' % self.prefix))
+                         snapshot.get('%sproject_id' % self.prefix))
         self.assertEqual(progress, snapshot.get('%sprogress' % self.prefix))
 
     def test_show(self):

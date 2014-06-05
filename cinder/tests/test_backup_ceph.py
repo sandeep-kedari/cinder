@@ -395,7 +395,8 @@ class BackupCephTestCase(test.TestCase):
                           self.volume_id)
 
         name = self.service._get_backup_base_name(self.volume_id, '1234')
-        self.assertEqual("volume-%s.backup.%s" % (self.volume_id, '1234'), name)
+        self.assertEqual("volume-%s.backup.%s" % (self.volume_id, '1234'),
+                         name)
 
     @common_mocks
     @mock.patch('fcntl.fcntl', spec=True)
@@ -440,20 +441,17 @@ class BackupCephTestCase(test.TestCase):
                             rbdio = rbddriver.RBDImageIOWrapper(meta)
                             self.service.backup(self.backup, rbdio)
 
-                            self.assertEqual(['popen_init',
-                                                              'read',
-                                                              'popen_init',
-                                                              'write',
-                                                              'stdout_close',
-                                                              'communicate'],
-                                                               self.callstack)
+                            self.assertEqual(['popen_init', 'read',
+                                             'popen_init', 'write',
+                                             'stdout_close', 'communicate'],
+                                             self.callstack)
 
                             self.assertFalse(mock_full_backup.called)
                             self.assertTrue(mock_get_backup_snaps.called)
 
                             # Ensure the files are equal
                             self.assertEqual(self.checksum.digest(),
-                                                   checksum.digest())
+                                             checksum.digest())
 
     @common_mocks
     def test_backup_vol_length_0(self):
@@ -503,7 +501,7 @@ class BackupCephTestCase(test.TestCase):
 
                     # Ensure the files are equal
                     self.assertEqual(self.checksum.digest(),
-                                        checksum.digest())
+                                     checksum.digest())
 
                     self.assertTrue(mock_restore_metadata.called)
                     self.assertTrue(mock_discard_bytes.called)
@@ -786,9 +784,8 @@ class BackupCephTestCase(test.TestCase):
         mock_fcntl.return_value = 0
         self._setup_mock_popen(mock_popen, ['out', 'err'])
         self.service._piped_execute(['foo'], ['bar'])
-        self.assertEqual(['popen_init', 'popen_init',
-                                          'stdout_close', 'communicate'],
-                                            self.callstack)
+        self.assertEqual(['popen_init', 'popen_init', 'stdout_close',
+                         'communicate'], self.callstack)
 
     @common_mocks
     def test_restore_metdata(self):

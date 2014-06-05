@@ -423,7 +423,7 @@ class LimiterTest(BaseLimitTestSuite):
     def test_no_delay_PUT(self):
         """Ensure no delay on a single call for a known limit."""
         delay = self.limiter.check_for_delay("PUT", "/anything")
-        self.assertEqual((None, None)delay)
+        self.assertEqual((None, None), delay)
 
     def test_delay_PUT(self):
         """Test delay on 11th PUT request.
@@ -878,7 +878,7 @@ class LimitsXMLSerializationTest(test.TestCase):
                             'next-available']:
                     self.assertEqual(
                         str(fixture['limits']['rate'][i]['limit'][j][key]),
-                                    limit.get(key))
+                        limit.get(key))
 
     def test_index_no_limits(self):
         serializer = limits.LimitsTemplate()

@@ -325,8 +325,8 @@ class TestMigrations(test.TestCase):
                                       TestMigrations.REPOSITORY,
                                       migration.db_initial_version())
         self.assertEqual(migration_api.db_version(engine,
-                                                  TestMigrations.REPOSITORY),
-                                      migration.db_initial_version())
+                         TestMigrations.REPOSITORY),
+                         migration.db_initial_version())
 
         migration_api.upgrade(engine, TestMigrations.REPOSITORY,
                               migration.db_initial_version() + 1)
@@ -358,8 +358,8 @@ class TestMigrations(test.TestCase):
                                 TestMigrations.REPOSITORY,
                                 version)
         self.assertEqual(migration_api.db_version(engine,
-                            TestMigrations.REPOSITORY),
-                            version)
+                         TestMigrations.REPOSITORY),
+                         version)
 
     def _migrate_up(self, engine, version, with_data=False):
         """Migrate up to a new version of the db.
@@ -381,8 +381,8 @@ class TestMigrations(test.TestCase):
                                   TestMigrations.REPOSITORY,
                                   version)
             self.assertEqual(migration_api.db_version(engine,
-                                         TestMigrations.REPOSITORY),
-                               version)
+                             TestMigrations.REPOSITORY),
+                             version)
 
             if with_data:
                 check = getattr(self, "_check_%3.3d" % version, None)

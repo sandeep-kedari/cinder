@@ -96,7 +96,7 @@ class SnapshotApiTest(test.TestCase):
 
         self.assertIn('snapshot', resp_dict)
         self.assertEqual(snapshot['display_name'],
-                   resp_dict['snapshot']['display_name'])
+                         resp_dict['snapshot']['display_name'])
         self.assertEqual(snapshot['display_description'],
                          resp_dict['snapshot']['display_description'])
 
@@ -115,9 +115,9 @@ class SnapshotApiTest(test.TestCase):
 
         self.assertIn('snapshot', resp_dict)
         self.assertEqual(snapshot['display_name'],
-                      resp_dict['snapshot']['display_name'])
+                         resp_dict['snapshot']['display_name'])
         self.assertEqual(snapshot['display_description'],
-                      resp_dict['snapshot']['display_description'])
+                         resp_dict['snapshot']['display_description'])
 
         snapshot = {"volume_id": "12",
                     "force": "**&&^^%%$$##@@",

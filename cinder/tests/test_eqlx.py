@@ -194,7 +194,7 @@ class DellEQLSanISCSIDriverTestCase(test.TestCase):
         iscsi_properties = self.driver.initialize_connection(volume,
                                                              self.connector)
         self.assertEqual(self._fake_get_iscsi_properties(volume),
-                        iscsi_properties['data'])
+                         iscsi_properties['data'])
 
     def test_terminate_connection(self):
         self.driver._eql_execute = self.mox.\
@@ -259,9 +259,9 @@ class DellEQLSanISCSIDriverTestCase(test.TestCase):
         prefix = ['Line1', 'Line2']
         expected_output = [' passed', None]
         self.assertEqual(expected_output[0],
-                       self.driver._get_prefixed_value(lines, prefix[0]))
+                         self.driver._get_prefixed_value(lines, prefix[0]))
         self.assertEqual(expected_output[1],
-                       self.driver._get_prefixed_value(lines, prefix[1]))
+                         self.driver._get_prefixed_value(lines, prefix[1]))
 
     def test_ssh_execute(self):
         ssh = self.mox.CreateMock(paramiko.SSHClient)

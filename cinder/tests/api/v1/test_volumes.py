@@ -130,7 +130,7 @@ class VolumeApiTest(test.TestCase):
         volume_id = res_dict['volume']['id']
         self.assertEqual(1, len(res_dict))
         self.assertEqual(db_vol_type['name'],
-                res_dict['volume']['volume_type'])
+                         res_dict['volume']['volume_type'])
 
         # Use correct volume type id
         vol.update(dict(volume_type=db_vol_type['id']))
@@ -139,7 +139,7 @@ class VolumeApiTest(test.TestCase):
         volume_id = res_dict['volume']['id']
         self.assertEqual(1, len(res_dict))
         self.assertEqual(db_vol_type['name'],
-                     res_dict['volume']['volume_type'])
+                         res_dict['volume']['volume_type'])
 
     def test_volume_creation_fails_with_bad_size(self):
         vol = {"size": '',
@@ -805,7 +805,7 @@ class VolumeSerializerTest(test.TestCase):
                 for gr_child in child:
                     self.assertIn(gr_child.get("key"), not_seen)
                     self.assertEqual(gr_child.text,
-                                    str(vol['metadata'][gr_child.get("key")]))
+                                     str(vol['metadata'][gr_child.get("key")]))
                     not_seen.remove(gr_child.get('key'))
                 self.assertEqual(0, len(not_seen))
 

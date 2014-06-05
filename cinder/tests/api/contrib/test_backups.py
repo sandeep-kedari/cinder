@@ -93,10 +93,12 @@ class BackupsAPITestCase(test.TestCase):
 
         self.assertEqual(200, res.status_int, 200)
         self.assertEqual('az1', res_dict['backup']['availability_zone'], 'az1')
-        self.assertEqual('volumebackups', res_dict['backup']['container'], 'volumebackups')
-        self.assertEqual('thid is s test backup', res_dict['backup']['description'],
-                         'this is a test backup')
-        self.assertEqual('test_backup', res_dict['backup']['name'], 'test_backup')
+        self.assertEqual('volumebackups', res_dict['backup']['container'],
+                         'volumebackups')
+        self.assertEqual('this is a test backup',
+                         res_dict['backup']['description'])
+        self.assertEqual('test_backup', res_dict['backup']['name'],
+                         'test_backup')
         self.assertEqual(backup_id, res_dict['backup']['id'], backup_id)
         self.assertEqual(0, res_dict['backup']['object_count'], 0)
         self.assertEqual(0, res_dict['backup']['size'], 0)
@@ -121,7 +123,7 @@ class BackupsAPITestCase(test.TestCase):
         name = backup.item(0).getAttribute('name')
         container_name = backup.item(0).getAttribute('container')
         self.assertEqual("volumebackups", container_name.strip())
-        self.assertEqual"'test_backup", name.strip())
+        self.assertEqual("test_backup", name.strip())
         db.backup_destroy(context.get_admin_context(), backup_id)
         db.volume_destroy(context.get_admin_context(), volume_id)
 
@@ -134,7 +136,7 @@ class BackupsAPITestCase(test.TestCase):
 
         self.assertEqual(404, res.status_int)
         self.assertEqual(404, res_dict['itemNotFound']['code'])
-        self.assertEqual('Backup 9999 could not be found',
+        self.assertEqual('Backup 9999 could not be found.',
                          res_dict['itemNotFound']['message'])
 
     def test_list_backups_json(self):
@@ -180,12 +182,12 @@ class BackupsAPITestCase(test.TestCase):
 
         self.assertEqual(2, backup_list.item(0).attributes.length)
         self.assertEqual(backup_id1,
-                             backup_list.item(0).getAttribute('id'))
+                         backup_list.item(0).getAttribute('id'))
         self.assertEqual(2, backup_list.item(1).attributes.length)
         self.assertEqual(backup_id2, backup_list.item(1).getAttribute('id'))
         self.assertEqual(2, backup_list.item(2).attributes.length)
         self.assertEqual(backup_id3,
-                                  backup_list.item(2).getAttribute('id'))
+                         backup_list.item(2).getAttribute('id'))
 
         db.backup_destroy(context.get_admin_context(), backup_id3)
         db.backup_destroy(context.get_admin_context(), backup_id2)
@@ -208,7 +210,7 @@ class BackupsAPITestCase(test.TestCase):
         self.assertEqual('az1', res_dict['backups'][0]['availability_zone'])
         self.assertEqual('volumebackups', res_dict['backups'][0]['container'])
         self.assertEqual('this is a test backup',
-                             res_dict['backups'][0]['description'])
+                         res_dict['backups'][0]['description'])
         self.assertEqual('test_backup', res_dict['backups'][0]['name'])
         self.assertEqual(backup_id1, res_dict['backups'][0]['id'])
         self.assertEqual(0, res_dict['backups'][0]['object_count'])
@@ -219,9 +221,9 @@ class BackupsAPITestCase(test.TestCase):
         self.assertEqual(12, len(res_dict['backups'][1]))
         self.assertEqual('az1', res_dict['backups'][1]['availability_zone'])
         self.assertEqual('volumebackups',
-                               res_dict['backups'][1]['container'])
+                         res_dict['backups'][1]['container'])
         self.assertEqual('this is a test backup',
-                           res_dict['backups'][1]['description'])
+                         res_dict['backups'][1]['description'])
         self.assertEqual('test_backup', res_dict['backups'][1]['name'])
         self.assertEqual(backup_id2, res_dict['backups'][1]['id'])
         self.assertEqual(0, res_dict['backups'][1]['object_count'])
@@ -233,9 +235,9 @@ class BackupsAPITestCase(test.TestCase):
         self.assertEqual('az1', res_dict['backups'][2]['availability_zone'])
         self.assertEqual('volumebackups', res_dict['backups'][2]['container'])
         self.assertEqual('this is a test backup',
-                             res_dict['backups'][2]['description'])
+                         res_dict['backups'][2]['description'])
         self.assertEqual('test_backup',
-                              res_dict['backups'][2]['name'])
+                         res_dict['backups'][2]['name'])
         self.assertEqual(backup_id3, res_dict['backups'][2]['id'])
         self.assertEqual(0, res_dict['backups'][2]['object_count'])
         self.assertEqual(0, res_dict['backups'][2]['size'])
@@ -263,63 +265,73 @@ class BackupsAPITestCase(test.TestCase):
 
         self.assertEqual(11, backup_detail.item(0).attributes.length)
         self.assertEqual('az1',
-            backup_detail.item(0).getAttribute('availability_zone'))
-        self.assertEqual('volumebackups', 
-            backup_detail.item(0).getAttribute('container'))
-        self.assertEqual('this is a test backup', 
-            backup_detail.item(0).getAttribute('description'))
-        self.assertEqual('test_backup', 
-            backup_detail.item(0).getAttribute('name'))
+                         backup_detail.item(0).getAttribute(
+                         'availability_zone'))
+        self.assertEqual('volumebackups',
+                         backup_detail.item(0).getAttribute(
+                         'container'))
+        self.assertEqual('this is a test backup',
+                         backup_detail.item(0).getAttribute(
+                         'description'))
+        self.assertEqual('test_backup',
+                         backup_detail.item(0).getAttribute('name'))
         self.assertEqual(backup_id1,
-            backup_detail.item(0).getAttribute('id'))
+                         backup_detail.item(0).getAttribute('id'))
         self.assertEqual(0,
-            int(backup_detail.item(0).getAttribute('object_count')))
+                         int(backup_detail.item(0).getAttribute(
+                         'object_count')))
         self.assertEqual(0,
-            int(backup_detail.item(0).getAttribute('size')))
+                         int(backup_detail.item(0).getAttribute('size')))
         self.assertEqual('creating',
-            backup_detail.item(0).getAttribute('status'))
+                         backup_detail.item(0).getAttribute('status'))
         self.assertEqual(1,
-            int(backup_detail.item(0).getAttribute('volume_id')))
+                         int(backup_detail.item(0).getAttribute(
+                         'volume_id')))
 
         self.assertEqual(11, backup_detail.item(1).attributes.length)
         self.assertEqual('az1',
-            backup_detail.item(1).getAttribute('availability_zone'))
-        self.assertEqual('volumebackups', 
-            backup_detail.item(1).getAttribute('container'))
-        self.assertEqual('this is a test backup', 
-            backup_detail.item(1).getAttribute('description'))
+                         backup_detail.item(1).getAttribute(
+                         'availability_zone'))
+        self.assertEqual('volumebackups',
+                         backup_detail.item(1).getAttribute('container'))
+        self.assertEqual('this is a test backup',
+                         backup_detail.item(1).getAttribute('description'))
         self.assertEqual('test_backup',
-            backup_detail.item(1).getAttribute('name'))
+                         backup_detail.item(1).getAttribute('name'))
         self.assertEqual(backup_id2,
-            backup_detail.item(1).getAttribute('id'))
+                         backup_detail.item(1).getAttribute('id'))
         self.assertEqual(0,
-            int(backup_detail.item(1).getAttribute('object_count')))
+                         int(backup_detail.item(1).getAttribute(
+                         'object_count')))
         self.assertEqual(0,
-            int(backup_detail.item(1).getAttribute('size')))
+                         int(backup_detail.item(1).getAttribute('size')))
         self.assertEqual('creating',
-            backup_detail.item(1).getAttribute('status'))
+                         backup_detail.item(1).getAttribute('status'))
         self.assertEqual(1,
-            int(backup_detail.item(1).getAttribute('volume_id')))
+                         int(backup_detail.item(1).getAttribute('volume_id')))
 
         self.assertEqual(11, backup_detail.item(2).attributes.length)
         self.assertEqual('az1',
-            backup_detail.item(2).getAttribute('availability_zone'))
+                         backup_detail.item(2).getAttribute(
+                         'availability_zone'))
         self.assertEqual('volumebackups',
-            backup_detail.item(2).getAttribute('container'))
+                         backup_detail.item(2).getAttribute('container'))
         self.assertEqual('this is a test backup',
-            backup_detail.item(2).getAttribute('description'))
+                         backup_detail.item(2).getAttribute('description'))
         self.assertEqual('test_backup',
-            backup_detail.item(2).getAttribute('name'))
+                         backup_detail.item(2).getAttribute('name'))
         self.assertEqual(backup_id3,
-            backup_detail.item(2).getAttribute('id'))
+                         backup_detail.item(2).getAttribute('id'))
         self.assertEqual(0,
-            int(backup_detail.item(2).getAttribute('object_count')))
+                         int(backup_detail.item(2).getAttribute(
+                         'object_count')))
         self.assertEqual(0,
-            int(backup_detail.item(2).getAttribute('size')))
+                         int(backup_detail.item(2).getAttribute('size')))
         self.assertEqual('creating',
-            backup_detail.item(2).getAttribute('status'))
+                         backup_detail.item(2).getAttribute('status'))
         self.assertEqual(1,
-            int(backup_detail.item(2).getAttribute('volume_id')))
+                         int(backup_detail.item(2).getAttribute(
+                         'volume_id')))
 
         db.backup_destroy(context.get_admin_context(), backup_id3)
         db.backup_destroy(context.get_admin_context(), backup_id2)
@@ -394,7 +406,7 @@ class BackupsAPITestCase(test.TestCase):
         self.assertEqual(400, res_dict['badRequest']['code'])
         self.assertEqual('The server could not comply with the request since'
                          ' it is either malformed or otherwise incorrect.',
-                          res_dict['badRequest']['message'])
+                         res_dict['badRequest']['message'])
 
     def test_create_backup_with_body_KeyError(self):
         # omit volume_id from body
@@ -414,7 +426,7 @@ class BackupsAPITestCase(test.TestCase):
         self.assertEqual(400, res.status_int)
         self.assertEqual(400, res_dict['badRequest']['code'])
         self.assertEqual('Incorrect request body format',
-                              res_dict['badRequest']['message'])
+                         res_dict['badRequest']['message'])
 
     def test_create_backup_with_VolumeNotFound(self):
         body = {"backup": {"display_name": "nightly001",
@@ -434,7 +446,7 @@ class BackupsAPITestCase(test.TestCase):
         self.assertEqual(404, res.status_int)
         self.assertEqual(404, res_dict['itemNotFound']['code'])
         self.assertEqual('Volume 9999 could not be found.',
-                          res_dict['itemNotFound']['message'])
+                         res_dict['itemNotFound']['message'])
 
     def test_create_backup_with_InvalidVolume(self):
         # need to create the volume referenced below first
@@ -458,7 +470,7 @@ class BackupsAPITestCase(test.TestCase):
         self.assertEqual(400, res_dict['badRequest']['code'])
         self.assertEqual('Invalid volume: Volume to be backed up must'
                          ' be available',
-                            res_dict['badRequest']['message'])
+                         res_dict['badRequest']['message'])
 
     @mock.patch('cinder.db.service_get_all_by_topic')
     def test_create_backup_WithOUT_enabled_backup_service(
@@ -486,7 +498,7 @@ class BackupsAPITestCase(test.TestCase):
         self.assertEqual(500, res.status_int)
         self.assertEqual(500, res_dict['computeFault']['code'])
         self.assertEqual('Service cinder-backup could not be found.',
-                                   res_dict['computeFault']['message'])
+                         res_dict['computeFault']['message'])
 
         volume = self.volume_api.get(context.get_admin_context(), volume_id)
         self.assertEqual('available', volume['status'])
@@ -533,32 +545,32 @@ class BackupsAPITestCase(test.TestCase):
 
         #test empty service
         self.assertEqual(False,
-                            self.backup_api._is_backup_service_enabled(volume,
+                         self.backup_api._is_backup_service_enabled(volume,
                                                                     test_host))
 
         #test host not match service
         self.assertEqual(False,
-                            self.backup_api._is_backup_service_enabled(volume,
+                         self.backup_api._is_backup_service_enabled(volume,
                                                                     test_host))
 
         #test az not match service
         self.assertEqual(False,
-                            self.backup_api._is_backup_service_enabled(volume,
+                         self.backup_api._is_backup_service_enabled(volume,
                                                                     test_host))
 
         #test disabled service
         self.assertEqual(False,
-                             self.backup_api._is_backup_service_enabled(volume,
+                         self.backup_api._is_backup_service_enabled(volume,
                                                                     test_host))
 
         #test dead service
         self.assertEqual(False,
-                              self.backup_api._is_backup_service_enabled(volume,
+                         self.backup_api._is_backup_service_enabled(volume,
                                                                     test_host))
 
         #test multi services and the last service matches
         self.assertEqual(True,
-                            self.backup_api._is_backup_service_enabled(volume,
+                         self.backup_api._is_backup_service_enabled(volume,
                                                                     test_host))
 
     def test_delete_backup_available(self):
@@ -585,7 +597,7 @@ class BackupsAPITestCase(test.TestCase):
 
         self.assertEqual(202, res.status_int)
         self.assertEqual('deleting',
-                          self._get_backup_attrib(backup_id, 'status'))
+                         self._get_backup_attrib(backup_id, 'status'))
 
         db.backup_destroy(context.get_admin_context(), backup_id)
 
@@ -612,9 +624,9 @@ class BackupsAPITestCase(test.TestCase):
 
         self.assertEqual(400, res.status_int)
         self.assertEqual(400, res_dict['badRequest']['code'])
-        self.assertEqual(''Invalid backup: Backup status must be '
-                         'available or error'',
-                          res_dict['badRequest']['message'],
+        self.assertEqual('Invalid backup: Backup status must be '
+                         'available or error',
+                         res_dict['badRequest']['message'])
 
         db.backup_destroy(context.get_admin_context(), backup_id)
 
@@ -651,9 +663,9 @@ class BackupsAPITestCase(test.TestCase):
         dom = minidom.parseString(res.body)
         restore = dom.getElementsByTagName('restore')
         self.assertEqual(backup_id,
-                restore.item(0).getAttribute('backup_id'))
+                         restore.item(0).getAttribute('backup_id'))
         self.assertEqual(volume_id,
-                      restore.item(0).getAttribute('volume_id'))
+                         restore.item(0).getAttribute('volume_id'))
 
         db.backup_destroy(context.get_admin_context(), backup_id)
         db.volume_destroy(context.get_admin_context(), volume_id)
@@ -674,7 +686,7 @@ class BackupsAPITestCase(test.TestCase):
         self.assertEqual(400, res.status_int)
         self.assertEqual(400, res_dict['badRequest']['code'])
         self.assertEqual('Incorrect request body format',
-                                 res_dict['badRequest']['message'])
+                         res_dict['badRequest']['message'])
 
         db.backup_destroy(context.get_admin_context(), backup_id)
 
@@ -695,7 +707,7 @@ class BackupsAPITestCase(test.TestCase):
         self.assertEqual(400, res.status_int)
         self.assertEqual(400, res_dict['badRequest']['code'])
         self.assertEqual('Incorrect request body format',
-                                  res_dict['badRequest']['message'])
+                         res_dict['badRequest']['message'])
 
     @mock.patch('cinder.volume.API.create')
     def test_restore_backup_volume_id_unspecified(self,
@@ -747,7 +759,7 @@ class BackupsAPITestCase(test.TestCase):
         self.assertEqual(400, res.status_int)
         self.assertEqual(400, res_dict['badRequest']['code'])
         self.assertEqual('Invalid input received: Invalid input',
-                                       res_dict['badRequest']['message'])
+                         res_dict['badRequest']['message'])
 
     def test_restore_backup_with_InvalidVolume(self):
         backup_id = self._create_backup(status='available')
@@ -768,7 +780,7 @@ class BackupsAPITestCase(test.TestCase):
         self.assertEqual(400, res_dict['badRequest']['code'], 400)
         self.assertEqual('Invalid volume: Volume to be restored to must '
                          'be available',
-                            res_dict['badRequest']['message'])
+                         res_dict['badRequest']['message'])
 
         db.volume_destroy(context.get_admin_context(), volume_id)
         db.backup_destroy(context.get_admin_context(), backup_id)
@@ -790,7 +802,7 @@ class BackupsAPITestCase(test.TestCase):
         self.assertEqual(400, res.status_int)
         self.assertEqual(400, res_dict['badRequest']['code'])
         self.assertEqual('Invalid backup: Backup status must be available',
-                            res_dict['badRequest']['message'])
+                         res_dict['badRequest']['message'])
 
         db.volume_destroy(context.get_admin_context(), volume_id)
         db.backup_destroy(context.get_admin_context(), backup_id)
@@ -810,7 +822,7 @@ class BackupsAPITestCase(test.TestCase):
         self.assertEqual(404, res.status_int)
         self.assertEqual(404, res_dict['itemNotFound']['code'], 404)
         self.assertEqual('Backup 9999 could not be found.',
-                                res_dict['itemNotFound']['message'])
+                         res_dict['itemNotFound']['message'])
 
         db.volume_destroy(context.get_admin_context(), volume_id)
 
@@ -829,7 +841,7 @@ class BackupsAPITestCase(test.TestCase):
         self.assertEqual(404, res.status_int)
         self.assertEqual(404, res_dict['itemNotFound']['code'])
         self.assertEqual('Volume 9999 could not be found.',
-                                 res_dict['itemNotFound']['message'])
+                         res_dict['itemNotFound']['message'])
 
         db.backup_destroy(context.get_admin_context(), backup_id)
 
@@ -862,7 +874,7 @@ class BackupsAPITestCase(test.TestCase):
         self.assertEqual('Requested volume or snapshot exceeds allowed '
                          'Gigabytes quota. Requested 2G, quota is 3G and '
                          '2G has been consumed.',
-                           res_dict['overLimit']['message'])
+                         res_dict['overLimit']['message'])
 
     @mock.patch('cinder.backup.API.restore')
     def test_restore_backup_with_VolumeLimitExceeded(self,
@@ -888,7 +900,7 @@ class BackupsAPITestCase(test.TestCase):
         self.assertEqual(413, res.status_int)
         self.assertEqual(413, res_dict['overLimit']['code'])
         self.assertEqual('Maximum number of volumes allowed (1) exceeded',
-                                        res_dict['overLimit']['message'])
+                         res_dict['overLimit']['message'])
 
     def test_restore_backup_to_undersized_volume(self):
         backup_size = 10
@@ -911,7 +923,7 @@ class BackupsAPITestCase(test.TestCase):
         self.assertEqual('Invalid volume: volume size %d is too '
                          'small to restore backup of size %d.'
                          % (volume_size, backup_size),
-                              res_dict['badRequest']['message'])
+                         res_dict['badRequest']['message'])
 
         db.volume_destroy(context.get_admin_context(), volume_id)
         db.backup_destroy(context.get_admin_context(), backup_id)
@@ -968,9 +980,9 @@ class BackupsAPITestCase(test.TestCase):
         # verify that request is successful
         self.assertEqual(200, res.status_int)
         self.assertEqual(backup_service,
-                             res_dict['backup-record']['backup_service'])
+                         res_dict['backup-record']['backup_service'])
         self.assertEqual(backup_url,
-                                    res_dict['backup-record']['backup_url'])
+                         res_dict['backup-record']['backup_url'])
         db.backup_destroy(context.get_admin_context(), backup_id)
 
     @mock.patch('cinder.backup.rpcapi.BackupAPI.export_record')
@@ -993,9 +1005,9 @@ class BackupsAPITestCase(test.TestCase):
         dom = minidom.parseString(res.body)
         export = dom.getElementsByTagName('backup-record')
         self.assertEqual(backup_service,
-                      export.item(0).getAttribute('backup_service'))
+                         export.item(0).getAttribute('backup_service'))
         self.assertEqual(backup_url,
-                       export.item(0).getAttribute('backup_url'))
+                         export.item(0).getAttribute('backup_url'))
 
         #db.backup_destroy(context.get_admin_context(), backup_id)
 
@@ -1013,7 +1025,7 @@ class BackupsAPITestCase(test.TestCase):
         self.assertEqual(404, res.status_int)
         self.assertEqual(404, res_dict['itemNotFound']['code'])
         self.assertEqual('Backup %s could not be found.' % backup_id,
-                                res_dict['itemNotFound']['message'])
+                         res_dict['itemNotFound']['message'])
 
     def test_export_record_for_unavailable_backup(self):
 
@@ -1052,7 +1064,7 @@ class BackupsAPITestCase(test.TestCase):
         self.assertEqual(400, res.status_int)
         self.assertEqual(400, res_dict['badRequest']['code'])
         self.assertEqual('Invalid backup: %s' % msg,
-                           res_dict['badRequest']['message'])
+                         res_dict['badRequest']['message'])
         db.backup_destroy(context.get_admin_context(), backup_id)
 
     def test_import_record_as_non_admin(self):
@@ -1159,7 +1171,7 @@ class BackupsAPITestCase(test.TestCase):
         self.assertEqual(500, res_dict['computeFault']['code'])
         self.assertEqual('Service %s could not be found.'
                          % backup_service,
-                        res_dict['computeFault']['message'])
+                         res_dict['computeFault']['message'])
 
     @mock.patch('cinder.backup.api.API._list_backup_services')
     @mock.patch('cinder.backup.rpcapi.BackupAPI.import_record')
@@ -1185,7 +1197,7 @@ class BackupsAPITestCase(test.TestCase):
         self.assertEqual(500, res_dict['computeFault']['code'])
         self.assertEqual('Service %s could not be found.'
                          % backup_service,
-                          res_dict['computeFault']['message'])
+                         res_dict['computeFault']['message'])
 
     def test_import_record_with_missing_body_elements(self):
         ctx = context.RequestContext('admin', 'fake', is_admin=True)
@@ -1203,7 +1215,7 @@ class BackupsAPITestCase(test.TestCase):
         self.assertEqual(400, res.status_int)
         self.assertEqual(400, res_dict['badRequest']['code'])
         self.assertEqual('Incorrect request body format.',
-                                      res_dict['badRequest']['message'])
+                         res_dict['badRequest']['message'])
 
         #test with no backup_url
         req = webob.Request.blank('/v2/fake/backups/import_record')
@@ -1217,7 +1229,7 @@ class BackupsAPITestCase(test.TestCase):
         self.assertEqual(400, res.status_int)
         self.assertEqual(400, res_dict['badRequest']['code'])
         self.assertEqual('Incorrect request body format.',
-                                   res_dict['badRequest']['message'])
+                         res_dict['badRequest']['message'])
 
         #test with no backup_url and backup_url
         req = webob.Request.blank('/v2/fake/backups/import_record')
@@ -1231,7 +1243,7 @@ class BackupsAPITestCase(test.TestCase):
         self.assertEqual(400, res.status_int)
         self.assertEqual(400, res_dict['badRequest']['code'])
         self.assertEqual('Incorrect request body format.',
-                               res_dict['badRequest']['message'])
+                         res_dict['badRequest']['message'])
 
     def test_import_record_with_no_body(self):
         ctx = context.RequestContext('admin', 'fake', is_admin=True)
@@ -1247,4 +1259,4 @@ class BackupsAPITestCase(test.TestCase):
         self.assertEqual(400, res.status_int)
         self.assertEqual(400, res_dict['badRequest']['code'])
         self.assertEqual('Incorrect request body format.',
-                                 res_dict['badRequest']['message'])
+                         res_dict['badRequest']['message'])

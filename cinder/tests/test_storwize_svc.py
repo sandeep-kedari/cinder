@@ -1959,14 +1959,14 @@ class StorwizeSVCDriverTestCase(test.TestCase):
             # Initialize connection from the first volume to a host
             ret = self.driver.initialize_connection(volume1, self._connector)
             self.assertEqual(expected[protocol]['driver_volume_type'],
-                               ret['driver_volume_type'])
+                             ret['driver_volume_type'])
             for k, v in expected[protocol]['data'].iteritems():
                 self.assertEqual(v, ret['data'][k])
 
             # Initialize again, should notice it and do nothing
             ret = self.driver.initialize_connection(volume1, self._connector)
             self.assertEqual(expected[protocol]['driver_volume_type'],
-                               ret['driver_volume_type'])
+                             ret['driver_volume_type'])
             for k, v in expected[protocol]['data'].iteritems():
                 self.assertEqual(v, ret['data'][k])
 
@@ -2380,7 +2380,7 @@ class StorwizeSVCDriverTestCase(test.TestCase):
         self.driver._add_vdisk_copy_op(ctxt, volume, new_ops)
         admin_metadata = self.db.volume_admin_metadata_get(ctxt, volume['id'])
         self.assertEqual(admin_metadata['vdiskcopyops'],
-                          ":".join(x for x in new_ops),
+                         ":".join(x for x in new_ops),
                          'Storwize driver add vdisk copy error.')
         self.driver._check_volume_copy_ops()
         self.driver._rm_vdisk_copy_op(ctxt, volume, new_ops[0], new_ops[1])
@@ -2618,9 +2618,9 @@ home address!s4
 '''
         resp = ssh.CLIResponse(raw, with_header=False)
         self.assertEqual([('s1', 'Bill', 's1'), ('s2', 'Bill2', 's2'),
-                          ('s3', 'John', 's3'), ('s4', 'John2', 's4')],
-                              list(resp.select('home address', 'name',
-                                          'home address')))
+                         ('s3', 'John', 's3'), ('s4', 'John2', 's4')],
+                         list(resp.select('home address', 'name',
+                         'home address')))
 
     def test_lsnode_all(self):
         raw = r'''id!name!UPS_serial_number!WWNN!status
@@ -2647,8 +2647,8 @@ port_speed!8Gb
         self.assertEqual(1, len(resp))
         self.assertEqual('1', resp[0]['id'])
         self.assertEqual([('500507680210C744', 'active'),
-                          ('500507680240C744', 'inactive')],
-                           list(resp.select('port_id', 'port_status')))
+                         ('500507680240C744', 'inactive')],
+                         list(resp.select('port_id', 'port_status')))
 
 
 class StorwizeHelpersTestCase(test.TestCase):

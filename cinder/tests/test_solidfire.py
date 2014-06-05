@@ -197,7 +197,7 @@ class SolidFireVolumeTestCase(test.TestCase):
         sfv = SolidFireDriver(configuration=self.configuration)
         model_update = sfv.create_volume(testvol)
         self.assertEqual('4096 4096',
-                     model_update.get('provider_geometry', None))
+                         model_update.get('provider_geometry', None))
         self.configuration.sf_emulate_512 = True
 
     def test_create_snapshot(self):
@@ -477,8 +477,8 @@ class SolidFireVolumeTestCase(test.TestCase):
                                                  "qos:maxIOPS": "200"})
         qos = sfv._set_qos_by_volume_type(self.ctxt, type_ref['id'])
         self.assertEqual({'minIOPS': 100,
-                               'maxIOPS': 200,
-                               'burstIOPS': 300}, qos)
+                         'maxIOPS': 200,
+                         'burstIOPS': 300}, qos)
 
     def test_retype(self):
         sfv = SolidFireDriver(configuration=self.configuration)
