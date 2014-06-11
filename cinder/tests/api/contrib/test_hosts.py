@@ -28,7 +28,7 @@ from cinder import test
 
 LOG = logging.getLogger(__name__)
 created_time = datetime.datetime(2012, 11, 14, 1, 20, 41, 95099)
-curr_time = datetime.datetime(2013, 7, 3, 0, 0, 1)
+curr_time = timeutils.utcnow()
 
 SERVICE_LIST = [
     {'created_at': created_time, 'updated_at': curr_time,
@@ -58,10 +58,6 @@ LIST_RESPONSE = [{'service-status': 'available', 'service': 'cinder-volume',
                   'host_name': 'test.host.1', 'last-update': curr_time}]
 
 
-def stub_utcnow():
-    return datetime.datetime(2013, 7, 3, 0, 0, 2)
-
-
 def stub_service_get_all(self, req):
     return SERVICE_LIST
 
@@ -85,27 +81,26 @@ class HostTestCase(test.TestCase):
         self.req = FakeRequest()
         self.stubs.Set(db, 'service_get_all',
                        stub_service_get_all)
-        self.stubs.Set(timeutils, 'utcnow', stub_utcnow)
 
     def _test_host_update(self, host, key, val, expected_value):
         body = {key: val}
         result = self.controller.update(self.req, host, body=body)
-        self.assertEqual(result[key], expected_value)
+        self.assertEqual(expected_value, result[key])
 
     def test_list_hosts(self):
         """Verify that the volume hosts are returned."""
         hosts = os_hosts._list_hosts(self.req)
-        self.assertEqual(hosts, LIST_RESPONSE)
+        self.assertEqual(LIST_RESPONSE, hosts)
 
         cinder_hosts = os_hosts._list_hosts(self.req, 'cinder-volume')
         expected = [host for host in LIST_RESPONSE
                     if host['service'] == 'cinder-volume']
-        self.assertEqual(cinder_hosts, expected)
+        self.assertEqual(expected, cinder_hosts)
 
     def test_list_hosts_with_zone(self):
         req = FakeRequestWithcinderZone()
         hosts = os_hosts._list_hosts(req)
-        self.assertEqual(hosts, LIST_RESPONSE)
+        self.assertEqual(LIST_RESPONSE, hosts)
 
     def test_bad_status_value(self):
         self.assertRaises(webob.exc.HTTPBadRequest, self.controller.update,

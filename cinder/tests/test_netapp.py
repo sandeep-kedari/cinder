@@ -340,89 +340,89 @@ class FakeDirectCMODEServerHandler(FakeHTTPRequestHandler):
                 </lun-map-info></attributes-list><num-records>1</num-records>
                 </results>"""
         elif 'lun-map' == api:
-            body = """<results status="passed"><lun-id-assigned>1
-            </lun-id-assigned>
-            </results>"""
+                body = """<results status="passed"><lun-id-assigned>1
+                </lun-id-assigned>
+                </results>"""
         elif 'lun-get-geometry' == api:
-            body = """<results status="passed"><bytes-per-sector>256
-            </bytes-per-sector><cylinders>512</cylinders><max-resize-size>
-            3221225472</max-resize-size><sectors-per-track>512
-            </sectors-per-track><size>2147483648</size>
-            <tracks-per-cylinder>256</tracks-per-cylinder></results>"""
+                body = """<results status="passed"><bytes-per-sector>256
+                </bytes-per-sector><cylinders>512</cylinders><max-resize-size>
+                3221225472</max-resize-size><sectors-per-track>512
+                </sectors-per-track><size>2147483648</size>
+                <tracks-per-cylinder>256</tracks-per-cylinder></results>"""
         elif 'iscsi-service-get-iter' == api:
-            body = """<results status="passed"><attributes-list>
-            <iscsi-service-info>
-            <alias-name>openstack</alias-name>
-            <is-available>true</is-available>
-            <node-name>iqn.1992-08.com.netapp:sn.fa9:vs.105</node-name>
-            <vserver>openstack</vserver></iscsi-service-info>
-            </attributes-list><num-records>1</num-records></results>"""
+                body = """<results status="passed"><attributes-list>
+                <iscsi-service-info>
+                <alias-name>openstack</alias-name>
+                <is-available>true</is-available>
+                <node-name>iqn.1992-08.com.netapp:sn.fa9:vs.105</node-name>
+                <vserver>openstack</vserver></iscsi-service-info>
+                </attributes-list><num-records>1</num-records></results>"""
         elif 'iscsi-interface-get-iter' == api:
-            body = """<results status="passed"><attributes-list>
-            <iscsi-interface-list-entry-info><current-node>
-            fas3170rre-cmode-01
-            </current-node><current-port>e1b-1165</current-port>
-            <interface-name>
-            iscsi_data_if</interface-name>
-            <ip-address>10.63.165.216</ip-address>
-            <ip-port>3260</ip-port><is-interface-enabled>true
-            </is-interface-enabled>
-            <relative-port-id>5</relative-port-id>
-            <tpgroup-name>iscsi_data_if</tpgroup-name>
-            <tpgroup-tag>1038</tpgroup-tag><vserver>
-            openstack</vserver>
-            </iscsi-interface-list-entry-info></attributes-list>
-            <num-records>1</num-records></results>"""
+                body = """<results status="passed"><attributes-list>
+                <iscsi-interface-list-entry-info><current-node>
+                fas3170rre-cmode-01
+                </current-node><current-port>e1b-1165</current-port>
+                <interface-name>
+                iscsi_data_if</interface-name>
+                <ip-address>10.63.165.216</ip-address>
+                <ip-port>3260</ip-port><is-interface-enabled>true
+                </is-interface-enabled>
+                <relative-port-id>5</relative-port-id>
+                <tpgroup-name>iscsi_data_if</tpgroup-name>
+                <tpgroup-tag>1038</tpgroup-tag><vserver>
+                openstack</vserver>
+                </iscsi-interface-list-entry-info></attributes-list>
+                <num-records>1</num-records></results>"""
         elif 'igroup-create' == api:
-            body = """<results status="passed"/>"""
+                body = """<results status="passed"/>"""
         elif 'igroup-add' == api:
-            body = """<results status="passed"/>"""
+                body = """<results status="passed"/>"""
         elif 'clone-create' == api:
-            body = """<results status="passed"/>"""
+                body = """<results status="passed"/>"""
         elif 'lun-unmap' == api:
-            body = """<results status="passed"/>"""
+                body = """<results status="passed"/>"""
         elif 'system-get-ontapi-version' == api:
-            body = """<results status="passed">
-                        <major-version>1</major-version>
-                        <minor-version>19</minor-version>
-                      </results>"""
+                body = """<results status="passed">
+                            <major-version>1</major-version>
+                            <minor-version>19</minor-version>
+                          </results>"""
         elif 'vserver-get-iter' == api:
-            body = """<results status="passed"><attributes-list>
-                      <vserver-info>
-                      <vserver-name>vserver</vserver-name>
-                      <vserver-type>node</vserver-type>
-                      </vserver-info>
-                      </attributes-list>
-                      <num-records>1</num-records></results>"""
+                body = """<results status="passed"><attributes-list>
+                          <vserver-info>
+                          <vserver-name>vserver</vserver-name>
+                          <vserver-type>node</vserver-type>
+                          </vserver-info>
+                          </attributes-list>
+                          <num-records>1</num-records></results>"""
         elif 'ems-autosupport-log' == api:
-            body = """<results status="passed"/>"""
+                body = """<results status="passed"/>"""
         elif 'lun-resize' == api:
-            body = """<results status="passed"/>"""
+                body = """<results status="passed"/>"""
         elif 'lun-get-geometry' == api:
-            body = """<results status="passed">
-                      <size>1</size>
-                      <bytes-per-sector>2</bytes-per-sector>
-                      <sectors-per-track>8</sectors-per-track>
-                      <tracks-per-cylinder>2</tracks-per-cylinder>
-                      <cylinders>4</cylinders>
-                      <max-resize-size>5</max-resize-size>
-                      </results>"""
+                body = """<results status="passed">
+                          <size>1</size>
+                          <bytes-per-sector>2</bytes-per-sector>
+                          <sectors-per-track>8</sectors-per-track>
+                          <tracks-per-cylinder>2</tracks-per-cylinder>
+                          <cylinders>4</cylinders>
+                          <max-resize-size>5</max-resize-size>
+                          </results>"""
         elif 'volume-options-list-info' == api:
-            body = """<results status="passed">
-                      <options>
-                      <option>
-                      <name>compression</name>
-                      <value>off</value>
-                      </option>
-                      </options>
-                      </results>"""
+                body = """<results status="passed">
+                          <options>
+                          <option>
+                          <name>compression</name>
+                          <value>off</value>
+                          </option>
+                          </options>
+                          </results>"""
         elif 'lun-move' == api:
-            body = """<results status="passed"/>"""
+                body = """<results status="passed"/>"""
         else:
-            # Unknown API
-            s.send_response(500)
-            s.end_headers
-            return
+                # Unknown API
+                s.send_response(500)
+                s.end_headers
+                return
         s.send_response(200)
         s.send_header("Content-Type", "text/xml; charset=utf-8")
         s.end_headers()
@@ -596,7 +596,7 @@ class NetAppDirectCmodeISCSIDriverTestCase(test.TestCase):
 
         connection_info = self.driver.initialize_connection(self.volume,
                                                             self.connector)
-        self.assertEqual(connection_info['driver_volume_type'], 'iscsi')
+        self.assertEqual('iscsi', connection_info['driver_volume_type'])
         properties = connection_info['data']
         if not properties:
             raise AssertionError('Target portal is none')
@@ -617,7 +617,7 @@ class NetAppDirectCmodeISCSIDriverTestCase(test.TestCase):
         connector_new = {'initiator': 'iqn.1993-08.org.debian:01:1001'}
         connection_info = self.driver.initialize_connection(self.volume,
                                                             connector_new)
-        self.assertEqual(connection_info['driver_volume_type'], 'iscsi')
+        self.assertEqual('iscsi', connection_info['driver_volume_type'])
         properties = connection_info['data']
         if not properties:
             raise AssertionError('Target portal is none')
@@ -668,7 +668,7 @@ class NetAppDriverNegativeTestCase(test.TestCase):
         configuration = create_configuration()
         configuration.netapp_storage_family = 'xyz_abc'
         try:
-            common.NetAppDriver(configuration=configuration)
+            driver = common.NetAppDriver(configuration=configuration)
             raise AssertionError('Wrong storage family is getting accepted.')
         except exception.InvalidInput:
             pass
@@ -678,7 +678,7 @@ class NetAppDriverNegativeTestCase(test.TestCase):
         configuration.netapp_storage_family = 'ontap'
         configuration.netapp_storage_protocol = 'ontap'
         try:
-            common.NetAppDriver(configuration=configuration)
+            driver = common.NetAppDriver(configuration=configuration)
             raise AssertionError('Wrong storage protocol is getting accepted.')
         except exception.InvalidInput:
             pass
@@ -690,7 +690,7 @@ class NetAppDriverNegativeTestCase(test.TestCase):
         configuration.netapp_storage_family = 'test_family'
         configuration.netapp_storage_protocol = 'iscsi'
         try:
-            common.NetAppDriver(configuration=configuration)
+            driver = common.NetAppDriver(configuration=configuration)
             raise AssertionError('Non NetApp driver is getting instantiated.')
         except exception.InvalidInput:
             pass
@@ -989,15 +989,15 @@ class FakeDirect7MODEServerHandler(FakeHTTPRequestHandler):
     <initiator-groups/>
   </results>"""
         elif 'lun-map' == api:
-            body = """<results status="passed"><lun-id-assigned>1
-            </lun-id-assigned>
-            </results>"""
+                body = """<results status="passed"><lun-id-assigned>1
+                </lun-id-assigned>
+                </results>"""
         elif 'iscsi-node-get-name' == api:
-            body = """<results status="passed">
+                body = """<results status="passed">
     <node-name>iqn.1992-08.com.netapp:sn.135093938</node-name>
   </results>"""
         elif 'iscsi-portal-list-info' == api:
-            body = """<results status="passed">
+                body = """<results status="passed">
     <iscsi-portal-list-entries>
       <iscsi-portal-list-entry-info>
         <ip-address>10.61.176.156</ip-address>
@@ -1008,11 +1008,11 @@ class FakeDirect7MODEServerHandler(FakeHTTPRequestHandler):
     </iscsi-portal-list-entries>
   </results>"""
         elif 'igroup-create' == api:
-            body = """<results status="passed"/>"""
+                body = """<results status="passed"/>"""
         elif 'igroup-add' == api:
-            body = """<results status="passed"/>"""
+                body = """<results status="passed"/>"""
         elif 'clone-start' == api:
-            body = """<results status="passed">
+                body = """<results status="passed">
     <clone-id>
       <clone-id-info>
         <volume-uuid>2d50ecf4-c288-11e0-9282-00a09825b3b5</volume-uuid>
@@ -1021,7 +1021,7 @@ class FakeDirect7MODEServerHandler(FakeHTTPRequestHandler):
     </clone-id>
   </results>"""
         elif 'clone-list-status' == api:
-            body = """<results status="passed">
+                body = """<results status="passed">
     <status>
       <ops-info>
         <clone-state>completed</clone-state>
@@ -1029,43 +1029,43 @@ class FakeDirect7MODEServerHandler(FakeHTTPRequestHandler):
     </status>
   </results>"""
         elif 'lun-unmap' == api:
-            body = """<results status="passed"/>"""
+                body = """<results status="passed"/>"""
         elif 'system-get-ontapi-version' == api:
-            body = """<results status="passed">
-                        <major-version>1</major-version>
-                        <minor-version>8</minor-version>
-                      </results>"""
+                body = """<results status="passed">
+                            <major-version>1</major-version>
+                            <minor-version>8</minor-version>
+                          </results>"""
         elif 'lun-set-space-reservation-info' == api:
-            body = """<results status="passed"/>"""
+                body = """<results status="passed"/>"""
         elif 'ems-autosupport-log' == api:
-            body = """<results status="passed"/>"""
+                body = """<results status="passed"/>"""
         elif 'lun-resize' == api:
-            body = """<results status="passed"/>"""
+                body = """<results status="passed"/>"""
         elif 'lun-get-geometry' == api:
-            body = """<results status="passed">
-                      <size>1</size>
-                      <bytes-per-sector>2</bytes-per-sector>
-                      <sectors-per-track>8</sectors-per-track>
-                      <tracks-per-cylinder>2</tracks-per-cylinder>
-                      <cylinders>4</cylinders>
-                      <max-resize-size>5</max-resize-size>
-                      </results>"""
+                body = """<results status="passed">
+                          <size>1</size>
+                          <bytes-per-sector>2</bytes-per-sector>
+                          <sectors-per-track>8</sectors-per-track>
+                          <tracks-per-cylinder>2</tracks-per-cylinder>
+                          <cylinders>4</cylinders>
+                          <max-resize-size>5</max-resize-size>
+                          </results>"""
         elif 'volume-options-list-info' == api:
-            body = """<results status="passed">
-                      <options>
-                      <option>
-                      <name>compression</name>
-                      <value>off</value>
-                      </option>
-                      </options>
-                      </results>"""
+                body = """<results status="passed">
+                          <options>
+                          <option>
+                          <name>compression</name>
+                          <value>off</value>
+                          </option>
+                          </options>
+                          </results>"""
         elif 'lun-move' == api:
-            body = """<results status="passed"/>"""
+                body = """<results status="passed"/>"""
         else:
-            # Unknown API
-            s.send_response(500)
-            s.end_headers
-            return
+                # Unknown API
+                s.send_response(500)
+                s.end_headers
+                return
         s.send_response(200)
         s.send_header("Content-Type", "text/xml; charset=utf-8")
         s.end_headers()
@@ -1218,30 +1218,30 @@ class NetAppApiElementTransTests(test.TestCase):
         root = NaElement('root')
         child = {'e1': 'v1', 'e2': 'v2', 'e3': 'v3'}
         root.translate_struct(child)
-        self.assertEqual(len(root.get_children()), 3)
-        self.assertEqual(root.get_child_content('e1'), 'v1')
-        self.assertEqual(root.get_child_content('e2'), 'v2')
-        self.assertEqual(root.get_child_content('e3'), 'v3')
+        self.assertEqual(3, len(root.get_children()))
+        self.assertEqual('v1', root.get_child_content('e1'))
+        self.assertEqual('v2', root.get_child_content('e2'))
+        self.assertEqual('v3', root.get_child_content('e3'))
 
     def test_translate_struct_dict_nonunique_key(self):
         """Tests if list/dict gets properly converted to NaElements."""
         root = NaElement('root')
         child = [{'e1': 'v1', 'e2': 'v2'}, {'e1': 'v3'}]
         root.translate_struct(child)
-        self.assertEqual(len(root.get_children()), 3)
+        self.assertEqual(3, len(root.get_children()))
         children = root.get_children()
         for c in children:
             if c.get_name() == 'e1':
                 self.assertIn(c.get_content(), ['v1', 'v3'])
             else:
-                self.assertEqual(c.get_content(), 'v2')
+                self.assertEqual('v2', c.get_content())
 
     def test_translate_struct_list(self):
         """Tests if list gets properly converted to NaElements."""
         root = NaElement('root')
         child = ['e1', 'e2']
         root.translate_struct(child)
-        self.assertEqual(len(root.get_children()), 2)
+        self.assertEqual(2, len(root.get_children()))
         self.assertIsNone(root.get_child_content('e1'))
         self.assertIsNone(root.get_child_content('e2'))
 
@@ -1250,7 +1250,7 @@ class NetAppApiElementTransTests(test.TestCase):
         root = NaElement('root')
         child = ('e1', 'e2')
         root.translate_struct(child)
-        self.assertEqual(len(root.get_children()), 2)
+        self.assertEqual(2, len(root.get_children()))
         self.assertIsNone(root.get_child_content('e1'))
         self.assertIsNone(root.get_child_content('e2'))
 
@@ -1267,17 +1267,17 @@ class NetAppApiElementTransTests(test.TestCase):
         root['e2'] = 1
         root['e3'] = 2.0
         root['e4'] = 8l
-        self.assertEqual(len(root.get_children()), 4)
-        self.assertEqual(root.get_child_content('e1'), 'v1')
-        self.assertEqual(root.get_child_content('e2'), '1')
-        self.assertEqual(root.get_child_content('e3'), '2.0')
-        self.assertEqual(root.get_child_content('e4'), '8')
+        self.assertEqual(4, len(root.get_children()))
+        self.assertEqual('v1', root.get_child_content('e1'))
+        self.assertEqual('1', root.get_child_content('e2'))
+        self.assertEqual('2.0', root.get_child_content('e3'))
+        self.assertEqual('8', root.get_child_content('e4'))
 
     def test_setter_na_element(self):
         """Tests na_element gets appended as child."""
         root = NaElement('root')
         root['e1'] = NaElement('nested')
-        self.assertEqual(len(root.get_children()), 1)
+        self.assertEqual(1, len(root.get_children()))
         e1 = root.get_child_by_name('e1')
         self.assertIsInstance(e1, NaElement)
         self.assertIsInstance(e1.get_child_by_name('nested'), NaElement)
@@ -1289,13 +1289,13 @@ class NetAppApiElementTransTests(test.TestCase):
         e1 = root.get_child_by_name('d')
         self.assertIsInstance(e1, NaElement)
         sub_ch = e1.get_children()
-        self.assertEqual(len(sub_ch), 2)
+        self.assertEqual(2, len(sub_ch))
         for c in sub_ch:
             self.assertIn(c.get_name(), ['e1', 'e2'])
             if c.get_name() == 'e1':
-                self.assertEqual(c.get_content(), 'v1')
+                self.assertEqual('v1', c.get_content())
             else:
-                self.assertEqual(c.get_content(), 'v2')
+                self.assertEqual('v2', c.get_content())
 
     def test_setter_child_list_tuple(self):
         """Tests list/tuple are appended as child to root."""

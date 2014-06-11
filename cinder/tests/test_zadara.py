@@ -493,6 +493,9 @@ class ZadaraVPSADriverTestCase(test.TestCase):
         self.stubs.Set(httplib, 'HTTPSConnection', FakeHTTPSConnection)
         self.driver.do_setup(None)
 
+    def tearDown(self):
+        super(ZadaraVPSADriverTestCase, self).tearDown()
+
     def test_create_destroy(self):
         """Create/Delete volume."""
         volume = {'name': 'test_volume_01', 'size': 1}
@@ -546,16 +549,16 @@ class ZadaraVPSADriverTestCase(test.TestCase):
         self.driver.create_volume(volume)
 
         props = self.driver.initialize_connection(volume, connector)
-        self.assertEqual(props['driver_volume_type'], 'iscsi')
+        self.assertEqual('iscsi', props['driver_volume_type'])
         data = props['data']
-        self.assertEqual(data['target_portal'], '1.1.1.1:3260')
-        self.assertEqual(data['target_iqn'],
-                         'iqn.2011-04.com.zadarastorage:vsa-xxx:1')
-        self.assertEqual(data['target_lun'], '0')
-        self.assertEqual(data['volume_id'], 123)
-        self.assertEqual(data['auth_method'], 'CHAP')
-        self.assertEqual(data['auth_username'], 'test_chap_user')
-        self.assertEqual(data['auth_password'], 'test_chap_secret')
+        self.assertEqual('1.1.1.1:3260', data['target_portal'])
+        self.assertEqual('iqn.2011-04.com.zadarastorage:vsa-xxx:1',
+                         data['target_iqn'])
+        self.assertEqual('0', data['target_lun'], '0')
+        self.assertEqual(123, data['volume_id'], 123)
+        self.assertEqual('CHAP', data['auth_method'], 'CHAP')
+        self.assertEqual('test_chap_user', data['auth_username'])
+        self.assertEqual('test_chap_secret', data['auth_password'])
 
         self.driver.terminate_connection(volume, connector)
         self.driver.delete_volume(volume)
@@ -568,9 +571,9 @@ class ZadaraVPSADriverTestCase(test.TestCase):
         connector3 = dict(initiator='test_iqn.3')
 
         self.driver.create_volume(volume)
-        self.driver.initialize_connection(volume, connector1)
-        self.driver.initialize_connection(volume, connector2)
-        self.driver.initialize_connection(volume, connector3)
+        props1 = self.driver.initialize_connection(volume, connector1)
+        props2 = self.driver.initialize_connection(volume, connector2)
+        props3 = self.driver.initialize_connection(volume, connector3)
 
         self.driver.terminate_connection(volume, connector1)
         self.driver.terminate_connection(volume, connector3)
@@ -580,7 +583,11 @@ class ZadaraVPSADriverTestCase(test.TestCase):
     def test_wrong_attach_params(self):
         """Test different wrong attach scenarios."""
         volume1 = {'name': 'test_volume_01', 'size': 1, 'id': 101}
+        volume2 = {'name': 'test_volume_02', 'size': 1, 'id': 102}
+        volume3 = {'name': 'test_volume_03', 'size': 1, 'id': 103}
         connector1 = dict(initiator='test_iqn.1')
+        connector2 = dict(initiator='test_iqn.2')
+        connector3 = dict(initiator='test_iqn.3')
 
         self.assertRaises(exception.VolumeNotFound,
                           self.driver.initialize_connection,
@@ -598,8 +605,8 @@ class ZadaraVPSADriverTestCase(test.TestCase):
 
         self.driver.create_volume(volume1)
         self.driver.create_volume(volume2)
-        self.driver.initialize_connection(volume1, connector1)
-        self.driver.initialize_connection(volume2, connector2)
+        props1 = self.driver.initialize_connection(volume1, connector1)
+        props2 = self.driver.initialize_connection(volume2, connector2)
 
         self.assertRaises(exception.ZadaraServerNotFound,
                           self.driver.terminate_connection,
@@ -659,9 +666,9 @@ class ZadaraVPSADriverTestCase(test.TestCase):
         connector3 = dict(initiator='test_iqn.3')
 
         self.driver.create_volume(volume1)
-        self.driver.initialize_connection(volume1, connector1)
-        self.driver.initialize_connection(volume1, connector2)
-        self.driver.initialize_connection(volume1, connector3)
+        props1 = self.driver.initialize_connection(volume1, connector1)
+        props2 = self.driver.initialize_connection(volume1, connector2)
+        props3 = self.driver.initialize_connection(volume1, connector3)
 
         self.flags(zadara_vpsa_auto_detach_on_delete=False)
         self.assertRaises(exception.VolumeAttached,
@@ -770,12 +777,11 @@ class ZadaraVPSADriverTestCase(test.TestCase):
 
         data = self.driver.get_volume_stats(True)
 
-        self.assertEqual(data['vendor_name'], 'Zadara Storage')
-        self.assertEqual(data['total_capacity_gb'], 'infinite')
-        self.assertEqual(data['free_capacity_gb'], 'infinite')
+        self.assertEqual('Zadara Storage', data['vendor_name'])
+        self.assertEqual('infinite', data['total_capacity_gb'])
+        self.assertEqual('infinite', data['free_capacity_gb'])
 
-        self.assertEqual(data,
-                         {'total_capacity_gb': 'infinite',
+        self.assertEqual({'total_capacity_gb': 'infinite',
                           'free_capacity_gb': 'infinite',
                           'reserved_percentage':
                           self.configuration.reserved_percentage,
@@ -784,4 +790,4 @@ class ZadaraVPSADriverTestCase(test.TestCase):
                           'driver_version': self.driver.VERSION,
                           'storage_protocol': 'iSCSI',
                           'volume_backend_name': 'ZadaraVPSAISCSIDriver',
-                          })
+                          }, data)

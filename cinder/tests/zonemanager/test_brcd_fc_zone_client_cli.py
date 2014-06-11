@@ -234,7 +234,7 @@ class TestBrcdFCZoneClientCLI(BrcdFCZoneClientCLI, test.TestCase):
         nsshow_list = [nsshow]
         run_ssh_mock.return_value = (Stream(nsshow), Stream())
         switch_data = self._get_switch_info(cmd_list)
-        self.assertEqual(switch_data, nsshow_list)
+        self.assertEqual(nsshow_list, switch_data)
         run_ssh_mock.assert_called_once_with(cmd_list, True, 1)
 
     def test__parse_ns_output(self):
@@ -242,7 +242,7 @@ class TestBrcdFCZoneClientCLI(BrcdFCZoneClientCLI, test.TestCase):
         return_wwn_list = []
         expected_wwn_list = ['20:1a:00:05:1e:e8:e3:29']
         return_wwn_list = self._parse_ns_output(switch_data)
-        self.assertEqual(return_wwn_list, expected_wwn_list)
+        self.assertEqual(expected_wwn_list, return_wwn_list)
         self.assertRaises(exception.InvalidParameterValue,
                           self._parse_ns_output, invalid_switch_data)
 

@@ -88,7 +88,7 @@ class DriverTestCase(test.TestCase):
         drv.do_setup('context')
         mock.VerifyAll()
 
-        self.assertEqual(nfsops, drv.nfs_ops)
+        self.assertEqual(drv.nfs_ops, nfsops)
 
     def test_create_volume(self):
         mock = mox.Mox()
@@ -121,7 +121,8 @@ class DriverTestCase(test.TestCase):
         ops.delete_volume('server', 'path', 'sr_uuid', 'vdi_uuid')
 
         mock.ReplayAll()
-        drv.delete_volume(dict(provider_location='sr_uuid/vdi_uuid'))
+        result = drv.delete_volume(dict(
+            provider_location='sr_uuid/vdi_uuid'))
         mock.VerifyAll()
 
     def test_create_export_does_not_raise_exception(self):

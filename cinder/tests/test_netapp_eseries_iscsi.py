@@ -628,8 +628,8 @@ class NetAppEseriesIscsiDriverTestCase(test.TestCase):
         configuration.netapp_controller_ips = '127.0.0.1,127.0.0.3'
         driver = common.NetAppDriver(configuration=configuration)
         driver.do_setup(context='context')
-        self.assertEqual(driver._client.get_system_id(),
-                         '1fa6efb5-f07b-4de4-9f0e-52e5f7ff5d1b')
+        self.assertEqual('1fa6efb5-f07b-4de4-9f0e-52e5f7ff5d1b',
+                         driver._client.get_system_id())
 
     def test_check_system_pwd_not_sync(self):
         def list_system():
@@ -660,54 +660,8 @@ class NetAppEseriesIscsiDriverTestCase(test.TestCase):
         self.driver.create_volume(self.volume)
         connection_info = self.driver.initialize_connection(self.volume,
                                                             self.connector)
-        self.assertEqual(connection_info['driver_volume_type'], 'iscsi')
+        self.assertEqual('iscsi', connection_info['driver_volume_type'])
         properties = connection_info.get('data')
-        self.assertIsNotNone(properties, 'Target portal is none')
-        self.driver.terminate_connection(self.volume, self.connector)
-        self.driver.delete_volume(self.volume)
-
-    def test_map_already_mapped_same_host(self):
-        self.driver.create_volume(self.volume)
-
-        maps = [{'lunMappingRef': 'hdkjsdhjsdh',
-                 'mapRef': '8400000060080E500023C73400300381515BFBA3',
-                 'volumeRef': 'CFDXJ67BLJH25DXCZFZD4NSF54',
-                 'lun': 2}]
-        self.driver._get_host_mapping_for_vol_frm_array = mock.Mock(
-            return_value=maps)
-        self.driver._get_free_lun = mock.Mock()
-        info = self.driver.initialize_connection(self.volume, self.connector)
-        self.assertEqual(
-            self.driver._get_host_mapping_for_vol_frm_array.call_count, 1)
-        self.assertEqual(self.driver._get_free_lun.call_count, 0)
-        self.assertEqual(info['driver_volume_type'], 'iscsi')
-        properties = info.get('data')
-        self.assertIsNotNone(properties, 'Target portal is none')
-        self.driver.terminate_connection(self.volume, self.connector)
-        self.driver.delete_volume(self.volume)
-
-    def test_map_already_mapped_diff_host(self):
-        self.driver.create_volume(self.volume)
-
-        maps = [{'lunMappingRef': 'hdkjsdhjsdh',
-                 'mapRef': '7400000060080E500023C73400300381515BFBA3',
-                 'volumeRef': 'CFDXJ67BLJH25DXCZFZD4NSF54',
-                 'lun': 2}]
-        self.driver._get_host_mapping_for_vol_frm_array = mock.Mock(
-            return_value=maps)
-        self.driver._get_vol_mapping_for_host_frm_array = mock.Mock(
-            return_value=[])
-        self.driver._get_free_lun = mock.Mock(return_value=0)
-        self.driver._del_vol_mapping_frm_cache = mock.Mock()
-        info = self.driver.initialize_connection(self.volume, self.connector)
-        self.assertEqual(
-            self.driver._get_vol_mapping_for_host_frm_array.call_count, 1)
-        self.assertEqual(
-            self.driver._get_host_mapping_for_vol_frm_array.call_count, 1)
-        self.assertEqual(self.driver._get_free_lun.call_count, 1)
-        self.assertEqual(self.driver._del_vol_mapping_frm_cache.call_count, 1)
-        self.assertEqual(info['driver_volume_type'], 'iscsi')
-        properties = info.get('data')
         self.assertIsNotNone(properties, 'Target portal is none')
         self.driver.terminate_connection(self.volume, self.connector)
         self.driver.delete_volume(self.volume)
@@ -722,7 +676,8 @@ class NetAppEseriesIscsiDriverTestCase(test.TestCase):
         connector_new = {'initiator': 'iqn.1993-08.org.debian:01:1001'}
         connection_info = self.driver.initialize_connection(self.volume,
                                                             connector_new)
-        self.assertEqual(connection_info['driver_volume_type'], 'iscsi')
+        self.assertEqual('iscsi', connection_info['driver_volume_type'],
+                         'iscsi')
         properties = connection_info.get('data')
         self.assertIsNotNone(properties, 'Target portal is none')
 

@@ -231,6 +231,9 @@ class FakeRpc(object):
 class CoraidDriverTestCase(test.TestCase):
     def setUp(self):
         super(CoraidDriverTestCase, self).setUp()
+
+        self.mox = mox.Mox()
+
         configuration = mox.MockObject(conf.Configuration)
         configuration.append_config_values(mox.IgnoreArg())
         configuration.coraid_esm_address = fake_esm_ipaddress
@@ -249,6 +252,10 @@ class CoraidDriverTestCase(test.TestCase):
 
         self.driver = coraid.CoraidDriver(configuration=configuration)
         self.driver.do_setup({})
+
+    def tearDown(self):
+        self.mox.UnsetStubs()
+        super(CoraidDriverTestCase, self).tearDown()
 
     def mock_volume_types(self, repositories=[]):
         if not repositories:
@@ -310,7 +317,7 @@ class CoraidDriverApplianceTestCase(CoraidDriverLoginSuccessTestCase):
         real_reply = self.driver.appliance.resize_volume(fake_volume_name,
                                                          new_volume_size)
 
-        self.assertEqual(reply['configState'], real_reply['configState'])
+        self.assertEqual(real_reply['configState'], reply['configState'])
 
 
 class CoraidDriverIntegrationalTestCase(CoraidDriverLoginSuccessTestCase):
@@ -547,9 +554,9 @@ class CoraidDriverIntegrationalTestCase(CoraidDriverLoginSuccessTestCase):
 
         self.mox.VerifyAll()
 
-        self.assertEqual(connection['driver_volume_type'], 'aoe')
-        self.assertEqual(connection['data']['target_shelf'], fake_shelf)
-        self.assertEqual(connection['data']['target_lun'], fake_lun)
+        self.assertEqual('aoe', connection['driver_volume_type'])
+        self.assertEqual(fake_shelf, connection['data']['target_shelf'])
+        self.assertEqual(fake_lun, connection['data']['target_lun'])
 
     def test_get_repository_capabilities(self):
         reply = [[{}, {'reply': [
@@ -570,8 +577,8 @@ class CoraidDriverIntegrationalTestCase(CoraidDriverLoginSuccessTestCase):
         self.mox.VerifyAll()
 
         self.assertEqual(
-            capabilities[fake_coraid_repository_key],
-            'Bronze-Bronze:Profile1:repo1 Bronze-Bronze:Profile2:repo2')
+            'Bronze-Bronze:Profile1:repo1 Bronze-Bronze:Profile2:repo2',
+            capabilities[fake_coraid_repository_key])
 
     def test_create_cloned_volume(self):
         self.mock_volume_types([fake_repository_name])
@@ -670,11 +677,17 @@ class CoraidDriverIntegrationalTestCase(CoraidDriverLoginSuccessTestCase):
 class AutoReloginCoraidTestCase(test.TestCase):
     def setUp(self):
         super(AutoReloginCoraidTestCase, self).setUp()
+        self.mox = mox.Mox()
+
         self.rest_client = coraid.CoraidRESTClient('https://fake')
         self.appliance = coraid.CoraidAppliance(self.rest_client,
                                                 'fake_username',
                                                 'fake_password',
                                                 'fake_group')
+
+    def tearDown(self):
+        self.mox.UnsetStubs()
+        super(AutoReloginCoraidTestCase, self).tearDown()
 
     def _test_auto_relogin_fail(self, state):
         self.mox.StubOutWithMock(self.rest_client, 'rpc')
@@ -848,7 +861,7 @@ class CoraidResetConnectionTestCase(CoraidDriverTestCase):
                                mox.IgnoreArg()).AndReturn('fake_app2')
         self.mox.ReplayAll()
 
-        self.assertEqual(self.driver.appliance, 'fake_app1')
-        self.assertEqual(self.driver.appliance, 'fake_app2')
+        self.assertEqual('fake_app1', self.driver.appliance)
+        self.assertEqual('fake_app2', self.driver.appliance)
 
         self.mox.VerifyAll()

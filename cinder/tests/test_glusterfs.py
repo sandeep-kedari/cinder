@@ -24,7 +24,6 @@ import mox as mox_lib
 from mox import IgnoreArg
 from mox import IsA
 from mox import stubout
-from oslo.config import cfg
 
 from cinder import brick
 from cinder import context
@@ -39,9 +38,6 @@ from cinder import utils
 from cinder.volume import configuration as conf
 from cinder.volume import driver as base_driver
 from cinder.volume.drivers import glusterfs
-
-
-CONF = cfg.CONF
 
 
 class DumbVolume(object):
@@ -90,6 +86,7 @@ class GlusterFsDriverTestCase(test.TestCase):
             self.TEST_SHARES_CONFIG_FILE
         self._configuration.glusterfs_mount_point_base = \
             self.TEST_MNT_POINT_BASE
+        self._configuration.glusterfs_disk_util = 'df'
         self._configuration.glusterfs_sparsed_volumes = True
         self._configuration.glusterfs_qcow2_volumes = False
 
@@ -98,7 +95,11 @@ class GlusterFsDriverTestCase(test.TestCase):
             glusterfs.GlusterfsDriver(configuration=self._configuration,
                                       db=FakeDb())
         self._driver.shares = {}
-        self.addCleanup(self._mox.UnsetStubs)
+
+    def tearDown(self):
+        self._mox.UnsetStubs()
+        self.stubs.UnsetAll()
+        super(GlusterFsDriverTestCase, self).tearDown()
 
     def stub_out_not_replaying(self, obj, attr_name):
         attr_to_replace = getattr(obj, attr_name)
@@ -124,8 +125,7 @@ class GlusterFsDriverTestCase(test.TestCase):
 
     def test_local_path(self):
         """local_path common use case."""
-        CONF.set_override("glusterfs_mount_point_base",
-                          self.TEST_MNT_POINT_BASE)
+        glusterfs.CONF.glusterfs_mount_point_base = self.TEST_MNT_POINT_BASE
         drv = self._driver
 
         volume = DumbVolume()
@@ -219,8 +219,8 @@ class GlusterFsDriverTestCase(test.TestCase):
         """_get_hash_str should calculation correct value."""
         drv = self._driver
 
-        self.assertEqual('ab03ab34eaca46a5fb81878f7e9b91fc',
-                         drv._get_hash_str(self.TEST_EXPORT1))
+        self.assertEqual(drv._get_hash_str(self.TEST_EXPORT1),
+                         'ab03ab34eaca46a5fb81878f7e9b91fc')
 
     def test_get_mount_point_for_share(self):
         """_get_mount_point_for_share should call RemoteFsClient."""
@@ -231,8 +231,7 @@ class GlusterFsDriverTestCase(test.TestCase):
         mox.StubOutWithMock(brick.remotefs.remotefs.RemoteFsClient,
                             'get_mount_point')
 
-        CONF.set_override("glusterfs_mount_point_base",
-                          self.TEST_MNT_POINT_BASE)
+        glusterfs.CONF.glusterfs_mount_point_base = self.TEST_MNT_POINT_BASE
 
         brick.remotefs.remotefs.RemoteFsClient.\
             get_mount_point(self.TEST_EXPORT1).AndReturn(hashed_path)
@@ -253,6 +252,8 @@ class GlusterFsDriverTestCase(test.TestCase):
                   (df_total_size, df_avail)
         df_output = df_head + df_data
 
+        setattr(glusterfs.CONF, 'glusterfs_disk_util', 'df')
+
         mox.StubOutWithMock(drv, '_get_mount_point_for_share')
         drv._get_mount_point_for_share(self.TEST_EXPORT1).\
             AndReturn(self.TEST_MNT_POINT)
@@ -264,10 +265,12 @@ class GlusterFsDriverTestCase(test.TestCase):
 
         mox.ReplayAll()
 
-        self.assertEqual((df_avail, df_total_size),
-                         drv._get_available_capacity(self.TEST_EXPORT1))
+        self.assertEqual(drv._get_available_capacity(self.TEST_EXPORT1),
+                         (df_avail, df_total_size))
 
         mox.VerifyAll()
+
+        delattr(glusterfs.CONF, 'glusterfs_disk_util')
 
     def test_load_shares_config(self):
         mox = self._mox
@@ -291,7 +294,7 @@ class GlusterFsDriverTestCase(test.TestCase):
 
         self.assertIn(self.TEST_EXPORT1, drv.shares)
         self.assertIn(self.TEST_EXPORT2, drv.shares)
-        self.assertEqual(len(drv.shares), 2)
+        self.assertEqual(2, len(drv.shares))
 
         self.assertEqual(drv.shares[self.TEST_EXPORT2],
                          self.TEST_EXPORT2_OPTIONS)
@@ -349,8 +352,8 @@ class GlusterFsDriverTestCase(test.TestCase):
 
         drv._ensure_shares_mounted()
 
-        self.assertEqual(1, len(drv._mounted_shares))
-        self.assertEqual(self.TEST_EXPORT1, drv._mounted_shares[0])
+        self.assertEqual(len(drv._mounted_shares), 1)
+        self.assertEqual(drv._mounted_shares[0], self.TEST_EXPORT1)
 
         mox.VerifyAll()
 
@@ -380,8 +383,7 @@ class GlusterFsDriverTestCase(test.TestCase):
         """do_setup should throw error if shares config is not configured."""
         drv = self._driver
 
-        CONF.set_override("glusterfs_shares_config",
-                          self.TEST_SHARES_CONFIG_FILE)
+        glusterfs.CONF.glusterfs_shares_config = self.TEST_SHARES_CONFIG_FILE
 
         self.assertRaises(exception.GlusterfsException,
                           drv.do_setup, IsA(context.RequestContext))
@@ -391,8 +393,7 @@ class GlusterFsDriverTestCase(test.TestCase):
         mox = self._mox
         drv = self._driver
 
-        CONF.set_override("glusterfs_shares_config",
-                          self.TEST_SHARES_CONFIG_FILE)
+        glusterfs.CONF.glusterfs_shares_config = self.TEST_SHARES_CONFIG_FILE
 
         mox.StubOutWithMock(os.path, 'exists')
         os.path.exists(self.TEST_SHARES_CONFIG_FILE).AndReturn(True)
@@ -417,8 +418,7 @@ class GlusterFsDriverTestCase(test.TestCase):
         mox = self._mox
         drv = self._driver
 
-        CONF.set_override("glusterfs_shares_config",
-                          self.TEST_SHARES_CONFIG_FILE)
+        glusterfs.CONF.glusterfs_shares_config = self.TEST_SHARES_CONFIG_FILE
 
         self.stubs.Set(drv, '_load_shares_config',
                        self._fake_load_shares_config)
@@ -479,8 +479,8 @@ class GlusterFsDriverTestCase(test.TestCase):
 
         mox.ReplayAll()
 
-        self.assertEqual(self.TEST_EXPORT2,
-                         drv._find_share(self.TEST_SIZE_IN_GB))
+        self.assertEqual(drv._find_share(self.TEST_SIZE_IN_GB),
+                         self.TEST_EXPORT2)
 
         mox.VerifyAll()
 
@@ -525,7 +525,7 @@ class GlusterFsDriverTestCase(test.TestCase):
         drv = self._driver
         volume = self._simple_volume()
 
-        CONF.set_override('glusterfs_sparsed_volumes', True)
+        setattr(glusterfs.CONF, 'glusterfs_sparsed_volumes', True)
 
         mox.StubOutWithMock(drv, '_create_sparsed_file')
         mox.StubOutWithMock(drv, '_set_rw_permissions_for_all')
@@ -538,6 +538,8 @@ class GlusterFsDriverTestCase(test.TestCase):
         drv._do_create_volume(volume)
 
         mox.VerifyAll()
+
+        delattr(glusterfs.CONF, 'glusterfs_sparsed_volumes')
 
     def test_create_nonsparsed_volume(self):
         mox = self._mox
@@ -627,7 +629,7 @@ class GlusterFsDriverTestCase(test.TestCase):
         volume = DumbVolume()
         volume['size'] = self.TEST_SIZE_IN_GB
         result = drv.create_volume(volume)
-        self.assertEqual(self.TEST_EXPORT1, result['provider_location'])
+        self.assertEqual(result['provider_location'], self.TEST_EXPORT1)
 
         mox.VerifyAll()
 
@@ -683,36 +685,28 @@ class GlusterFsDriverTestCase(test.TestCase):
 
         drv.create_cloned_volume(volume, src_vref)
 
-    @mock.patch('cinder.openstack.common.fileutils.delete_if_exists')
-    def test_delete_volume(self, mock_delete_if_exists):
-        volume = self._simple_volume()
-        volume_filename = 'volume-%s' % self.VOLUME_UUID
-        volume_path = '%s/%s' % (self.TEST_MNT_POINT, volume_filename)
-        info_file = volume_path + '.info'
+    def test_delete_volume(self):
+        """delete_volume simple test case."""
+        mox = self._mox
+        drv = self._driver
 
-        with contextlib.nested(
-                mock.patch.object(self._driver, '_ensure_share_mounted'),
-                mock.patch.object(self._driver, '_local_volume_dir'),
-                mock.patch.object(self._driver, 'get_active_image_from_info'),
-                mock.patch.object(self._driver, '_execute'),
-                mock.patch.object(self._driver, '_local_path_volume_info')
-        ) as (mock_ensure_share_mounted, mock_local_volume_dir,
-              mock_active_image_from_info, mock_execute,
-              mock_local_path_volume_info):
-            mock_local_volume_dir.return_value = self.TEST_MNT_POINT
-            mock_active_image_from_info.return_value = volume_filename
-            mock_local_path_volume_info.return_value = info_file
+        self.stub_out_not_replaying(drv, '_ensure_share_mounted')
 
-            self._driver.delete_volume(volume)
+        volume = DumbVolume()
+        volume['name'] = 'volume-123'
+        volume['provider_location'] = self.TEST_EXPORT1
 
-            mock_ensure_share_mounted.assert_called_once_with(
-                volume['provider_location'])
-            mock_local_volume_dir.assert_called_once_with(volume)
-            mock_active_image_from_info.assert_called_once_with(volume)
-            mock_execute.assert_called_once_with('rm', '-f', volume_path,
-                                                 run_as_root=True)
-            mock_local_path_volume_info.assert_called_once_with(volume)
-            mock_delete_if_exists.assert_called_once_with(info_file)
+        mox.StubOutWithMock(drv, 'local_path')
+        drv.local_path(volume).AndReturn(self.TEST_LOCAL_PATH)
+
+        mox.StubOutWithMock(drv, '_execute')
+        drv._execute('rm', '-f', self.TEST_LOCAL_PATH, run_as_root=True)
+
+        mox.ReplayAll()
+
+        drv.delete_volume(volume)
+
+        mox.VerifyAll()
 
     def test_delete_should_ensure_share_mounted(self):
         """delete_volume should ensure that corresponding share is mounted."""
@@ -753,6 +747,31 @@ class GlusterFsDriverTestCase(test.TestCase):
 
         mox.VerifyAll()
 
+    @mock.patch('os.remove')
+    @mock.patch('os.path.exists')
+    def test_delete_volume_with_info_file(self, mock_path_exists, mock_remove):
+        mock_path_exists.return_value = True
+        info_file = self.TEST_LOCAL_PATH + '.info'
+        volume = self._simple_volume()
+
+        with contextlib.nested(
+                mock.patch.object(self._driver, '_ensure_share_mounted'),
+                mock.patch.object(self._driver, 'local_path'),
+                mock.patch.object(self._driver, '_execute')
+        ) as (mock_ensure_share_mounted, mock_local_path, mock_execute):
+            mock_local_path.return_value = self.TEST_LOCAL_PATH
+
+            self._driver.delete_volume(volume)
+
+            mock_ensure_share_mounted.assert_called_once_with(
+                volume['provider_location'])
+            mock_local_path.assert_called_once_with(volume)
+            mock_execute.assert_called_once_with('rm', '-f',
+                                                 self.TEST_LOCAL_PATH,
+                                                 run_as_root=True)
+            mock_path_exists.assert_called_once_with(info_file)
+            mock_remove.assert_called_once_with(info_file)
+
     def test_create_snapshot(self):
         (mox, drv) = self._mox, self._driver
 
@@ -770,6 +789,7 @@ class GlusterFsDriverTestCase(test.TestCase):
         mox.StubOutWithMock(drv, '_execute')
 
         vol_filename = 'volume-%s' % self.VOLUME_UUID
+        snap_filename = '%s.%s' % (vol_filename, self.SNAP_UUID)
 
         hashed = drv._get_hash_str(self.TEST_EXPORT1)
         vol_path = '%s/%s/%s' % (self.TEST_MNT_POINT_BASE,
@@ -783,6 +803,12 @@ class GlusterFsDriverTestCase(test.TestCase):
             AndReturn(info_dict)
 
         drv._create_qcow2_snap_file(snap_ref, vol_filename, snap_path)
+
+        qemu_img_info_output = ("""image: volume-%s
+        file format: raw
+        virtual size: 1.0G (1073741824 bytes)
+        disk size: 152K
+        """ % self.VOLUME_UUID, '')
 
         drv._read_info_file(info_path, empty_if_missing=True).\
             AndReturn(info_dict)
@@ -826,6 +852,7 @@ class GlusterFsDriverTestCase(test.TestCase):
                                            self.VOLUME_UUID)
         volume_filename = 'volume-%s' % self.VOLUME_UUID
 
+        snap_path = '%s.%s' % (volume_path, self.SNAP_UUID)
         snap_path_2 = '%s.%s' % (volume_path, self.SNAP_UUID_2)
         snap_file = '%s.%s' % (volume_filename, self.SNAP_UUID)
         snap_file_2 = '%s.%s' % (volume_filename, self.SNAP_UUID_2)
@@ -860,6 +887,13 @@ class GlusterFsDriverTestCase(test.TestCase):
                     'volume_id': self.VOLUME_UUID,
                     'volume': self._simple_volume(),
                     'id': self.SNAP_UUID_2}
+
+        snap_path_2_chain = [{self.SNAP_UUID_2: snap_file_2},
+                             {self.SNAP_UUID: snap_file},
+                             {'active': snap_file_2}]
+
+        snap_path_chain = [{self.SNAP_UUID: snap_file},
+                           {'active': snap_file}]
 
         drv._read_info_file(info_path, empty_if_missing=True).\
             AndReturn(info_file_dict)
@@ -907,10 +941,19 @@ class GlusterFsDriverTestCase(test.TestCase):
                                     hashed,
                                     volume_file)
 
+        info_path = '%s%s' % (volume_path, '.info')
         snap_path = '%s.%s' % (volume_path, self.SNAP_UUID)
         snap_file = 'volume-%s.%s' % (self.VOLUME_UUID, self.SNAP_UUID)
         snap_path_2 = '%s.%s' % (volume_path, self.SNAP_UUID_2)
         snap_file_2 = 'volume-%s.%s' % (self.VOLUME_UUID, self.SNAP_UUID_2)
+
+        qemu_img_info_output_snap_2 = """image: volume-%s.%s
+        file format: qcow2
+        virtual size: 1.0G (1073741824 bytes)
+        disk size: 173K
+        backing file: %s
+        """ % (self.VOLUME_UUID, self.SNAP_UUID_2,
+               'volume-%s.%s' % (self.VOLUME_UUID, self.SNAP_UUID_2))
 
         qemu_img_info_output_snap_1 = """image: volume-%s.%s
         file format: qcow2
@@ -919,6 +962,12 @@ class GlusterFsDriverTestCase(test.TestCase):
         backing file: %s
         """ % (self.VOLUME_UUID, self.SNAP_UUID,
                'volume-%s.%s' % (self.VOLUME_UUID, self.SNAP_UUID))
+
+        qemu_img_info_output = """image: volume-%s
+        file format: qcow2
+        virtual size: 1.0G (1073741824 bytes)
+        disk size: 175K
+        """ % self.VOLUME_UUID
 
         mox.StubOutWithMock(drv, '_execute')
         mox.StubOutWithMock(drv, '_read_info_file')
@@ -1031,8 +1080,8 @@ class GlusterFsDriverTestCase(test.TestCase):
 
         info = drv._read_info_file(info_path)
 
-        self.assertEqual(info[self.VOLUME_UUID],
-                         'volume-%s' % self.VOLUME_UUID)
+        self.assertEqual('volume-%s' % self.VOLUME_UUID,
+                         info[self.VOLUME_UUID])
 
         mox.VerifyAll()
 
@@ -1315,6 +1364,7 @@ class GlusterFsDriverTestCase(test.TestCase):
         info_path = '%s.info' % volume_path
 
         snap_path = '%s.%s' % (volume_path, self.SNAP_UUID)
+        snap_path_2 = '%s.%s' % (volume_path, self.SNAP_UUID_2)
         snap_file = '%s.%s' % (volume_file, self.SNAP_UUID)
         snap_file_2 = '%s.%s' % (volume_file, self.SNAP_UUID_2)
 
@@ -1483,8 +1533,7 @@ class GlusterFsDriverTestCase(test.TestCase):
     def test_get_backing_chain_for_path(self):
         (mox, drv) = self._mox, self._driver
 
-        CONF.set_override('glusterfs_mount_point_base',
-                          self.TEST_MNT_POINT_BASE)
+        glusterfs.CONF.glusterfs_mount_point_base = self.TEST_MNT_POINT_BASE
 
         volume = self._simple_volume()
         vol_filename = volume['name']
@@ -1538,13 +1587,13 @@ class GlusterFsDriverTestCase(test.TestCase):
 
         # Verify chain contains all expected data
         item_1 = drv._get_matching_backing_file(chain, vol_filename)
-        self.assertEqual(item_1['filename'], vol_filename_2)
+        self.assertEqual(vol_filename_2, item_1['filename'])
         chain.remove(item_1)
         item_2 = drv._get_matching_backing_file(chain, vol_filename_2)
-        self.assertEqual(item_2['filename'], vol_filename_3)
+        self.assertEqual(vol_filename_3, item_2['filename'])
         chain.remove(item_2)
-        self.assertEqual(len(chain), 1)
-        self.assertEqual(chain[0]['filename'], vol_filename)
+        self.assertEqual(1, len(chain))
+        self.assertEqual(vol_filename, chain[0]['filename'])
 
     def test_copy_volume_from_snapshot(self):
         (mox, drv) = self._mox, self._driver
@@ -1659,17 +1708,17 @@ class GlusterFsDriverTestCase(test.TestCase):
 
         conn_info = drv.initialize_connection(volume, None)
 
-        self.assertEqual(conn_info['data']['format'], 'raw')
-        self.assertEqual(conn_info['driver_volume_type'], 'glusterfs')
-        self.assertEqual(conn_info['data']['name'], volume['name'])
-        self.assertEqual(conn_info['mount_point_base'],
-                         self.TEST_MNT_POINT_BASE)
+        self.assertEqual('raw', conn_info['data']['format'])
+        self.assertEqual('glusterfs', conn_info['driver_volume_type'])
+        self.assertEqual(volume['name'], conn_info['data']['name'])
+        self.assertEqual(self.TEST_MNT_POINT_BASE,
+                         conn_info['mount_point_base'])
 
     def test_get_mount_point_base(self):
         (mox, drv) = self._mox, self._driver
 
-        self.assertEqual(drv._get_mount_point_base(),
-                         self.TEST_MNT_POINT_BASE)
+        self.assertEqual(self.TEST_MNT_POINT_BASE,
+                         drv._get_mount_point_base())
 
     def test_backup_volume(self):
         """Backup a volume with no snapshots."""

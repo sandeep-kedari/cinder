@@ -73,7 +73,7 @@ class ServiceManagerTestCase(test.TestCase):
                                'test',
                                'cinder.tests.test_service.FakeManager')
         serv.start()
-        self.assertEqual(serv.test_method(), 'manager')
+        self.assertEqual('manager', serv.test_method())
 
     def test_override_manager_method(self):
         serv = ExtendedService('test',
@@ -81,7 +81,7 @@ class ServiceManagerTestCase(test.TestCase):
                                'test',
                                'cinder.tests.test_service.FakeManager')
         serv.start()
-        self.assertEqual(serv.test_method(), 'service')
+        self.assertEqual('service', serv.test_method())
 
 
 class ServiceFlagsTestCase(test.TestCase):
@@ -201,7 +201,7 @@ class ServiceTestCase(test.TestCase):
         CONF.set_override('report_interval', 10)
         service.Service.create(binary="test_service",
                                manager="cinder.tests.test_service.FakeManager")
-        self.assertEqual(CONF.service_down_time, 25)
+        self.assertEqual(25, CONF.service_down_time)
 
 
 class TestWSGIService(test.TestCase):
@@ -229,11 +229,11 @@ class OSCompatibilityTestCase(test.TestCase):
                             fake_process_launcher):
                 launcher = service.get_launcher()
                 if fake_os == 'nt':
-                    self.assertEqual(type(launcher),
-                                     service.Launcher)
+                    self.assertEqual(service.Launcher,
+                                     type(launcher))
                 else:
-                    self.assertEqual(launcher,
-                                     fake_process_launcher())
+                    self.assertEqual(fake_process_launcher(),
+                                     launcher)
 
     def test_process_launcher_on_windows(self):
         self._test_service_launcher('nt')

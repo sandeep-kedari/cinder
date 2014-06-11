@@ -39,15 +39,15 @@ class VolumeOpsTestCase(test.TestCase):
     def test_split_datastore_path(self):
         test1 = '[datastore1] myfolder/mysubfolder/myvm.vmx'
         (datastore, folder, file_name) = volumeops.split_datastore_path(test1)
-        self.assertEqual(datastore, 'datastore1')
-        self.assertEqual(folder, 'myfolder/mysubfolder/')
-        self.assertEqual(file_name, 'myvm.vmx')
+        self.assertEqual('datastore1', datastore)
+        self.assertEqual('myfolder/mysubfolder/', folder)
+        self.assertEqual('myvm.vmx', file_name)
 
         test2 = '[datastore2 ]   myfolder/myvm.vmdk'
         (datastore, folder, file_name) = volumeops.split_datastore_path(test2)
-        self.assertEqual(datastore, 'datastore2')
-        self.assertEqual(folder, 'myfolder/')
-        self.assertEqual(file_name, 'myvm.vmdk')
+        self.assertEqual('datastore2', datastore)
+        self.assertEqual('myfolder/', folder)
+        self.assertEqual('myvm.vmdk', file_name)
 
         test3 = 'myfolder/myvm.vmdk'
         self.assertRaises(IndexError, volumeops.split_datastore_path, test3)
@@ -81,7 +81,7 @@ class VolumeOpsTestCase(test.TestCase):
         self.session.invoke_api.return_value = retrieve_result
         self.vops.cancel_retrieval = mock.Mock(spec=object)
         result = self.vops.get_backing(name)
-        self.assertEqual(mock.sentinel.vm_obj, result)
+        self.assertEqual(result, mock.sentinel.vm_obj)
         self.session.invoke_api.assert_called_with(vim_util, 'get_objects',
                                                    self.session.vim,
                                                    'VirtualMachine',
@@ -95,7 +95,7 @@ class VolumeOpsTestCase(test.TestCase):
         self.vops.continue_retrieval = mock.Mock(spec=object)
         self.vops.continue_retrieval.return_value = retrieve_result
         result = self.vops.get_backing(name)
-        self.assertEqual(mock.sentinel.vm_obj, result)
+        self.assertEqual(result, mock.sentinel.vm_obj)
         self.session.invoke_api.assert_called_with(vim_util, 'get_objects',
                                                    self.session.vim,
                                                    'VirtualMachine',
@@ -118,7 +118,7 @@ class VolumeOpsTestCase(test.TestCase):
         host = mock.sentinel.host
         self.session.invoke_api.return_value = host
         result = self.vops.get_host(instance)
-        self.assertEqual(host, result)
+        self.assertEqual(result, host)
         self.session.invoke_api.assert_called_once_with(vim_util,
                                                         'get_object_property',
                                                         self.session.vim,
@@ -129,7 +129,7 @@ class VolumeOpsTestCase(test.TestCase):
         hosts = mock.sentinel.hosts
         self.session.invoke_api.return_value = hosts
         result = self.vops.get_hosts()
-        self.assertEqual(hosts, result)
+        self.assertEqual(result, hosts)
         self.session.invoke_api.assert_called_once_with(vim_util,
                                                         'get_objects',
                                                         self.session.vim,
@@ -140,7 +140,7 @@ class VolumeOpsTestCase(test.TestCase):
         retrieve_result = mock.sentinel.retrieve_result
         self.session.invoke_api.return_value = retrieve_result
         result = self.vops.continue_retrieval(retrieve_result)
-        self.assertEqual(retrieve_result, result)
+        self.assertEqual(result, retrieve_result)
         self.session.invoke_api.assert_called_once_with(vim_util,
                                                         'continue_retrieval',
                                                         self.session.vim,
@@ -225,7 +225,7 @@ class VolumeOpsTestCase(test.TestCase):
         self.session.invoke_api.return_value = host_mounts
 
         hosts = self.vops.get_connected_hosts(datastore)
-        self.assertEqual([mock.sentinel.host], hosts)
+        self.assertEqual(hosts, [mock.sentinel.host])
         self.session.invoke_api.assert_called_once_with(vim_util,
                                                         'get_object_property',
                                                         self.session.vim,
@@ -240,7 +240,7 @@ class VolumeOpsTestCase(test.TestCase):
         def _is_valid(host_mounts, is_valid):
             self.session.invoke_api.return_value = host_mounts
             result = self.vops._is_valid(datastore, host)
-            self.assertEqual(is_valid, result)
+            self.assertEqual(result, is_valid)
             self.session.invoke_api.assert_called_with(vim_util,
                                                        'get_object_property',
                                                        self.session.vim,
@@ -296,8 +296,8 @@ class VolumeOpsTestCase(test.TestCase):
                                                resource_pool]
         # invoke function and verify results
         (dss_actual, rp_actual) = self.vops.get_dss_rp(host)
-        self.assertEqual([mock.sentinel.ds1, mock.sentinel.ds2], dss_actual)
-        self.assertEqual(resource_pool, rp_actual)
+        self.assertEqual(dss_actual, [mock.sentinel.ds1, mock.sentinel.ds2])
+        self.assertEqual(rp_actual, resource_pool)
 
         # invoke function with no valid datastore and verify exception raised
         host_mounts = self._create_host_mounts("inaccessible", host)
@@ -312,7 +312,7 @@ class VolumeOpsTestCase(test.TestCase):
         child = mock.Mock(spec=object)
         child._type = 'Parent'
         ret = self.vops._get_parent(child, 'Parent')
-        self.assertEqual(ret, child)
+        self.assertEqual(child, ret)
 
         # Recursive
         parent = mock.Mock(spec=object)
@@ -321,7 +321,7 @@ class VolumeOpsTestCase(test.TestCase):
         child._type = 'Child'
         self.session.invoke_api.return_value = parent
         ret = self.vops._get_parent(child, 'Parent')
-        self.assertEqual(ret, parent)
+        self.assertEqual(parent, ret)
         self.session.invoke_api.assert_called_with(vim_util,
                                                    'get_object_property',
                                                    self.session.vim, child,
@@ -344,12 +344,12 @@ class VolumeOpsTestCase(test.TestCase):
 
         self.session.invoke_api.side_effect = mock_invoke_api
         ret = self.vops.get_dc(o2)
-        self.assertEqual(dc, ret)
+        self.assertEqual(ret, dc)
 
     def test_get_vmfolder(self):
         self.session.invoke_api.return_value = mock.sentinel.ret
         ret = self.vops.get_vmfolder(mock.sentinel.dc)
-        self.assertEqual(mock.sentinel.ret, ret)
+        self.assertEqual(ret, mock.sentinel.ret)
         self.session.invoke_api.assert_called_once_with(vim_util,
                                                         'get_object_property',
                                                         self.session.vim,
@@ -365,7 +365,7 @@ class VolumeOpsTestCase(test.TestCase):
         child_folder = mock.sentinel.child_folder
         self.session.invoke_api.side_effect = [prop_val, child_folder]
         ret = self.vops.create_folder(parent_folder, child_name)
-        self.assertEqual(child_folder, ret)
+        self.assertEqual(ret, child_folder)
         expected_invoke_api = [mock.call(vim_util, 'get_object_property',
                                          self.session.vim, parent_folder,
                                          'childEntity'),
@@ -389,7 +389,7 @@ class VolumeOpsTestCase(test.TestCase):
         self.session.invoke_api.side_effect = [prop_val, child_entity_1_name,
                                                child_entity_2_name]
         ret = self.vops.create_folder(parent_folder, child_name)
-        self.assertEqual(child_entity_2, ret)
+        self.assertEqual(ret, child_entity_2)
         expected_invoke_api = [mock.call(vim_util, 'get_object_property',
                                          self.session.vim, parent_folder,
                                          'childEntity'),
@@ -410,7 +410,7 @@ class VolumeOpsTestCase(test.TestCase):
         disk_type = 'thin'
         ds_name = mock.sentinel.ds_name
         ret = self.vops._get_create_spec(name, size_kb, disk_type, ds_name)
-        self.assertEqual(name, ret.name)
+        self.assertEqual(ret.name, name)
         self.assertEqual('[%s]' % ds_name, ret.files.vmPathName)
         self.assertEqual(1, ret.deviceChange[1].device.capacityInKB)
         expected = [mock.call.create('ns0:VirtualLsiLogicController'),
@@ -441,7 +441,7 @@ class VolumeOpsTestCase(test.TestCase):
         ds_name = mock.sentinel.ds_name
         ret = self.vops.create_backing(name, size_kb, disk_type, folder,
                                        resource_pool, host, ds_name)
-        self.assertEqual(mock.sentinel.result, ret)
+        self.assertEqual(ret, mock.sentinel.result)
         get_create_spec.assert_called_once_with(name, size_kb, disk_type,
                                                 ds_name, None)
         self.session.invoke_api.assert_called_once_with(self.session.vim,
@@ -458,7 +458,7 @@ class VolumeOpsTestCase(test.TestCase):
         datastore.ManagedObjectReference = [mock.sentinel.ds]
         self.session.invoke_api.return_value = datastore
         ret = self.vops.get_datastore(backing)
-        self.assertEqual(mock.sentinel.ds, ret)
+        self.assertEqual(ret, mock.sentinel.ds)
         self.session.invoke_api.assert_called_once_with(vim_util,
                                                         'get_object_property',
                                                         self.session.vim,
@@ -469,7 +469,7 @@ class VolumeOpsTestCase(test.TestCase):
         summary = mock.sentinel.summary
         self.session.invoke_api.return_value = summary
         ret = self.vops.get_summary(datastore)
-        self.assertEqual(summary, ret)
+        self.assertEqual(ret, summary)
         self.session.invoke_api.assert_called_once_with(vim_util,
                                                         'get_object_property',
                                                         self.session.vim,
@@ -486,11 +486,11 @@ class VolumeOpsTestCase(test.TestCase):
         disk_move_type = mock.sentinel.disk_move_type
         ret = self.vops._get_relocate_spec(datastore, resource_pool, host,
                                            disk_move_type)
-        self.assertEqual(spec, ret)
-        self.assertEqual(datastore, ret.datastore)
-        self.assertEqual(resource_pool, ret.pool)
-        self.assertEqual(host, ret.host)
-        self.assertEqual(disk_move_type, ret.diskMoveType)
+        self.assertEqual(ret, spec)
+        self.assertEqual(datastore, ret.datastore, datastore)
+        self.assertEqual(ret.pool, resource_pool)
+        self.assertEqual(ret.host, host)
+        self.assertEqual(ret.diskMoveType, disk_move_type)
 
     @mock.patch('cinder.volume.drivers.vmware.volumeops.VMwareVolumeOps.'
                 '_get_relocate_spec')
@@ -538,7 +538,7 @@ class VolumeOpsTestCase(test.TestCase):
         desc = mock.sentinel.description
         quiesce = True
         ret = self.vops.create_snapshot(backing, name, desc, quiesce)
-        self.assertEqual(mock.sentinel.result, ret)
+        self.assertEqual(ret, mock.sentinel.result)
         self.session.invoke_api.assert_called_once_with(self.session.vim,
                                                         'CreateSnapshot_Task',
                                                         backing, name=name,
@@ -587,7 +587,7 @@ class VolumeOpsTestCase(test.TestCase):
         self.session.invoke_api.return_value = snapshot_tree
         backing = mock.sentinel.backing
         ret = self.vops.get_snapshot(backing, snapshot_name)
-        self.assertEqual(snapshot, ret)
+        self.assertEqual(ret, snapshot)
         self.session.invoke_api.assert_called_with(vim_util,
                                                    'get_object_property',
                                                    self.session.vim,
@@ -631,7 +631,7 @@ class VolumeOpsTestCase(test.TestCase):
         with mock.patch.object(self.vops, '_get_parent') as get_parent:
             get_parent.return_value = folder
             ret = self.vops._get_folder(backing)
-            self.assertEqual(folder, ret)
+            self.assertEqual(ret, folder)
             get_parent.assert_called_once_with(backing, 'Folder')
 
     def test_get_clone_spec(self):
@@ -642,11 +642,11 @@ class VolumeOpsTestCase(test.TestCase):
         disk_move_type = mock.sentinel.disk_move_type
         snapshot = mock.sentinel.snapshot
         ret = self.vops._get_clone_spec(datastore, disk_move_type, snapshot)
-        self.assertEqual(spec, ret)
-        self.assertEqual(snapshot, ret.snapshot)
-        self.assertEqual(spec, ret.location)
-        self.assertEqual(datastore, ret.location.datastore)
-        self.assertEqual(disk_move_type, ret.location.diskMoveType)
+        self.assertEqual(ret, spec)
+        self.assertEqual(ret.snapshot, snapshot)
+        self.assertEqual(ret.location, spec)
+        self.assertEqual(ret.location.datastore, datastore)
+        self.assertEqual(ret.location.diskMoveType, disk_move_type)
         expected_calls = [mock.call('ns0:VirtualMachineRelocateSpec'),
                           mock.call('ns0:VirtualMachineCloneSpec')]
         factory.create.assert_has_calls(expected_calls, any_order=True)
@@ -673,7 +673,7 @@ class VolumeOpsTestCase(test.TestCase):
         ret = self.vops.clone_backing(name, backing, snapshot, clone_type,
                                       datastore)
         # verify calls
-        self.assertEqual(mock.sentinel.new_backing, ret)
+        self.assertEqual(ret, mock.sentinel.new_backing)
         disk_move_type = 'moveAllDiskBackingsAndDisallowSharing'
         get_clone_spec.assert_called_with(datastore, disk_move_type, snapshot)
         expected = [mock.call(vim_util, 'get_object_property',
@@ -687,7 +687,7 @@ class VolumeOpsTestCase(test.TestCase):
         ret = self.vops.clone_backing(name, backing, snapshot, clone_type,
                                       datastore)
         # verify calls
-        self.assertEqual(mock.sentinel.new_backing, ret)
+        self.assertEqual(ret, mock.sentinel.new_backing)
         disk_move_type = 'createNewChildDiskBacking'
         get_clone_spec.assert_called_with(datastore, disk_move_type, snapshot)
         expected = [mock.call(vim_util, 'get_object_property',
@@ -726,7 +726,7 @@ class VolumeOpsTestCase(test.TestCase):
         invoke_api.return_value = path
         backing = mock.sentinel.backing
         ret = self.vops.get_path_name(backing)
-        self.assertEqual(path_name, ret)
+        self.assertEqual(ret, path_name)
         invoke_api.assert_called_once_with(vim_util, 'get_object_property',
                                            self.session.vim, backing,
                                            'config.files')
@@ -737,7 +737,7 @@ class VolumeOpsTestCase(test.TestCase):
         invoke_api.return_value = entity_name
         entity = mock.sentinel.entity
         ret = self.vops.get_entity_name(entity)
-        self.assertEqual(entity_name, ret)
+        self.assertEqual(ret, entity_name)
         invoke_api.assert_called_once_with(vim_util, 'get_object_property',
                                            self.session.vim, entity, 'name')
 
@@ -753,7 +753,7 @@ class VolumeOpsTestCase(test.TestCase):
         invoke_api.return_value = [device]
         # Test get_vmdk_path
         ret = self.vops.get_vmdk_path(backing)
-        self.assertEqual(mock.sentinel.vmdk_path, ret)
+        self.assertEqual(ret, mock.sentinel.vmdk_path)
         invoke_api.assert_called_once_with(vim_util, 'get_object_property',
                                            self.session.vim, backing,
                                            'config.hardware.device')

@@ -45,10 +45,8 @@ class TestBlockDeviceDriver(cinder.test.TestCase):
         self.drv.local_path(TEST_VOLUME1).AndReturn('/dev/loop1')
         self.mox.ReplayAll()
         data = self.drv.initialize_connection(TEST_VOLUME1, TEST_CONNECTOR)
-        self.assertEqual(data, {
-            'driver_volume_type': 'local',
-            'data': {'device_path': '/dev/loop1'}
-        })
+        self.assertEqual({'driver_volume_type': 'local',
+                         'data': {'device_path': '/dev/loop1'}}, data)
 
     def test_initialize_connection_different_hosts(self):
         TEST_CONNECTOR = {'host': 'localhost1'}
@@ -60,7 +58,7 @@ class TestBlockDeviceDriver(cinder.test.TestCase):
                                           TEST_CONNECTOR).AndReturn('data')
         self.mox.ReplayAll()
         data = self.drv.initialize_connection(TEST_VOLUME2, TEST_CONNECTOR)
-        self.assertEqual(data, 'data')
+        self.assertEqual('data', data)
 
     def test_delete_not_volume_provider_location(self):
         TEST_VOLUME2 = {'provider_location': None}
@@ -101,8 +99,8 @@ class TestBlockDeviceDriver(cinder.test.TestCase):
             .AndReturn('dev_path')
         self.mox.ReplayAll()
         result = self.drv.create_volume(TEST_VOLUME)
-        self.assertEqual(result, {
-            'provider_location': 'dev_path'})
+        self.assertEqual({
+            'provider_location': 'dev_path'}, result)
 
     def test_update_volume_stats(self):
         self.mox.StubOutWithMock(self.drv, '_devices_sizes')
@@ -115,8 +113,7 @@ class TestBlockDeviceDriver(cinder.test.TestCase):
             AndReturn('BlockDeviceDriver')
         self.mox.ReplayAll()
         self.drv._update_volume_stats()
-        self.assertEqual(self.drv._stats,
-                         {'total_capacity_gb': 2,
+        self.assertEqual({'total_capacity_gb': 2,
                           'free_capacity_gb': 2,
                           'reserved_percentage':
                           self.configuration.reserved_percentage,
@@ -125,7 +122,7 @@ class TestBlockDeviceDriver(cinder.test.TestCase):
                           'driver_version': self.drv.VERSION,
                           'storage_protocol': 'unknown',
                           'volume_backend_name': 'BlockDeviceDriver',
-                          })
+                          }, self.drv._stats)
 
     def test_create_cloned_volume(self):
         TEST_SRC = {'id': '1',
@@ -143,8 +140,8 @@ class TestBlockDeviceDriver(cinder.test.TestCase):
         volutils.copy_volume('/dev/loop1', dev, 2048, mox.IgnoreArg(),
                              execute=self.drv._execute)
         self.mox.ReplayAll()
-        self.assertEqual(self.drv.create_cloned_volume(TEST_VOLUME, TEST_SRC),
-                         {'provider_location': '/dev/loop2'})
+        self.assertEqual({'provider_location': '/dev/loop2'},
+                         self.drv.create_cloned_volume(TEST_VOLUME, TEST_SRC))
 
     def test_copy_image_to_volume(self):
         TEST_VOLUME = {'provider_location': '1 2 3 /dev/loop1', 'size': 1}
@@ -188,7 +185,7 @@ class TestBlockDeviceDriver(cinder.test.TestCase):
         path1 = self.drv.local_path(TEST_VOLUME1).AndReturn('/dev/loop1')
         path2 = self.drv.local_path(TEST_VOLUME2).AndReturn('/dev/loop2')
         self.mox.ReplayAll()
-        self.assertEqual(self.drv._get_used_devices(), set([path1, path2]))
+        self.assertEqual(set([path1, path2]), self.drv._get_used_devices())
 
     def test_get_device_size(self):
         dev_path = '/dev/loop1'
@@ -197,15 +194,15 @@ class TestBlockDeviceDriver(cinder.test.TestCase):
         self.drv._execute('blockdev', '--getsz', dev_path,
                           run_as_root=True).AndReturn((out, None))
         self.mox.ReplayAll()
-        self.assertEqual(self.drv._get_device_size(dev_path), 1)
+        self.assertEqual(1, self.drv._get_device_size(dev_path))
 
     def test_devices_sizes(self):
         self.mox.StubOutWithMock(self.drv, '_get_device_size')
         for dev in self.configuration.available_devices:
             self.drv._get_device_size(dev).AndReturn(1)
         self.mox.ReplayAll()
-        self.assertEqual(self.drv._devices_sizes(),
-                         {'/dev/loop1': 1, '/dev/loop2': 1})
+        self.assertEqual({'/dev/loop1': 1, '/dev/loop2': 1},
+                         self.drv._devices_sizes())
 
     def test_find_appropriate_size_device_no_free_disks(self):
         size = 1
@@ -238,5 +235,5 @@ class TestBlockDeviceDriver(cinder.test.TestCase):
         self.mox.StubOutWithMock(self.drv, '_get_used_devices')
         self.drv._get_used_devices().AndReturn(set())
         self.mox.ReplayAll()
-        self.assertEqual(self.drv.find_appropriate_size_device(size),
-                         '/dev/loop2')
+        self.assertEqual('/dev/loop2',
+                         self.drv.find_appropriate_size_device(size))

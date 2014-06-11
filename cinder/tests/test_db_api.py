@@ -70,20 +70,21 @@ class ModelsObjectComparatorMixin(object):
         obj2 = self._dict_from_object(obj2, ignored_keys)
 
         self.assertEqual(
-            len(obj1), len(obj2),
+            len(obj2), len(obj1),
             "Keys mismatch: %s" % str(set(obj1.keys()) ^ set(obj2.keys())))
+
         for key, value in obj1.iteritems():
-            self.assertEqual(value, obj2[key])
+            self.assertEqual(obj2[key], value)
 
     def _assertEqualListsOfObjects(self, objs1, objs2, ignored_keys=None):
         obj_to_dict = lambda o: self._dict_from_object(o, ignored_keys)
         sort_key = lambda d: [d[k] for k in sorted(d)]
         conv_and_sort = lambda obj: sorted(map(obj_to_dict, obj), key=sort_key)
 
-        self.assertEqual(conv_and_sort(objs1), conv_and_sort(objs2))
+        self.assertEqual(conv_and_sort(objs2), conv_and_sort(objs1))
 
     def _assertEqualListsOfPrimitivesAsSets(self, primitives1, primitives2):
-        self.assertEqual(len(primitives1), len(primitives2))
+        self.assertEqual(len(primitives2), len(primitives1))
         for primitive in primitives1:
             self.assertIn(primitive, primitives2)
 
@@ -119,7 +120,7 @@ class DBAPIServiceTestCase(BaseTest):
         service = self._create_service({})
         self.assertFalse(service['id'] is None)
         for key, value in self._get_base_values().iteritems():
-            self.assertEqual(value, service[key])
+            self.assertEqual(service[key], value)
 
     def test_service_destroy(self):
         service1 = self._create_service({})
@@ -143,7 +144,7 @@ class DBAPIServiceTestCase(BaseTest):
         db.service_update(self.ctxt, service['id'], new_values)
         updated_service = db.service_get(self.ctxt, service['id'])
         for key, value in new_values.iteritems():
-            self.assertEqual(value, updated_service[key])
+            self.assertEqual(updated_service[key], value)
 
     def test_service_update_not_found_exception(self):
         self.assertRaises(exception.ServiceNotFound,
@@ -151,6 +152,7 @@ class DBAPIServiceTestCase(BaseTest):
 
     def test_service_get(self):
         service1 = self._create_service({})
+        service2 = self._create_service({'host': 'some_other_fake_host'})
         real_service1 = db.service_get(self.ctxt, service1['id'])
         self._assertEqualObjects(service1, real_service1)
 
@@ -160,6 +162,7 @@ class DBAPIServiceTestCase(BaseTest):
 
     def test_service_get_by_host_and_topic(self):
         service1 = self._create_service({'host': 'host1', 'topic': 'topic1'})
+        service2 = self._create_service({'host': 'host2', 'topic': 'topic2'})
 
         real_service1 = db.service_get_by_host_and_topic(self.ctxt,
                                                          host='host1',
@@ -188,11 +191,11 @@ class DBAPIServiceTestCase(BaseTest):
         values = [
             {'host': 'host1', 'topic': 't1'},
             {'host': 'host2', 'topic': 't1'},
-            {'host': 'host4', 'disabled': True, 'topic': 't1'},
+            {'disabled': True, 'topic': 't1'},
             {'host': 'host3', 'topic': 't2'}
         ]
         services = [self._create_service(vals) for vals in values]
-        expected = services[:3]
+        expected = services[:2]
         real = db.service_get_all_by_topic(self.ctxt, 't1')
         self._assertEqualListsOfObjects(expected, real)
 
@@ -241,7 +244,7 @@ class DBAPIServiceTestCase(BaseTest):
             db.volume_create(self.ctxt, {'host': vals['host'], 'size': size})
         for service, size in db.service_get_all_volume_sorted(self.ctxt):
             self._assertEqualObjects(services.pop(0), service)
-            self.assertEqual(values.pop(0)[1], size)
+            self.assertEqual(size, values.pop(0)[1])
 
 
 class DBAPIVolumeTestCase(BaseTest):
@@ -251,7 +254,7 @@ class DBAPIVolumeTestCase(BaseTest):
     def test_volume_create(self):
         volume = db.volume_create(self.ctxt, {'host': 'host1'})
         self.assertTrue(uuidutils.is_uuid_like(volume['id']))
-        self.assertEqual(volume.host, 'host1')
+        self.assertEqual('host1', volume.host)
 
     def test_volume_allocate_iscsi_target_no_more_targets(self):
         self.assertRaises(exception.NoMoreTargets,
@@ -265,7 +268,7 @@ class DBAPIVolumeTestCase(BaseTest):
                                                 'target_num': 42})
         target_num = db.volume_allocate_iscsi_target(self.ctxt, volume['id'],
                                                      host)
-        self.assertEqual(target_num, 42)
+        self.assertEqual(42, target_num)
 
     def test_volume_attached_invalid_uuid(self):
         self.assertRaises(exception.InvalidUUID, db.volume_attached, self.ctxt,
@@ -277,10 +280,10 @@ class DBAPIVolumeTestCase(BaseTest):
         db.volume_attached(self.ctxt, volume['id'],
                            instance_uuid, None, '/tmp')
         volume = db.volume_get(self.ctxt, volume['id'])
-        self.assertEqual(volume['status'], 'in-use')
-        self.assertEqual(volume['mountpoint'], '/tmp')
-        self.assertEqual(volume['attach_status'], 'attached')
-        self.assertEqual(volume['instance_uuid'], instance_uuid)
+        self.assertEqual('in-use', volume['status'])
+        self.assertEqual('/tmp', volume['mountpoint'])
+        self.assertEqual('attached', volume['attach_status'])
+        self.assertEqual(instance_uuid, volume['instance_uuid'])
         self.assertIsNone(volume['attached_host'])
 
     def test_volume_attached_to_host(self):
@@ -289,11 +292,11 @@ class DBAPIVolumeTestCase(BaseTest):
         db.volume_attached(self.ctxt, volume['id'],
                            None, host_name, '/tmp')
         volume = db.volume_get(self.ctxt, volume['id'])
-        self.assertEqual(volume['status'], 'in-use')
-        self.assertEqual(volume['mountpoint'], '/tmp')
-        self.assertEqual(volume['attach_status'], 'attached')
+        self.assertEqual('in-use', volume['status'])
+        self.assertEqual('/tmp', volume['mountpoint'])
+        self.assertEqual('attached', volume['attach_status'])
         self.assertIsNone(volume['instance_uuid'])
-        self.assertEqual(volume['attached_host'], host_name)
+        self.assertEqual(host_name, volume['attached_host'])
 
     def test_volume_data_get_for_host(self):
         for i in xrange(3):
@@ -302,7 +305,7 @@ class DBAPIVolumeTestCase(BaseTest):
         for i in xrange(3):
             self.assertEqual((3, 300),
                              db.volume_data_get_for_host(
-                                 self.ctxt, 'h%d' % i))
+                             self.ctxt, 'h%d' % i))
 
     def test_volume_data_get_for_project(self):
         for i in xrange(3):
@@ -314,7 +317,7 @@ class DBAPIVolumeTestCase(BaseTest):
         for i in xrange(3):
             self.assertEqual((3, 300),
                              db.volume_data_get_for_project(
-                                 self.ctxt, 'p%d' % i))
+                             self.ctxt, 'p%d' % i))
 
     def test_volume_detached_from_instance(self):
         volume = db.volume_create(self.ctxt, {})
@@ -380,6 +383,24 @@ class DBAPIVolumeTestCase(BaseTest):
                                             db.volume_get_all_by_host(
                                             self.ctxt, 'h%d' % i))
 
+    def test_volume_get_all_by_instance_uuid(self):
+        instance_uuids = []
+        volumes = []
+        for i in xrange(3):
+            instance_uuid = str(uuidutils.uuid.uuid1())
+            instance_uuids.append(instance_uuid)
+            volumes.append([db.volume_create(self.ctxt,
+                            {'instance_uuid': instance_uuid})
+                            for j in xrange(3)])
+        for i in xrange(3):
+            self._assertEqualListsOfObjects(volumes[i],
+                                            db.volume_get_all_by_instance_uuid(
+                                            self.ctxt, instance_uuids[i]))
+
+    def test_volume_get_all_by_instance_uuid_empty(self):
+        self.assertEqual(db.volume_get_all_by_instance_uuid(self.ctxt,
+                                                            'empty'), [])
+
     def test_volume_get_all_by_project(self):
         volumes = []
         for i in xrange(3):
@@ -399,16 +420,16 @@ class DBAPIVolumeTestCase(BaseTest):
         # no name filter
         volumes = db.volume_get_all(self.ctxt, None, None, 'created_at',
                                     'asc')
-        self.assertEqual(len(volumes), 3)
+        self.assertEqual(3, len(volumes))
         # filter on name
         volumes = db.volume_get_all(self.ctxt, None, None, 'created_at',
                                     'asc', {'display_name': 'vol2'})
-        self.assertEqual(len(volumes), 1)
-        self.assertEqual(volumes[0]['display_name'], 'vol2')
+        self.assertEqual(1, len(volumes))
+        self.assertEqual('vol2', volumes[0]['display_name'])
         # filter no match
         volumes = db.volume_get_all(self.ctxt, None, None, 'created_at',
                                     'asc', {'display_name': 'vol4'})
-        self.assertEqual(len(volumes), 0)
+        self.assertEqual(0, len(volumes))
 
     def test_volume_list_by_status(self):
         db.volume_create(self.ctxt, {'display_name': 'vol1',
@@ -421,30 +442,30 @@ class DBAPIVolumeTestCase(BaseTest):
         # no status filter
         volumes = db.volume_get_all(self.ctxt, None, None, 'created_at',
                                     'asc')
-        self.assertEqual(len(volumes), 3)
+        self.assertEqual(3, len(volumes))
         # single match
         volumes = db.volume_get_all(self.ctxt, None, None, 'created_at',
                                     'asc', {'status': 'in-use'})
-        self.assertEqual(len(volumes), 1)
-        self.assertEqual(volumes[0]['status'], 'in-use')
+        self.assertEqual(1, len(volumes))
+        self.assertEqual('in-use', volumes[0]['status'])
         # multiple match
         volumes = db.volume_get_all(self.ctxt, None, None, 'created_at',
                                     'asc', {'status': 'available'})
-        self.assertEqual(len(volumes), 2)
+        self.assertEqual(2, len(volumes))
         for volume in volumes:
-            self.assertEqual(volume['status'], 'available')
+            self.assertEqual('available', volume['status'])
         # multiple filters
         volumes = db.volume_get_all(self.ctxt, None, None, 'created_at',
                                     'asc', {'status': 'available',
                                             'display_name': 'vol1'})
-        self.assertEqual(len(volumes), 1)
-        self.assertEqual(volumes[0]['display_name'], 'vol1')
-        self.assertEqual(volumes[0]['status'], 'available')
+        self.assertEqual(1, len(volumes))
+        self.assertEqual('vol1', volumes[0]['display_name'])
+        self.assertEqual('available', volumes[0]['status'])
         # no match
         volumes = db.volume_get_all(self.ctxt, None, None, 'created_at',
                                     'asc', {'status': 'in-use',
                                             'display_name': 'vol1'})
-        self.assertEqual(len(volumes), 0)
+        self.assertEqual(0, len(volumes))
 
     def _assertEqualsVolumeOrderResult(self, correct_order, limit=None,
                                        sort_key='created_at', sort_dir='asc',
@@ -460,19 +481,19 @@ class DBAPIVolumeTestCase(BaseTest):
         else:
             result = db.volume_get_all(self.ctxt, None, limit, sort_key,
                                        sort_dir, filters=filters)
-        self.assertEqual(len(correct_order), len(result))
+        self.assertEqual(len(result), len(correct_order))
         for vol1, vol2 in zip(result, correct_order):
             for key in match_keys:
                 val1 = vol1.get(key)
                 val2 = vol2.get(key)
                 # metadata is a dict, compare the 'key' and 'value' of each
                 if key == 'volume_metadata':
-                    self.assertEqual(len(val1), len(val2))
+                    self.assertEqual(len(val2), len(val1))
                     val1_dict = dict((x.key, x.value) for x in val1)
                     val2_dict = dict((x.key, x.value) for x in val2)
                     self.assertDictMatch(val1_dict, val2_dict)
                 else:
-                    self.assertEqual(val1, val2)
+                    self.assertEqual(val2, val1)
 
     def test_volume_get_by_filter(self):
         """Verifies that all filtering is done at the DB layer."""
@@ -551,9 +572,6 @@ class DBAPIVolumeTestCase(BaseTest):
                                             'metadata': {'key2': 'val2',
                                                          'key3': 'val3'},
                                             'host': 'host5'})
-        db.volume_admin_metadata_update(self.ctxt, vol5.id,
-                                        {"readonly": "True"}, False)
-
         vols = [vol1, vol2, vol3, vol4, vol5]
 
         # Ensure we have 5 total instances
@@ -573,16 +591,13 @@ class DBAPIVolumeTestCase(BaseTest):
         self._assertEqualsVolumeOrderResult([vol2, vol3], limit=100,
                                             filters=filters)
 
-        # metadata filters
+        # metdata filters
         filters = {'metadata': {'key1': 'val1'}}
         self._assertEqualsVolumeOrderResult([vol3, vol4], filters=filters)
         self._assertEqualsVolumeOrderResult([vol3], limit=1,
                                             filters=filters)
         self._assertEqualsVolumeOrderResult([vol3, vol4], limit=10,
                                             filters=filters)
-
-        filters = {'metadata': {'readonly': 'True'}}
-        self._assertEqualsVolumeOrderResult([vol5], filters=filters)
 
         filters = {'metadata': {'key1': 'val1',
                                 'key2': 'val2'}}
@@ -648,9 +663,9 @@ class DBAPIVolumeTestCase(BaseTest):
         self._assertEqualsVolumeOrderResult([], filters=filters)
 
     def test_volume_get_iscsi_target_num(self):
-        db.iscsi_target_create_safe(self.ctxt, {'volume_id': 42,
-                                                'target_num': 43})
-        self.assertEqual(43, db.volume_get_iscsi_target_num(self.ctxt, 42))
+        target = db.iscsi_target_create_safe(self.ctxt, {'volume_id': 42,
+                                                         'target_num': 43})
+        self.assertEqual(db.volume_get_iscsi_target_num(self.ctxt, 42), 43)
 
     def test_volume_get_iscsi_target_num_nonexistent(self):
         self.assertRaises(exception.ISCSITargetNotFoundForVolume,
@@ -661,7 +676,7 @@ class DBAPIVolumeTestCase(BaseTest):
         db.volume_update(self.ctxt, volume['id'],
                          {'host': 'h2', 'metadata': {'m1': 'v1'}})
         volume = db.volume_get(self.ctxt, volume['id'])
-        self.assertEqual('h2', volume['host'])
+        self.assertEqual(volume['host'], 'h2')
 
     def test_volume_update_nonexistent(self):
         self.assertRaises(exception.VolumeNotFound, db.volume_update,
@@ -671,7 +686,7 @@ class DBAPIVolumeTestCase(BaseTest):
         metadata = {'a': 'b', 'c': 'd'}
         db.volume_create(self.ctxt, {'id': 1, 'metadata': metadata})
 
-        self.assertEqual(metadata, db.volume_metadata_get(self.ctxt, 1))
+        self.assertEqual(db.volume_metadata_get(self.ctxt, 1), metadata)
 
     def test_volume_metadata_update(self):
         metadata1 = {'a': '1', 'c': '2'}
@@ -681,7 +696,7 @@ class DBAPIVolumeTestCase(BaseTest):
         db.volume_create(self.ctxt, {'id': 1, 'metadata': metadata1})
         db_meta = db.volume_metadata_update(self.ctxt, 1, metadata2, False)
 
-        self.assertEqual(should_be, db_meta)
+        self.assertEqual(db_meta, should_be)
 
     def test_volume_metadata_update_delete(self):
         metadata1 = {'a': '1', 'c': '2'}
@@ -691,14 +706,14 @@ class DBAPIVolumeTestCase(BaseTest):
         db.volume_create(self.ctxt, {'id': 1, 'metadata': metadata1})
         db_meta = db.volume_metadata_update(self.ctxt, 1, metadata2, True)
 
-        self.assertEqual(should_be, db_meta)
+        self.assertEqual(db_meta, should_be)
 
     def test_volume_metadata_delete(self):
         metadata = {'a': 'b', 'c': 'd'}
         db.volume_create(self.ctxt, {'id': 1, 'metadata': metadata})
         db.volume_metadata_delete(self.ctxt, 1, 'c')
         metadata.pop('c')
-        self.assertEqual(metadata, db.volume_metadata_get(self.ctxt, 1))
+        self.assertEqual(db.volume_metadata_get(self.ctxt, 1), metadata)
 
 
 class DBAPISnapshotTestCase(BaseTest):
@@ -707,15 +722,15 @@ class DBAPISnapshotTestCase(BaseTest):
 
     def test_snapshot_data_get_for_project(self):
         actual = db.snapshot_data_get_for_project(self.ctxt, 'project1')
-        self.assertEqual(actual, (0, 0))
+        self.assertEqual((0, 0), actual)
         db.volume_create(self.ctxt, {'id': 1,
                                      'project_id': 'project1',
                                      'size': 42})
-        db.snapshot_create(self.ctxt, {'id': 1, 'volume_id': 1,
-                                       'project_id': 'project1',
-                                       'volume_size': 42})
+        snapshot = db.snapshot_create(self.ctxt, {'id': 1, 'volume_id': 1,
+                                                  'project_id': 'project1',
+                                                  'volume_size': 42})
         actual = db.snapshot_data_get_for_project(self.ctxt, 'project1')
-        self.assertEqual(actual, (1, 42))
+        self.assertEqual((1, 42), actual)
 
     def test_snapshot_get_all(self):
         db.volume_create(self.ctxt, {'id': 1})
@@ -730,7 +745,7 @@ class DBAPISnapshotTestCase(BaseTest):
         db.snapshot_create(self.ctxt,
                            {'id': 1, 'volume_id': 1, 'metadata': metadata})
 
-        self.assertEqual(metadata, db.snapshot_metadata_get(self.ctxt, 1))
+        self.assertEqual(db.snapshot_metadata_get(self.ctxt, 1), metadata)
 
     def test_snapshot_metadata_update(self):
         metadata1 = {'a': '1', 'c': '2'}
@@ -742,7 +757,7 @@ class DBAPISnapshotTestCase(BaseTest):
                            {'id': 1, 'volume_id': 1, 'metadata': metadata1})
         db_meta = db.snapshot_metadata_update(self.ctxt, 1, metadata2, False)
 
-        self.assertEqual(should_be, db_meta)
+        self.assertEqual(db_meta, should_be)
 
     def test_snapshot_metadata_update_delete(self):
         metadata1 = {'a': '1', 'c': '2'}
@@ -754,7 +769,7 @@ class DBAPISnapshotTestCase(BaseTest):
                            {'id': 1, 'volume_id': 1, 'metadata': metadata1})
         db_meta = db.snapshot_metadata_update(self.ctxt, 1, metadata2, True)
 
-        self.assertEqual(should_be, db_meta)
+        self.assertEqual(db_meta, should_be)
 
     def test_snapshot_metadata_delete(self):
         metadata = {'a': '1', 'c': '2'}
@@ -765,7 +780,7 @@ class DBAPISnapshotTestCase(BaseTest):
                            {'id': 1, 'volume_id': 1, 'metadata': metadata})
         db.snapshot_metadata_delete(self.ctxt, 1, 'c')
 
-        self.assertEqual(should_be, db.snapshot_metadata_get(self.ctxt, 1))
+        self.assertEqual(db.snapshot_metadata_get(self.ctxt, 1), should_be)
 
 
 class DBAPIVolumeTypeTestCase(BaseTest):
@@ -905,24 +920,46 @@ class DBAPIReservationTestCase(BaseTest):
             'usage': {'id': 1}
         }
 
+    def test_reservation_create(self):
+        reservation = db.reservation_create(self.ctxt, **self.values)
+        self._assertEqualObjects(self.values, reservation, ignored_keys=(
+            'deleted', 'updated_at',
+            'deleted_at', 'id',
+            'created_at', 'usage',
+            'usage_id'))
+        self.assertEqual(self.values['usage']['id'], reservation['usage_id'])
+
+    def test_reservation_get(self):
+        reservation = db.reservation_create(self.ctxt, **self.values)
+        reservation_db = db.reservation_get(self.ctxt, self.values['uuid'])
+        self._assertEqualObjects(reservation, reservation_db)
+
+    def test_reservation_get_nonexistent(self):
+        self.assertRaises(exception.ReservationNotFound,
+                          db.reservation_get,
+                          self.ctxt,
+                          'non-exitent-resevation-uuid')
+
     def test_reservation_commit(self):
         reservations = _quota_reserve(self.ctxt, 'project1')
         expected = {'project_id': 'project1',
                     'volumes': {'reserved': 1, 'in_use': 0},
                     'gigabytes': {'reserved': 2, 'in_use': 0},
                     }
-        self.assertEqual(expected,
-                         db.quota_usage_get_all_by_project(
-                             self.ctxt, 'project1'))
+        self.assertEqual(db.quota_usage_get_all_by_project(
+                         self.ctxt, 'project1'), expected)
+        db.reservation_get(self.ctxt, reservations[0])
         db.reservation_commit(self.ctxt, reservations, 'project1')
+        self.assertRaises(exception.ReservationNotFound,
+                          db.reservation_get,
+                          self.ctxt,
+                          reservations[0])
         expected = {'project_id': 'project1',
                     'volumes': {'reserved': 0, 'in_use': 1},
                     'gigabytes': {'reserved': 0, 'in_use': 2},
                     }
-        self.assertEqual(expected,
-                         db.quota_usage_get_all_by_project(
-                             self.ctxt,
-                             'project1'))
+        self.assertEqual(db.quota_usage_get_all_by_project(
+                         self.ctxt, 'project1'), expected)
 
     def test_reservation_rollback(self):
         reservations = _quota_reserve(self.ctxt, 'project1')
@@ -930,33 +967,51 @@ class DBAPIReservationTestCase(BaseTest):
                     'volumes': {'reserved': 1, 'in_use': 0},
                     'gigabytes': {'reserved': 2, 'in_use': 0},
                     }
-        self.assertEqual(expected,
-                         db.quota_usage_get_all_by_project(
-                             self.ctxt,
-                             'project1'))
+        self.assertEqual(db.quota_usage_get_all_by_project(
+                         self.ctxt, 'project1'), expected)
+        db.reservation_get(self.ctxt, reservations[0])
         db.reservation_rollback(self.ctxt, reservations, 'project1')
+        self.assertRaises(exception.ReservationNotFound,
+                          db.reservation_get,
+                          self.ctxt,
+                          reservations[0])
         expected = {'project_id': 'project1',
                     'volumes': {'reserved': 0, 'in_use': 0},
                     'gigabytes': {'reserved': 0, 'in_use': 0},
                     }
-        self.assertEqual(expected,
-                         db.quota_usage_get_all_by_project(
-                             self.ctxt,
-                             'project1'))
+        self.assertEqual(db.quota_usage_get_all_by_project(
+                         self.ctxt, 'project1'), expected)
+
+    def test_reservation_get_all_by_project(self):
+        reservations = _quota_reserve(self.ctxt, 'project1')
+        r1 = db.reservation_get(self.ctxt, reservations[0])
+        r2 = db.reservation_get(self.ctxt, reservations[1])
+        expected = {'project_id': 'project1',
+                    r1['resource']: {r1['uuid']: r1['delta']},
+                    r2['resource']: {r2['uuid']: r2['delta']}}
+        self.assertEqual(db.reservation_get_all_by_project(
+                         self.ctxt, 'project1'), expected)
 
     def test_reservation_expire(self):
         self.values['expire'] = datetime.datetime.utcnow() + \
             datetime.timedelta(days=1)
-        _quota_reserve(self.ctxt, 'project1')
+        reservations = _quota_reserve(self.ctxt, 'project1')
         db.reservation_expire(self.ctxt)
 
         expected = {'project_id': 'project1',
                     'gigabytes': {'reserved': 0, 'in_use': 0},
                     'volumes': {'reserved': 0, 'in_use': 0}}
-        self.assertEqual(expected,
-                         db.quota_usage_get_all_by_project(
-                             self.ctxt,
-                             'project1'))
+        self.assertEqual(db.quota_usage_get_all_by_project(
+                         self.ctxt, 'project1'), expected)
+
+    def test_reservation_destroy(self):
+        reservations = _quota_reserve(self.ctxt, 'project1')
+        r1 = db.reservation_get(self.ctxt, reservations[0])
+        db.reservation_destroy(self.ctxt, reservations[1])
+        expected = {'project_id': 'project1',
+                    r1['resource']: {r1['uuid']: r1['delta']}}
+        self.assertEqual(db.reservation_get_all_by_project(
+                         self.ctxt, 'project1'), expected)
 
 
 class DBAPIQuotaClassTestCase(BaseTest):
@@ -984,10 +1039,11 @@ class DBAPIQuotaClassTestCase(BaseTest):
                           'nonexistent')
 
     def test_quota_class_get_all_by_name(self):
-        db.quota_class_create(self.ctxt, 'test2', 'res1', 43)
-        db.quota_class_create(self.ctxt, 'test2', 'res2', 44)
+        sample1 = db.quota_class_create(self.ctxt, 'test2', 'res1', 43)
+        sample2 = db.quota_class_create(self.ctxt, 'test2', 'res2', 44)
         self.assertEqual({'class_name': 'test_qc', 'test_resource': 42},
-                         db.quota_class_get_all_by_name(self.ctxt, 'test_qc'))
+                         db.quota_class_get_all_by_name(self.ctxt,
+                                                        'test_qc'))
         self.assertEqual({'class_name': 'test2', 'res1': 43, 'res2': 44},
                          db.quota_class_get_all_by_name(self.ctxt, 'test2'))
 
@@ -997,8 +1053,8 @@ class DBAPIQuotaClassTestCase(BaseTest):
         self.assertEqual(43, updated['hard_limit'])
 
     def test_quota_class_destroy_all_by_name(self):
-        db.quota_class_create(self.ctxt, 'test2', 'res1', 43)
-        db.quota_class_create(self.ctxt, 'test2', 'res2', 44)
+        sample1 = db.quota_class_create(self.ctxt, 'test2', 'res1', 43)
+        sample2 = db.quota_class_create(self.ctxt, 'test2', 'res2', 44)
         db.quota_class_destroy_all_by_name(self.ctxt, 'test2')
         self.assertEqual({'class_name': 'test2'},
                          db.quota_class_get_all_by_name(self.ctxt, 'test2'))
@@ -1010,14 +1066,14 @@ class DBAPIQuotaTestCase(BaseTest):
 
     def test_quota_create(self):
         quota = db.quota_create(self.ctxt, 'project1', 'resource', 99)
-        self.assertEqual(quota.resource, 'resource')
-        self.assertEqual(quota.hard_limit, 99)
-        self.assertEqual(quota.project_id, 'project1')
+        self.assertEqual('resource', quota.resource)
+        self.assertEqual(99, quota.hard_limit)
+        self.assertEqual('project1', quota.project_id)
 
     def test_quota_get(self):
         quota = db.quota_create(self.ctxt, 'project1', 'resource', 99)
         quota_db = db.quota_get(self.ctxt, 'project1', 'resource')
-        self._assertEqualObjects(quota, quota_db)
+        self._assertEqualObjects(quota_db, quota)
 
     def test_quota_get_all_by_project(self):
         for i in range(3):
@@ -1025,18 +1081,16 @@ class DBAPIQuotaTestCase(BaseTest):
                 db.quota_create(self.ctxt, 'proj%d' % i, 'res%d' % j, j)
         for i in range(3):
             quotas_db = db.quota_get_all_by_project(self.ctxt, 'proj%d' % i)
-            self.assertEqual(quotas_db, {'project_id': 'proj%d' % i,
-                                         'res0': 0,
-                                         'res1': 1,
-                                         'res2': 2})
+            self.assertEqual({'project_id': 'proj%d' % i, 'res0': 0,
+                             'res1': 1, 'res2': 2}, quotas_db)
 
     def test_quota_update(self):
         db.quota_create(self.ctxt, 'project1', 'resource1', 41)
         db.quota_update(self.ctxt, 'project1', 'resource1', 42)
         quota = db.quota_get(self.ctxt, 'project1', 'resource1')
-        self.assertEqual(quota.hard_limit, 42)
-        self.assertEqual(quota.resource, 'resource1')
-        self.assertEqual(quota.project_id, 'project1')
+        self.assertEqual(42, quota.hard_limit)
+        self.assertEqual('resource1', quota.resource)
+        self.assertEqual('project1', quota.project_id)
 
     def test_quota_update_nonexistent(self):
         self.assertRaises(exception.ProjectQuotaNotFound,
@@ -1055,12 +1109,12 @@ class DBAPIQuotaTestCase(BaseTest):
 
     def test_quota_reserve(self):
         reservations = _quota_reserve(self.ctxt, 'project1')
-        self.assertEqual(len(reservations), 2)
-        quota_usage = db.quota_usage_get_all_by_project(self.ctxt, 'project1')
-        self.assertEqual({'project_id': 'project1',
-                          'gigabytes': {'reserved': 2, 'in_use': 0},
-                          'volumes': {'reserved': 1, 'in_use': 0}},
-                         quota_usage)
+        self.assertEqual(2, len(reservations))
+        res_names = ['gigabytes', 'volumes']
+        for uuid in reservations:
+            reservation = db.reservation_get(self.ctxt, uuid)
+            self.assertIn(reservation.resource, res_names)
+            res_names.remove(reservation.resource)
 
     def test_quota_destroy(self):
         db.quota_create(self.ctxt, 'project1', 'resource1', 41)
@@ -1070,13 +1124,18 @@ class DBAPIQuotaTestCase(BaseTest):
                           self.ctxt, 'project1', 'resource1')
 
     def test_quota_destroy_all_by_project(self):
-        _quota_reserve(self.ctxt, 'project1')
+        reservations = _quota_reserve(self.ctxt, 'project1')
         db.quota_destroy_all_by_project(self.ctxt, 'project1')
-        self.assertEqual(db.quota_get_all_by_project(self.ctxt, 'project1'),
-                         {'project_id': 'project1'})
-        self.assertEqual(db.quota_usage_get_all_by_project(self.ctxt,
-                                                           'project1'),
-                         {'project_id': 'project1'})
+        self.assertEqual({'project_id': 'project1'},
+                         db.quota_get_all_by_project(self.ctxt, 'project1'))
+        self.assertEqual({'project_id': 'project1'},
+                         db.quota_usage_get_all_by_project(self.ctxt,
+                                                           'project1'))
+        for r in reservations:
+            self.assertRaises(exception.ReservationNotFound,
+                              db.reservation_get,
+                              self.ctxt,
+                              r)
 
     def test_quota_usage_get_nonexistent(self):
         self.assertRaises(exception.QuotaUsageNotFound,
@@ -1086,20 +1145,20 @@ class DBAPIQuotaTestCase(BaseTest):
                           'nonexitent_resource')
 
     def test_quota_usage_get(self):
-        _quota_reserve(self.ctxt, 'p1')
+        reservations = _quota_reserve(self.ctxt, 'p1')
         quota_usage = db.quota_usage_get(self.ctxt, 'p1', 'gigabytes')
         expected = {'resource': 'gigabytes', 'project_id': 'p1',
                     'in_use': 0, 'reserved': 2, 'total': 2}
         for key, value in expected.iteritems():
-            self.assertEqual(value, quota_usage[key], key)
+            self.assertEqual(quota_usage[key], value, key)
 
     def test_quota_usage_get_all_by_project(self):
-        _quota_reserve(self.ctxt, 'p1')
+        reservations = _quota_reserve(self.ctxt, 'p1')
         expected = {'project_id': 'p1',
                     'volumes': {'in_use': 0, 'reserved': 1},
                     'gigabytes': {'in_use': 0, 'reserved': 2}}
-        self.assertEqual(expected, db.quota_usage_get_all_by_project(
-                         self.ctxt, 'p1'))
+        self.assertEqual(db.quota_usage_get_all_by_project(
+                         self.ctxt, 'p1'), expected)
 
 
 class DBAPIIscsiTargetTestCase(BaseTest):
@@ -1113,16 +1172,16 @@ class DBAPIIscsiTargetTestCase(BaseTest):
         target = db.iscsi_target_create_safe(self.ctxt,
                                              self._get_base_values())
         self.assertTrue(target['id'])
-        self.assertEqual(target['host'], 'fake_host')
-        self.assertEqual(target['target_num'], 10)
+        self.assertEqual('fake_host', target['host'])
+        self.assertEqual(10, target['target_num'])
 
     def test_iscsi_target_count_by_host(self):
         for i in range(3):
             values = self._get_base_values()
             values['target_num'] += i
             db.iscsi_target_create_safe(self.ctxt, values)
-        self.assertEqual(db.iscsi_target_count_by_host(self.ctxt, 'fake_host'),
-                         3)
+        self.assertEqual(3, db.iscsi_target_count_by_host(self.ctxt,
+                                                          'fake_host'))
 
     @test.testtools.skip("bug 1187367")
     def test_integrity_error(self):

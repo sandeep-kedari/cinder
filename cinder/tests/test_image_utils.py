@@ -123,20 +123,20 @@ class TestUtils(test.TestCase):
 
         inf = image_utils.qemu_img_info(TEST_PATH)
 
-        self.assertEqual(inf.image, 'qemu.qcow2')
-        self.assertEqual(inf.backing_file, 'qemu.qcow2')
-        self.assertEqual(inf.file_format, 'qcow2')
-        self.assertEqual(inf.virtual_size, 52428800)
-        self.assertEqual(inf.cluster_size, 65536)
-        self.assertEqual(inf.disk_size, 200704)
+        self.assertEqual('qemu.qcow2', inf.image)
+        self.assertEqual('qemu.qcow2', inf.backing_file)
+        self.assertEqual('qcow2', inf.file_format)
+        self.assertEqual(52428800, inf.virtual_size)
+        self.assertEqual(65536, inf.cluster_size)
+        self.assertEqual(200704, inf.disk_size)
 
-        self.assertEqual(inf.snapshots[0]['id'], '1')
-        self.assertEqual(inf.snapshots[0]['tag'], 'snap1')
-        self.assertEqual(inf.snapshots[0]['vm_size'], '1.7G')
-        self.assertEqual(inf.snapshots[0]['date'], '2011-10-04')
-        self.assertEqual(inf.snapshots[0]['vm_clock'], '19:04:00 32:06:34.974')
+        self.assertEqual('1', inf.snapshots[0]['id'])
+        self.assertEqual('snap1', inf.snapshots[0]['tag'])
+        self.assertEqual('1.7G', inf.snapshots[0]['vm_size'])
+        self.assertEqual('2011-10-04', inf.snapshots[0]['date'])
+        self.assertEqual('19:04:00 32:06:34.974', inf.snapshots[0]['vm_clock'])
 
-        self.assertEqual(str(inf), TEST_STR)
+        self.assertEqual(TEST_STR, str(inf))
 
     def test_qemu_img_info_alt(self):
         """Test a slightly different variation of qemu-img output.
@@ -175,21 +175,21 @@ class TestUtils(test.TestCase):
 
         inf = image_utils.qemu_img_info(TEST_PATH)
 
-        self.assertEqual(inf.image, 'qemu.qcow2')
-        self.assertEqual(inf.backing_file, 'qemu.qcow2')
-        self.assertEqual(inf.file_format, 'qcow2')
-        self.assertEqual(inf.virtual_size, 52428800)
-        self.assertEqual(inf.cluster_size, 65536)
-        self.assertEqual(inf.disk_size, 200704)
+        self.assertEqual('qemu.qcow2', inf.image)
+        self.assertEqual('qemu.qcow2', inf.backing_file)
+        self.assertEqual('qcow2', inf.file_format)
+        self.assertEqual(52428800, inf.virtual_size)
+        self.assertEqual(65536, inf.cluster_size)
+        self.assertEqual(200704, inf.disk_size)
 
-        self.assertEqual(inf.snapshots[0]['id'], '1')
-        self.assertEqual(inf.snapshots[0]['tag'], 'snap1')
-        self.assertEqual(inf.snapshots[0]['vm_size'], '1.7G')
-        self.assertEqual(inf.snapshots[0]['date'], '2011-10-04')
-        self.assertEqual(inf.snapshots[0]['vm_clock'],
-                         '19:04:00 32:06:34.974')
+        self.assertEqual('1', inf.snapshots[0]['id'])
+        self.assertEqual('snap1', inf.snapshots[0]['tag'])
+        self.assertEqual('1.7G', inf.snapshots[0]['vm_size'])
+        self.assertEqual('2011-10-04', inf.snapshots[0]['date'])
+        self.assertEqual('19:04:00 32:06:34.974',
+                         inf.snapshots[0]['vm_clock'])
 
-        self.assertEqual(str(inf), TEST_STR)
+        self.assertEqual(TEST_STR, str(inf))
 
     def _test_fetch_to_raw(self, has_qemu=True, src_inf=None, dest_inf=None):
         mox = self._mox
@@ -523,7 +523,7 @@ class TestGetSize(test.TestCase):
         result = image_utils.get_vhd_size('vhdfile')
         mox.VerifyAll()
 
-        self.assertEqual(1024, result)
+        self.assertEqual(result, 1024)
 
 
 class TestResize(test.TestCase):
@@ -604,7 +604,7 @@ class TestCoalesceChain(test.TestCase):
         result = image_utils.coalesce_chain(['0.vhd'])
         mox.VerifyAll()
 
-        self.assertEqual('0.vhd', result)
+        self.assertEqual(result, '0.vhd')
 
     def test_chain_of_two_vhds(self):
         self.mox.StubOutWithMock(image_utils, 'get_vhd_size')
@@ -621,7 +621,7 @@ class TestCoalesceChain(test.TestCase):
 
         result = image_utils.coalesce_chain(['0.vhd', '1.vhd'])
         self.mox.VerifyAll()
-        self.assertEqual('1.vhd', result)
+        self.assertEqual(result, '1.vhd')
 
 
 class TestDiscoverChain(test.TestCase):
@@ -637,8 +637,8 @@ class TestDiscoverChain(test.TestCase):
         result = image_utils.discover_vhd_chain('some/path')
         mox.VerifyAll()
 
-        self.assertEqual(
-            ['some/path/0.vhd', 'some/path/1.vhd'], result)
+        self.assertEqual(result,
+                         ['some/path/0.vhd', 'some/path/1.vhd'])
 
 
 class TestXenServerImageToCoalescedVhd(test.TestCase):

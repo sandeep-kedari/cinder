@@ -42,13 +42,12 @@ class AllocatedCapacityWeigherTestCase(test.TestCase):
                                                        weight_properties)[0]
 
     @mock.patch('cinder.db.sqlalchemy.api.service_get_all_by_topic')
-    def _get_all_hosts(self, _mock_service_get_all_by_topic, disabled=False):
+    def _get_all_hosts(self, _mock_service_get_all_by_topic):
         ctxt = context.get_admin_context()
-        fakes.mock_host_manager_db_calls(_mock_service_get_all_by_topic,
-                                         disabled=disabled)
+        fakes.mock_host_manager_db_calls(_mock_service_get_all_by_topic)
         host_states = self.host_manager.get_all_host_states(ctxt)
         _mock_service_get_all_by_topic.assert_called_once_with(
-            ctxt, CONF.volume_topic, disabled=disabled)
+            ctxt, CONF.volume_topic)
         return host_states
 
     def test_default_of_spreading_first(self):
@@ -61,8 +60,8 @@ class AllocatedCapacityWeigherTestCase(test.TestCase):
 
         # so, host1 should win:
         weighed_host = self._get_weighed_host(hostinfo_list)
-        self.assertEqual(weighed_host.weight, 0)
-        self.assertEqual(weighed_host.obj.host, 'host1')
+        self.assertEqual(0, weighed_host.weight)
+        self.assertEqual('host1', weighed_host.obj.host)
 
     def test_capacity_weight_multiplier1(self):
         self.flags(allocated_capacity_weight_multiplier=1.0)
@@ -75,8 +74,8 @@ class AllocatedCapacityWeigherTestCase(test.TestCase):
 
         # so, host4 should win:
         weighed_host = self._get_weighed_host(hostinfo_list)
-        self.assertEqual(weighed_host.weight, 1848.0)
-        self.assertEqual(weighed_host.obj.host, 'host4')
+        self.assertEqual(1848.0, weighed_host.weight)
+        self.assertEqual('host4', weighed_host.obj.host)
 
     def test_capacity_weight_multiplier2(self):
         self.flags(allocated_capacity_weight_multiplier=-2.0)
@@ -89,5 +88,5 @@ class AllocatedCapacityWeigherTestCase(test.TestCase):
 
         # so, host1 should win:
         weighed_host = self._get_weighed_host(hostinfo_list)
-        self.assertEqual(weighed_host.weight, 0)
-        self.assertEqual(weighed_host.obj.host, 'host1')
+        self.assertEqual(0, weighed_host.weight)
+        self.assertEqual('host1', weighed_host.obj.host)

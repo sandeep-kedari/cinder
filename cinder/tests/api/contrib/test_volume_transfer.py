@@ -75,10 +75,10 @@ class VolumeTransferAPITestCase(test.TestCase):
         req.headers['Content-Type'] = 'application/json'
         res = req.get_response(fakes.wsgi_app())
         res_dict = json.loads(res.body)
-        self.assertEqual(res.status_int, 200)
-        self.assertEqual(res_dict['transfer']['name'], 'test_transfer')
-        self.assertEqual(res_dict['transfer']['id'], transfer['id'])
-        self.assertEqual(res_dict['transfer']['volume_id'], volume_id)
+        self.assertEqual(200, res.status_int)
+        self.assertEqual('test_transfer', res_dict['transfer']['name'])
+        self.assertEqual(transfer['id'], res_dict['transfer']['id'])
+        self.assertEqual(volume_id, res_dict['transfer']['volume_id'])
 
         db.transfer_destroy(context.get_admin_context(), transfer['id'])
         db.volume_destroy(context.get_admin_context(), volume_id)
@@ -92,11 +92,11 @@ class VolumeTransferAPITestCase(test.TestCase):
         req.headers['Content-Type'] = 'application/xml'
         req.headers['Accept'] = 'application/xml'
         res = req.get_response(fakes.wsgi_app())
-        self.assertEqual(res.status_int, 200)
+        self.assertEqual(200, res.status_int)
         dom = minidom.parseString(res.body)
         transfer_xml = dom.getElementsByTagName('transfer')
         name = transfer_xml.item(0).getAttribute('name')
-        self.assertEqual(name.strip(), "test_transfer")
+        self.assertEqual("test_transfer", name.strip())
 
         db.transfer_destroy(context.get_admin_context(), transfer['id'])
         db.volume_destroy(context.get_admin_context(), volume_id)
@@ -108,10 +108,10 @@ class VolumeTransferAPITestCase(test.TestCase):
         res = req.get_response(fakes.wsgi_app())
         res_dict = json.loads(res.body)
 
-        self.assertEqual(res.status_int, 404)
-        self.assertEqual(res_dict['itemNotFound']['code'], 404)
-        self.assertEqual(res_dict['itemNotFound']['message'],
-                         'Transfer 1234 could not be found.')
+        self.assertEqual(404, res.status_int)
+        self.assertEqual(404, res_dict['itemNotFound']['code'])
+        self.assertEqual('Transfer 1234 could not be found.',
+                         res_dict['itemNotFound']['message'])
 
     def test_list_transfers_json(self):
         volume_id_1 = self._create_volume(size=5)
@@ -125,12 +125,12 @@ class VolumeTransferAPITestCase(test.TestCase):
         res = req.get_response(fakes.wsgi_app())
         res_dict = json.loads(res.body)
 
-        self.assertEqual(res.status_int, 200)
-        self.assertEqual(len(res_dict['transfers'][0]), 4)
-        self.assertEqual(res_dict['transfers'][0]['id'], transfer1['id'])
-        self.assertEqual(res_dict['transfers'][0]['name'], 'test_transfer')
-        self.assertEqual(len(res_dict['transfers'][1]), 4)
-        self.assertEqual(res_dict['transfers'][1]['name'], 'test_transfer')
+        self.assertEqual(200, res.status_int)
+        self.assertEqual(4, len(res_dict['transfers'][0]))
+        self.assertEqual(transfer1['id'], res_dict['transfers'][0]['id'])
+        self.assertEqual('test_transfer', res_dict['transfers'][0]['name'])
+        self.assertEqual(4, len(res_dict['transfers'][1]))
+        self.assertEqual('test_transfer', res_dict['transfers'][1]['name'])
 
         db.transfer_destroy(context.get_admin_context(), transfer2['id'])
         db.transfer_destroy(context.get_admin_context(), transfer1['id'])
@@ -152,12 +152,12 @@ class VolumeTransferAPITestCase(test.TestCase):
         self.assertEqual(res.status_int, 200)
         dom = minidom.parseString(res.body)
         transfer_list = dom.getElementsByTagName('transfer')
-        self.assertEqual(transfer_list.item(0).attributes.length, 3)
-        self.assertEqual(transfer_list.item(0).getAttribute('id'),
-                         transfer1['id'])
-        self.assertEqual(transfer_list.item(1).attributes.length, 3)
-        self.assertEqual(transfer_list.item(1).getAttribute('id'),
-                         transfer2['id'])
+        self.assertEqual(3, transfer_list.item(0).attributes.length)
+        self.assertEqual(transfer1['id'],
+                         transfer_list.item(0).getAttribute('id'))
+        self.assertEqual(3, transfer_list.item(1).attributes.length)
+        self.assertEqual(transfer2['id'],
+                         transfer_list.item(1).getAttribute('id'))
 
         db.transfer_destroy(context.get_admin_context(), transfer2['id'])
         db.transfer_destroy(context.get_admin_context(), transfer1['id'])
@@ -177,18 +177,17 @@ class VolumeTransferAPITestCase(test.TestCase):
         res = req.get_response(fakes.wsgi_app())
         res_dict = json.loads(res.body)
 
-        self.assertEqual(res.status_int, 200)
-        self.assertEqual(len(res_dict['transfers'][0]), 5)
-        self.assertEqual(res_dict['transfers'][0]['name'],
-                         'test_transfer')
-        self.assertEqual(res_dict['transfers'][0]['id'], transfer1['id'])
-        self.assertEqual(res_dict['transfers'][0]['volume_id'], volume_id_1)
+        self.assertEqual(200, res.status_int)
+        self.assertEqual(5, len(res_dict['transfers'][0]))
+        self.assertEqual('test_transfer',
+                         res_dict['transfers'][0]['name'])
+        self.assertEqual(transfer1['id'], res_dict['transfers'][0]['id'])
+        self.assertEqual(volume_id_1, res_dict['transfers'][0]['volume_id'])
 
-        self.assertEqual(len(res_dict['transfers'][1]), 5)
-        self.assertEqual(res_dict['transfers'][1]['name'],
-                         'test_transfer')
-        self.assertEqual(res_dict['transfers'][1]['id'], transfer2['id'])
-        self.assertEqual(res_dict['transfers'][1]['volume_id'], volume_id_2)
+        self.assertEqual(5, len(res_dict['transfers'][1]))
+        self.assertEqual('test_transfer', res_dict['transfers'][1]['name'])
+        self.assertEqual(transfer2['id'], res_dict['transfers'][1]['id'])
+        self.assertEqual(volume_id_2, res_dict['transfers'][1]['volume_id'])
 
         db.transfer_destroy(context.get_admin_context(), transfer2['id'])
         db.transfer_destroy(context.get_admin_context(), transfer1['id'])
@@ -207,25 +206,25 @@ class VolumeTransferAPITestCase(test.TestCase):
         req.headers['Accept'] = 'application/xml'
         res = req.get_response(fakes.wsgi_app())
 
-        self.assertEqual(res.status_int, 200)
+        self.assertEqual(200, res.status_int)
         dom = minidom.parseString(res.body)
         transfer_detail = dom.getElementsByTagName('transfer')
 
-        self.assertEqual(transfer_detail.item(0).attributes.length, 4)
-        self.assertEqual(
-            transfer_detail.item(0).getAttribute('name'), 'test_transfer')
-        self.assertEqual(
-            transfer_detail.item(0).getAttribute('id'), transfer1['id'])
-        self.assertEqual(transfer_detail.item(0).getAttribute('volume_id'),
-                         volume_id_1)
+        self.assertEqual(4, transfer_detail.item(0).attributes.length)
+        self.assertEqual('test_transfer',
+                         transfer_detail.item(0).getAttribute('name'))
+        self.assertEqual(transfer1['id'],
+                         transfer_detail.item(0).getAttribute('id'))
+        self.assertEqual(volume_id_1,
+                         transfer_detail.item(0).getAttribute('volume_id'))
 
-        self.assertEqual(transfer_detail.item(1).attributes.length, 4)
-        self.assertEqual(
-            transfer_detail.item(1).getAttribute('name'), 'test_transfer')
-        self.assertEqual(
-            transfer_detail.item(1).getAttribute('id'), transfer2['id'])
-        self.assertEqual(transfer_detail.item(1).getAttribute('volume_id'),
-                         volume_id_2)
+        self.assertEqual(4, transfer_detail.item(1).attributes.length)
+        self.assertEqual('test_transfer',
+                         transfer_detail.item(1).getAttribute('name'))
+        self.assertEqual(transfer2['id'],
+                         transfer_detail.item(1).getAttribute('id'))
+        self.assertEqual(volume_id_2,
+                         transfer_detail.item(1).getAttribute('volume_id'))
 
         db.transfer_destroy(context.get_admin_context(), transfer2['id'])
         db.transfer_destroy(context.get_admin_context(), transfer1['id'])
@@ -246,7 +245,7 @@ class VolumeTransferAPITestCase(test.TestCase):
         res_dict = json.loads(res.body)
         LOG.info(res_dict)
 
-        self.assertEqual(res.status_int, 202)
+        self.assertEqual(202, res.status_int)
         self.assertIn('id', res_dict['transfer'])
         self.assertIn('auth_key', res_dict['transfer'])
         self.assertIn('created_at', res_dict['transfer'])
@@ -267,13 +266,13 @@ class VolumeTransferAPITestCase(test.TestCase):
         req.headers['Accept'] = 'application/xml'
         res = req.get_response(fakes.wsgi_app())
 
-        self.assertEqual(res.status_int, 202)
+        self.assertEqual(202, res.status_int)
         dom = minidom.parseString(res.body)
         transfer = dom.getElementsByTagName('transfer')
         self.assertTrue(transfer.item(0).hasAttribute('id'))
         self.assertTrue(transfer.item(0).hasAttribute('auth_key'))
         self.assertTrue(transfer.item(0).hasAttribute('created_at'))
-        self.assertEqual(transfer.item(0).getAttribute('name'), 'transfer-001')
+        self.assertEqual('transfer-001', transfer.item(0).getAttribute('name'))
         self.assertTrue(transfer.item(0).hasAttribute('volume_id'))
         db.volume_destroy(context.get_admin_context(), volume_id)
 
@@ -286,11 +285,11 @@ class VolumeTransferAPITestCase(test.TestCase):
         res = req.get_response(fakes.wsgi_app())
         res_dict = json.loads(res.body)
 
-        self.assertEqual(res.status_int, 400)
-        self.assertEqual(res_dict['badRequest']['code'], 400)
-        self.assertEqual(res_dict['badRequest']['message'],
-                         'The server could not comply with the request since'
-                         ' it is either malformed or otherwise incorrect.')
+        self.assertEqual(400, res.status_int)
+        self.assertEqual(400, res_dict['badRequest']['code'])
+        self.assertEqual('The server could not comply with the request since'
+                         ' it is either malformed or otherwise incorrect.',
+                         res_dict['badRequest']['message'])
 
     def test_create_transfer_with_body_KeyError(self):
         body = {"transfer": {"display_name": "transfer1"}}
@@ -301,10 +300,10 @@ class VolumeTransferAPITestCase(test.TestCase):
         res = req.get_response(fakes.wsgi_app())
         res_dict = json.loads(res.body)
 
-        self.assertEqual(res.status_int, 400)
-        self.assertEqual(res_dict['badRequest']['code'], 400)
-        self.assertEqual(res_dict['badRequest']['message'],
-                         'Incorrect request body format')
+        self.assertEqual(400, res.status_int)
+        self.assertEqual(400, res_dict['badRequest']['code'])
+        self.assertEqual('Incorrect request body format',
+                         res_dict['badRequest']['message'])
 
     def test_create_transfer_with_VolumeNotFound(self):
         body = {"transfer": {"display_name": "transfer1",
@@ -317,10 +316,10 @@ class VolumeTransferAPITestCase(test.TestCase):
         res = req.get_response(fakes.wsgi_app())
         res_dict = json.loads(res.body)
 
-        self.assertEqual(res.status_int, 404)
-        self.assertEqual(res_dict['itemNotFound']['code'], 404)
-        self.assertEqual(res_dict['itemNotFound']['message'],
-                         'Volume 1234 could not be found.')
+        self.assertEqual(404, res.status_int)
+        self.assertEqual(404, res_dict['itemNotFound']['code'])
+        self.assertEqual('Volume 1234 could not be found.',
+                         res_dict['itemNotFound']['message'])
 
     def test_create_transfer_with_InvalidVolume(self):
         volume_id = self._create_volume(status='attached')
@@ -333,10 +332,10 @@ class VolumeTransferAPITestCase(test.TestCase):
         res = req.get_response(fakes.wsgi_app())
         res_dict = json.loads(res.body)
 
-        self.assertEqual(res.status_int, 400)
-        self.assertEqual(res_dict['badRequest']['code'], 400)
-        self.assertEqual(res_dict['badRequest']['message'],
-                         'Invalid volume: status must be available')
+        self.assertEqual(400, res.status_int, 400)
+        self.assertEqual(400, res_dict['badRequest']['code'], 400)
+        self.assertEqual('Invalid volume: status must be available',
+                         res_dict['badRequest']['message'])
 
         db.volume_destroy(context.get_admin_context(), volume_id)
 
@@ -359,12 +358,13 @@ class VolumeTransferAPITestCase(test.TestCase):
         res = req.get_response(fakes.wsgi_app())
         res_dict = json.loads(res.body)
 
-        self.assertEqual(res.status_int, 404)
-        self.assertEqual(res_dict['itemNotFound']['code'], 404)
-        self.assertEqual(res_dict['itemNotFound']['message'],
-                         'Transfer %s could not be found.' % transfer['id'])
-        self.assertEqual(db.volume_get(context.get_admin_context(),
-                         volume_id)['status'], 'available')
+        self.assertEqual(404, res.status_int, 404)
+        self.assertEqual(404, res_dict['itemNotFound']['code'], 404)
+        self.assertEqual('Transfer %s could not be found.' % transfer['id'],
+                         res_dict['itemNotFound']['message'])
+        self.assertEqual('available', db.volume_get(
+                         context.get_admin_context(),
+                         volume_id)['status'])
 
         db.volume_destroy(context.get_admin_context(), volume_id)
 
@@ -375,10 +375,10 @@ class VolumeTransferAPITestCase(test.TestCase):
         res = req.get_response(fakes.wsgi_app())
         res_dict = json.loads(res.body)
 
-        self.assertEqual(res.status_int, 404)
-        self.assertEqual(res_dict['itemNotFound']['code'], 404)
-        self.assertEqual(res_dict['itemNotFound']['message'],
-                         'Transfer 9999 could not be found.')
+        self.assertEqual(404, res.status_int)
+        self.assertEqual(404, res_dict['itemNotFound']['code'])
+        self.assertEqual('Transfer 9999 could not be found.',
+                         res_dict['itemNotFound']['message'])
 
     def test_accept_transfer_volume_id_specified_json(self):
         volume_id = self._create_volume()
@@ -394,9 +394,9 @@ class VolumeTransferAPITestCase(test.TestCase):
         res = req.get_response(fakes.wsgi_app())
         res_dict = json.loads(res.body)
 
-        self.assertEqual(res.status_int, 202)
-        self.assertEqual(res_dict['transfer']['id'], transfer['id'])
-        self.assertEqual(res_dict['transfer']['volume_id'], volume_id)
+        self.assertEqual(202, res.status_int)
+        self.assertEqual(transfer['id'], res_dict['transfer']['id'])
+        self.assertEqual(volume_id, res_dict['transfer']['volume_id'])
 
     def test_accept_transfer_volume_id_specified_xml(self):
         volume_id = self._create_volume(size=5)
@@ -410,12 +410,12 @@ class VolumeTransferAPITestCase(test.TestCase):
         req.headers['Accept'] = 'application/xml'
         res = req.get_response(fakes.wsgi_app())
 
-        self.assertEqual(res.status_int, 202)
+        self.assertEqual(202, res.status_int)
         dom = minidom.parseString(res.body)
         accept = dom.getElementsByTagName('transfer')
-        self.assertEqual(accept.item(0).getAttribute('id'),
-                         transfer['id'])
-        self.assertEqual(accept.item(0).getAttribute('volume_id'), volume_id)
+        self.assertEqual(transfer['id'],
+                         accept.item(0).getAttribute('id'))
+        self.assertEqual(volume_id, accept.item(0).getAttribute('volume_id'))
 
         db.volume_destroy(context.get_admin_context(), volume_id)
 
@@ -432,11 +432,11 @@ class VolumeTransferAPITestCase(test.TestCase):
         res = req.get_response(fakes.wsgi_app())
         res_dict = json.loads(res.body)
 
-        self.assertEqual(res.status_int, 400)
-        self.assertEqual(res_dict['badRequest']['code'], 400)
-        self.assertEqual(res_dict['badRequest']['message'],
-                         'The server could not comply with the request since'
-                         ' it is either malformed or otherwise incorrect.')
+        self.assertEqual(400, res.status_int)
+        self.assertEqual(400, res_dict['badRequest']['code'])
+        self.assertEqual('The server could not comply with the request since'
+                         ' it is either malformed or otherwise incorrect.',
+                         res_dict['badRequest']['message'])
 
         db.volume_destroy(context.get_admin_context(), volume_id)
 
@@ -455,11 +455,11 @@ class VolumeTransferAPITestCase(test.TestCase):
 
         res_dict = json.loads(res.body)
 
-        self.assertEqual(res.status_int, 400)
-        self.assertEqual(res_dict['badRequest']['code'], 400)
-        self.assertEqual(res_dict['badRequest']['message'],
-                         'The server could not comply with the request since'
-                         ' it is either malformed or otherwise incorrect.')
+        self.assertEqual(400, res.status_int)
+        self.assertEqual(400, res_dict['badRequest']['code'])
+        self.assertEqual('The server could not comply with the request since'
+                         ' it is either malformed or otherwise incorrect.',
+                         res_dict['badRequest']['message'])
 
     def test_accept_transfer_invalid_id_auth_key(self):
         volume_id = self._create_volume()
@@ -475,11 +475,11 @@ class VolumeTransferAPITestCase(test.TestCase):
         res = req.get_response(fakes.wsgi_app())
         res_dict = json.loads(res.body)
 
-        self.assertEqual(res.status_int, 400)
-        self.assertEqual(res_dict['badRequest']['code'], 400)
-        self.assertEqual(res_dict['badRequest']['message'],
-                         'Invalid auth key: Attempt to transfer %s with '
-                         'invalid auth key.' % transfer['id'])
+        self.assertEqual(400, res.status_int)
+        self.assertEqual(400, res_dict['badRequest']['code'])
+        self.assertEqual('Invalid auth key: Attempt to transfer %s with '
+                         'invalid auth key.' % transfer['id'],
+                         res_dict['badRequest']['message'])
 
         db.transfer_destroy(context.get_admin_context(), transfer['id'])
         db.volume_destroy(context.get_admin_context(), volume_id)
@@ -497,10 +497,10 @@ class VolumeTransferAPITestCase(test.TestCase):
         res = req.get_response(fakes.wsgi_app())
         res_dict = json.loads(res.body)
 
-        self.assertEqual(res.status_int, 404)
-        self.assertEqual(res_dict['itemNotFound']['code'], 404)
-        self.assertEqual(res_dict['itemNotFound']['message'],
-                         'TransferNotFound: Transfer 1 could not be found.')
+        self.assertEqual(404, res.status_int)
+        self.assertEqual(404, res_dict['itemNotFound']['code'])
+        self.assertEqual('TransferNotFound: Transfer 1 could not be found.',
+                         res_dict['itemNotFound']['message'])
 
         db.transfer_destroy(context.get_admin_context(), transfer['id'])
         db.volume_destroy(context.get_admin_context(), volume_id)
@@ -532,12 +532,12 @@ class VolumeTransferAPITestCase(test.TestCase):
         res = req.get_response(fakes.wsgi_app())
         res_dict = json.loads(res.body)
 
-        self.assertEqual(res.status_int, 413)
-        self.assertEqual(res_dict['overLimit']['code'], 413)
-        self.assertEqual(res_dict['overLimit']['message'],
-                         'Requested volume or snapshot exceeds allowed '
+        self.assertEqual(413, res.status_int)
+        self.assertEqual(413, res_dict['overLimit']['code'])
+        self.assertEqual('Requested volume or snapshot exceeds allowed '
                          'Gigabytes quota. Requested 2G, quota is 3G and '
-                         '2G has been consumed.')
+                         '2G has been consumed.',
+                         res_dict['overLimit']['message'])
 
     def test_accept_transfer_with_VolumeLimitExceeded(self):
 
@@ -564,8 +564,8 @@ class VolumeTransferAPITestCase(test.TestCase):
         res = req.get_response(fakes.wsgi_app())
         res_dict = json.loads(res.body)
 
-        self.assertEqual(res.status_int, 413)
-        self.assertEqual(res_dict['overLimit']['code'], 413)
-        self.assertEqual(res_dict['overLimit']['message'],
-                         'VolumeLimitExceeded: Maximum number of volumes '
-                         'allowed (1) exceeded')
+        self.assertEqual(413, res.status_int)
+        self.assertEqual(413, res_dict['overLimit']['code'])
+        self.assertEqual('VolumeLimitExceeded: Maximum number of volumes '
+                         'allowed (1) exceeded',
+                         res_dict['overLimit']['message'])

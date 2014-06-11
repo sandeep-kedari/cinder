@@ -40,23 +40,28 @@ CONF.register_opts(more_volume_opts)
 
 
 class VolumeConfigurationTest(test.TestCase):
+    def setUp(self):
+        super(VolumeConfigurationTest, self).setUp()
+
+    def tearDown(self):
+        super(VolumeConfigurationTest, self).tearDown()
 
     def test_group_grafts_opts(self):
         c = configuration.Configuration(volume_opts, config_group='foo')
-        self.assertEqual(c.str_opt, CONF.foo.str_opt)
-        self.assertEqual(c.bool_opt, CONF.foo.bool_opt)
+        self.assertEqual(CONF.foo.str_opt, c.str_opt)
+        self.assertEqual(CONF.foo.bool_opt, c.bool_opt)
 
     def test_opts_no_group(self):
         c = configuration.Configuration(volume_opts)
-        self.assertEqual(c.str_opt, CONF.str_opt)
-        self.assertEqual(c.bool_opt, CONF.bool_opt)
+        self.assertEqual(CONF.str_opt, c.str_opt)
+        self.assertEqual(CONF.bool_opt, c.bool_opt)
 
     def test_grafting_multiple_opts(self):
         c = configuration.Configuration(volume_opts, config_group='foo')
         c.append_config_values(more_volume_opts)
-        self.assertEqual(c.str_opt, CONF.foo.str_opt)
-        self.assertEqual(c.bool_opt, CONF.foo.bool_opt)
-        self.assertEqual(c.int_opt, CONF.foo.int_opt)
+        self.assertEqual(CONF.foo.str_opt, c.str_opt)
+        self.assertEqual(CONF.foo.bool_opt, c.bool_opt)
+        self.assertEqual(CONF.foo.int_opt, c.int_opt)
 
     def test_safe_get(self):
         c = configuration.Configuration(volume_opts, config_group='foo')

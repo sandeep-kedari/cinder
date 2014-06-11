@@ -162,10 +162,13 @@ class TestMigrations(test.TestCase):
         # We start each test case with a completely blank slate.
         self._reset_databases()
 
+    def tearDown(self):
+
         # We destroy the test data store between each test case,
         # and recreate it, which ensures that we have no side-effects
         # from the tests
-        self.addCleanup(self._reset_databases)
+        self._reset_databases()
+        super(TestMigrations, self).tearDown()
 
     def _reset_databases(self):
         def execute_cmd(cmd=None):
@@ -173,7 +176,7 @@ class TestMigrations(test.TestCase):
                                     stderr=subprocess.STDOUT, shell=True)
             output = proc.communicate()[0]
             LOG.debug(output)
-            self.assertEqual(0, proc.returncode)
+            self.assertEqual(proc.returncode, 0)
 
         for key, engine in self.engines.items():
             conn_string = self.test_databases[key]
@@ -286,7 +289,7 @@ class TestMigrations(test.TestCase):
                                        "and ENGINE!='InnoDB' "
                                        "and TABLE_NAME!='migrate_version'")
         count = noninnodb.scalar()
-        self.assertEqual(count, 0, "%d non InnoDB tables created" % count)
+        self.assertEqual(0, count, "%d non InnoDB tables created" % count)
 
     def test_postgresql_connect_fail(self):
         """Test connection failure on PostgrSQL.
@@ -321,9 +324,9 @@ class TestMigrations(test.TestCase):
         migration_api.version_control(engine,
                                       TestMigrations.REPOSITORY,
                                       migration.db_initial_version())
-        self.assertEqual(migration.db_initial_version(),
-                         migration_api.db_version(engine,
-                                                  TestMigrations.REPOSITORY))
+        self.assertEqual(migration_api.db_version(engine,
+                         TestMigrations.REPOSITORY),
+                         migration.db_initial_version())
 
         migration_api.upgrade(engine, TestMigrations.REPOSITORY,
                               migration.db_initial_version() + 1)
@@ -354,9 +357,9 @@ class TestMigrations(test.TestCase):
         migration_api.downgrade(engine,
                                 TestMigrations.REPOSITORY,
                                 version)
-        self.assertEqual(version,
-                         migration_api.db_version(engine,
-                                                  TestMigrations.REPOSITORY))
+        self.assertEqual(migration_api.db_version(engine,
+                         TestMigrations.REPOSITORY),
+                         version)
 
     def _migrate_up(self, engine, version, with_data=False):
         """Migrate up to a new version of the db.
@@ -377,10 +380,9 @@ class TestMigrations(test.TestCase):
             migration_api.upgrade(engine,
                                   TestMigrations.REPOSITORY,
                                   version)
-            self.assertEqual(
-                version,
-                migration_api.db_version(engine,
-                                         TestMigrations.REPOSITORY))
+            self.assertEqual(migration_api.db_version(engine,
+                             TestMigrations.REPOSITORY),
+                             version)
 
             if with_data:
                 check = getattr(self, "_check_%3.3d" % version, None)
@@ -470,13 +472,13 @@ class TestMigrations(test.TestCase):
                             data['volume_type_extra_specs'][2]['key']
                             ).execute().first()
 
-        self.assertEqual(v1['volume_type_id'], vt1['id'])
-        self.assertEqual(v2['volume_type_id'], vt1['id'])
-        self.assertEqual(v3['volume_type_id'], vt3['id'])
+        self.assertEqual(vt1['id'], v1['volume_type_id'])
+        self.assertEqual(vt1['id'], v2['volume_type_id'])
+        self.assertEqual(vt3['id'], v3['volume_type_id'])
 
-        self.assertEqual(vtes1['volume_type_id'], vt1['id'])
-        self.assertEqual(vtes2['volume_type_id'], vt1['id'])
-        self.assertEqual(vtes3['volume_type_id'], vt2['id'])
+        self.assertEqual(vt1['id'], vtes1['volume_type_id'], vt1['id'])
+        self.assertEqual(vt1['id'], vtes2['volume_type_id'], vt1['id'])
+        self.assertEqual(vt2['id'], vtes3['volume_type_id'], vt2['id'])
 
     def test_migration_005(self):
         """Test that adding source_volid column works correctly."""
@@ -537,13 +539,13 @@ class TestMigrations(test.TestCase):
 
             fkey, = snapshots.c.volume_id.foreign_keys
 
-            self.assertEqual(volumes.c.id, fkey.column)
+            self.assertEqual(fkey.column, volumes.c.id)
 
     def test_downgrade_007_removes_fk(self):
         for metadata in self.metadatas_downgraded_from(7):
             snapshots = sqlalchemy.Table('snapshots', metadata, autoload=True)
 
-            self.assertEqual(0, len(snapshots.c.volume_id.foreign_keys))
+            self.assertEqual(len(snapshots.c.volume_id.foreign_keys), 0)
 
     def test_migration_008(self):
         """Test that adding and removing the backups table works correctly."""
@@ -1035,7 +1037,7 @@ class TestMigrations(test.TestCase):
                 where(quota_class_metadata.c.class_name == 'default').\
                 execute().scalar()
 
-            self.assertEqual(3, num_defaults)
+            self.assertEqual(num_defaults, 3)
 
             migration_api.downgrade(engine, TestMigrations.REPOSITORY, 20)
 
@@ -1044,7 +1046,7 @@ class TestMigrations(test.TestCase):
                 where(quota_class_metadata.c.class_name == 'default').\
                 execute().scalar()
 
-            self.assertEqual(3, num_defaults)
+            self.assertEqual(num_defaults, 3)
 
     def test_migration_022(self):
         """Test that adding disabled_reason column works correctly."""

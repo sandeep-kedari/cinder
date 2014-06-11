@@ -191,7 +191,7 @@ class VMwareEsxVmdkDriverTestCase(test.TestCase):
 
         test_obj = TestClass()
         self.assertRaises(exception.CinderException, test_obj.fail)
-        self.assertEqual(test_obj.counter1, 3)
+        self.assertEqual(3, test_obj.counter1)
         ret = test_obj.success()
         self.assertEqual(1, ret)
 
@@ -222,12 +222,12 @@ class VMwareEsxVmdkDriverTestCase(test.TestCase):
     def test_get_volume_stats(self):
         """Test get_volume_stats."""
         stats = self._driver.get_volume_stats()
-        self.assertEqual(stats['vendor_name'], 'VMware')
-        self.assertEqual(stats['driver_version'], self._driver.VERSION)
-        self.assertEqual(stats['storage_protocol'], 'LSI Logic SCSI')
-        self.assertEqual(stats['reserved_percentage'], 0)
-        self.assertEqual(stats['total_capacity_gb'], 'unknown')
-        self.assertEqual(stats['free_capacity_gb'], 'unknown')
+        self.assertEqual('VMware', stats['vendor_name'])
+        self.assertEqual(self._driver.VERSION, stats['driver_version'])
+        self.assertEqual('LSI Logic SCSI', stats['storage_protocol'])
+        self.assertEqual(0, stats['reserved_percentage'])
+        self.assertEqual('unknown', stats['total_capacity_gb'])
+        self.assertEqual('unknown', stats['free_capacity_gb'])
 
     def test_create_volume(self):
         """Test create_volume."""
@@ -264,7 +264,7 @@ class VMwareEsxVmdkDriverTestCase(test.TestCase):
 
         m.ReplayAll()
         ret = self._session.wait_for_task(mox.IgnoreArg())
-        self.assertEqual(ret.result, result)
+        self.assertEqual(result, ret.result)
         m.UnsetStubs()
         m.VerifyAll()
 
@@ -308,7 +308,7 @@ class VMwareEsxVmdkDriverTestCase(test.TestCase):
         self._driver.volumeops = self._volumeops
 
         backing = FakeMor('VirtualMachine', 'my_vm')
-        FakeMor('Task', 'my_task')
+        task = FakeMor('Task', 'my_task')
 
         m.StubOutWithMock(self._volumeops, 'get_backing')
         m.StubOutWithMock(self._volumeops, 'delete_backing')
@@ -363,7 +363,7 @@ class VMwareEsxVmdkDriverTestCase(test.TestCase):
 
         m.ReplayAll()
         result = self._driver._create_backing_in_inventory(volume)
-        self.assertEqual(result, backing)
+        self.assertEqual(backing, result)
         m.UnsetStubs()
         m.VerifyAll()
 
@@ -386,9 +386,10 @@ class VMwareEsxVmdkDriverTestCase(test.TestCase):
 
         m.ReplayAll()
         conn_info = self._driver.initialize_connection(volume, connector)
-        self.assertEqual(conn_info['driver_volume_type'], 'vmdk')
-        self.assertEqual(conn_info['data']['volume'], 'my_back')
-        self.assertEqual(conn_info['data']['volume_id'], 'volume_id')
+        self.assertEqual('vmdk', conn_info['driver_volume_type'])
+        self.assertEqual('my_back', conn_info['data']['volume'], 'my_back')
+        self.assertEqual('volume_id', conn_info['data']['volume_id'],
+                         'volume_id')
         m.UnsetStubs()
         m.VerifyAll()
 
@@ -452,13 +453,13 @@ class VMwareEsxVmdkDriverTestCase(test.TestCase):
         m.ReplayAll()
 
         summary = self._driver._select_datastore_summary(1, datastores)
-        self.assertEqual(summary, summary1)
+        self.assertEqual(summary1, summary)
 
         summary = self._driver._select_datastore_summary(10, datastores)
-        self.assertEqual(summary, summary2)
+        self.assertEqual(summary2, summary)
 
         summary = self._driver._select_datastore_summary(40, datastores)
-        self.assertEqual(summary, summary4)
+        self.assertEqual(summary4, summary)
 
         self.assertRaises(error_util.VimException,
                           self._driver._select_datastore_summary,
@@ -487,9 +488,9 @@ class VMwareEsxVmdkDriverTestCase(test.TestCase):
         (folder, datastore_summary) = driver._get_folder_ds_summary(volume,
                                                                     rp, dss)
         # verify returned values and calls made
-        self.assertEqual(mock.sentinel.folder, folder,
+        self.assertEqual(folder, mock.sentinel.folder,
                          "Folder returned is wrong.")
-        self.assertEqual(mock.sentinel.summary, datastore_summary,
+        self.assertEqual(datastore_summary, mock.sentinel.summary,
                          "Datastore summary returned is wrong.")
         volumeops.get_dc.assert_called_once_with(rp)
         volumeops.get_vmfolder.assert_called_once_with(mock.sentinel.dc)
@@ -501,8 +502,8 @@ class VMwareEsxVmdkDriverTestCase(test.TestCase):
         """Test _get_disk_type."""
         volume = FakeObject()
         volume['volume_type_id'] = None
-        self.assertEqual(vmdk.VMwareEsxVmdkDriver._get_disk_type(volume),
-                         'thin')
+        self.assertEqual('thin',
+                         vmdk.VMwareEsxVmdkDriver._get_disk_type(volume))
 
     def test_init_conn_with_instance_no_backing(self):
         """Test initialize_connection with instance and without backing."""
@@ -541,9 +542,9 @@ class VMwareEsxVmdkDriverTestCase(test.TestCase):
 
         m.ReplayAll()
         conn_info = self._driver.initialize_connection(volume, connector)
-        self.assertEqual(conn_info['driver_volume_type'], 'vmdk')
-        self.assertEqual(conn_info['data']['volume'], 'my_back')
-        self.assertEqual(conn_info['data']['volume_id'], 'volume_id')
+        self.assertEqual('vmdk', conn_info['driver_volume_type'])
+        self.assertEqual('my_back', conn_info['data']['volume'])
+        self.assertEqual('volume_id', conn_info['data']['volume_id'])
         m.UnsetStubs()
         m.VerifyAll()
 
@@ -562,9 +563,9 @@ class VMwareEsxVmdkDriverTestCase(test.TestCase):
 
         m.ReplayAll()
         conn_info = self._driver.initialize_connection(volume, connector)
-        self.assertEqual(conn_info['driver_volume_type'], 'vmdk')
-        self.assertEqual(conn_info['data']['volume'], 'my_back')
-        self.assertEqual(conn_info['data']['volume_id'], 'volume_id')
+        self.assertEqual('vmdk', conn_info['driver_volume_type'])
+        self.assertEqual('my_back', conn_info['data']['volume'])
+        self.assertEqual('volume_id', conn_info['data']['volume_id'])
         m.UnsetStubs()
         m.VerifyAll()
 
@@ -1418,9 +1419,9 @@ class VMwareVcVmdkDriverTestCase(VMwareEsxVmdkDriverTestCase):
 
         m.ReplayAll()
         conn_info = self._driver.initialize_connection(volume, connector)
-        self.assertEqual(conn_info['driver_volume_type'], 'vmdk')
-        self.assertEqual(conn_info['data']['volume'], 'my_back')
-        self.assertEqual(conn_info['data']['volume_id'], 'volume_id')
+        self.assertEqual('vmdk', conn_info['driver_volume_type'])
+        self.assertEqual('my_back', conn_info['data']['volume'])
+        self.assertEqual('volume_id', conn_info['data']['volume_id'])
         m.UnsetStubs()
         m.VerifyAll()
 
@@ -1468,6 +1469,7 @@ class VMwareVcVmdkDriverTestCase(VMwareEsxVmdkDriverTestCase):
         m.StubOutWithMock(self._driver, '_get_folder_ds_summary')
         folder = FakeMor('Folder', 'my_fol')
         summary = FakeDatastoreSummary(1, 1, datastore1)
+        size = 1
         self._driver._get_folder_ds_summary(volume, resource_pool,
                                             [datastore1]).AndReturn((folder,
                                                                      summary))
@@ -1479,9 +1481,9 @@ class VMwareVcVmdkDriverTestCase(VMwareEsxVmdkDriverTestCase):
 
         m.ReplayAll()
         conn_info = self._driver.initialize_connection(volume, connector)
-        self.assertEqual(conn_info['driver_volume_type'], 'vmdk')
-        self.assertEqual(conn_info['data']['volume'], 'my_back')
-        self.assertEqual(conn_info['data']['volume_id'], 'volume_id')
+        self.assertEqual('vmdk', conn_info['driver_volume_type'])
+        self.assertEqual('my_back', conn_info['data']['volume'])
+        self.assertEqual('volume_id', conn_info['data']['volume_id'])
         m.UnsetStubs()
         m.VerifyAll()
 
@@ -1803,7 +1805,7 @@ class VMwareVcVmdkDriverTestCase(VMwareEsxVmdkDriverTestCase):
         # call _filter_ds_by_profile with a fake profile
         actual_dss = self._driver._filter_ds_by_profile(datastores, profile)
         # verify return value and called methods
-        self.assertEqual(filtered_dss, actual_dss,
+        self.assertEqual(actual_dss, filtered_dss,
                          "Wrong filtered datastores returned.")
         ds_to_hubs.assert_called_once_with(pbm_cf, datastores)
         volumeops.filter_matching_hubs.assert_called_once_with(hubs,
@@ -1841,9 +1843,9 @@ class VMwareVcVmdkDriverTestCase(VMwareEsxVmdkDriverTestCase):
         (folder, datastore_summary) = driver._get_folder_ds_summary(volume,
                                                                     rp, dss)
         # verify returned values and calls made
-        self.assertEqual(mock.sentinel.folder, folder,
+        self.assertEqual(folder, mock.sentinel.folder,
                          "Folder returned is wrong.")
-        self.assertEqual(mock.sentinel.summary, datastore_summary,
+        self.assertEqual(datastore_summary, mock.sentinel.summary,
                          "Datastore summary returned is wrong.")
         volumeops.get_dc.assert_called_once_with(rp)
         volumeops.get_vmfolder.assert_called_once_with(mock.sentinel.dc)

@@ -25,6 +25,7 @@ import mock
 from cinder import exception
 from cinder.openstack.common import log as logging
 from cinder import test
+from cinder import units
 from cinder.volume.drivers.emc.emc_smis_common import EMCSMISCommon
 from cinder.volume.drivers.emc.emc_smis_fc import EMCSMISFCDriver
 from cinder.volume.drivers.emc.emc_smis_iscsi import EMCSMISISCSIDriver
@@ -997,8 +998,9 @@ class EMCSMISISCSIDriverTestCase(test.TestCase):
     def test_map_unmap(self):
         self.driver.create_volume(self.data.test_volume)
         self.data.test_volume['EMCCurrentOwningStorageProcessor'] = 'SP_A'
-        self.driver.initialize_connection(self.data.test_volume,
-                                          self.data.connector)
+        connection_info = self.driver.initialize_connection(
+            self.data.test_volume,
+            self.data.connector)
         self.driver.terminate_connection(self.data.test_volume,
                                          self.data.connector)
         self.driver.delete_volume(self.data.test_volume)
@@ -1107,11 +1109,9 @@ class EMCSMISFCDriverTestCase(test.TestCase):
         self.data = EMCSMISCommonData()
 
         self.tempdir = tempfile.mkdtemp()
-        self.addCleanup(shutil.rmtree, self.tempdir)
         super(EMCSMISFCDriverTestCase, self).setUp()
         self.config_file_path = None
         self.create_fake_config_file()
-        self.addCleanup(os.remove, self.config_file_path)
 
         configuration = mock.Mock()
         configuration.cinder_emc_config_file = self.config_file_path
@@ -1215,7 +1215,7 @@ class EMCSMISFCDriverTestCase(test.TestCase):
         connection_info = self.driver.initialize_connection(
             self.data.test_volume,
             self.data.connector)
-        self.assertEqual(connection_info, output)
+        self.assertEqual(output, connection_info)
 
         connection_info = self.driver.terminate_connection(
             self.data.test_volume,
@@ -1229,15 +1229,16 @@ class EMCSMISFCDriverTestCase(test.TestCase):
 
         vol_instance = self.driver.common._find_lun(self.data.test_volume)
 
-        mock.call._get_ecom_connection(),
-        mock.call.find_device_number(self.data.test_volume),
-        mock.call._find_lun(self.data.test_volume),
-        mock.call.self._find_controller_configuration_service(
-            self.data.storage_system),
-        mock.call._remove_members(conf_service, vol_instance),
-        mock.call.get_target_wwns(
-            self.data.storage_system,
-            self.data.connector)
+        expected = [
+            mock.call._get_ecom_connection(),
+            mock.call.find_device_number(self.data.test_volume),
+            mock.call._find_lun(self.data.test_volume),
+            mock.call.self._find_controller_configuration_service(
+                self.data.storage_system),
+            mock.call._remove_members(conf_service, vol_instance),
+            mock.call.get_target_wwns(
+                self.data.storage_system,
+                self.data.connector)]
 
         output = {
             'driver_volume_type': 'fibre_channel',
@@ -1249,7 +1250,7 @@ class EMCSMISFCDriverTestCase(test.TestCase):
                                          ['1234567890123', '0987654321321'],
                                          }}}
 
-        self.assertEqual(connection_info, output)
+        self.assertEqual(output, connection_info)
 
         self.driver.delete_volume(self.data.test_volume)
 
@@ -1354,3 +1355,36 @@ class EMCSMISFCDriverTestCase(test.TestCase):
         volume_with_vt = self.data.test_volume
         volume_with_vt['volume_type_id'] = 1
         self.driver.create_volume(volume_with_vt)
+
+        configservice = {'CreationClassName':
+                         'Clar_StorageConfigurationService',
+                         'SystemName': 'CLARiiON+APM00123456789'}
+
+        pool = {'InstanceID': 'CLARiiON+APM00123456789+U+gold',
+                'CreationClassName': 'Clar_UnifiedStoragePool'}
+
+        volumesize = int(volume_with_vt['size']) * units.GiB
+
+        storage_type = {'storagetype:provisioning': 'thick',
+                        'storagetype:pool': 'gold'}
+
+        expected = [
+            mock.call._get_storage_type(volume_with_vt),
+            mock.call._find_pool('gold'),
+            mock.call.get_provisioning(storage_type),
+            mock.call.InvokeMethod('CreateOrModifyElementFromStoragePool',
+                                   configservice, volume_with_vt['name'],
+                                   pool,
+                                   self.driver.common._getnum(2, '16'),
+                                   self.driver.common._getnum(volumesize,
+                                                              '64'))]
+
+    def _cleanup(self):
+        bExists = os.path.exists(self.config_file_path)
+        if bExists:
+            os.remove(self.config_file_path)
+        shutil.rmtree(self.tempdir)
+
+    def tearDown(self):
+        self._cleanup()
+        super(EMCSMISFCDriverTestCase, self).tearDown()

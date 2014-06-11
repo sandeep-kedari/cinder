@@ -115,13 +115,13 @@ class FakeHVSCommon(rest_common.HVSCommon):
 
         if self.test_normal:
             if url == "/xx/sessions":
-                data = """{"error":{"code":0},
-                            "data":{"username":"admin",
-                                    "deviceid":"210235G7J20000000000"
-                                   }}"""
+                    data = """{"error":{"code":0},
+                                "data":{"username":"admin",
+                                        "deviceid":"210235G7J20000000000"
+                                       }}"""
             if url == "sessions":
-                data = """{"error":{"code":0},
-                            "data":{"ID":11}}"""
+                    data = """{"error":{"code":0},
+                                "data":{"ID":11}}"""
 
             if url == "storagepool":
                 data = """{"error":{"code":0},
@@ -504,10 +504,7 @@ class HVSRESTiSCSIDriverTestCase(test.TestCase):
     def setUp(self):
         super(HVSRESTiSCSIDriverTestCase, self).setUp()
         self.tmp_dir = tempfile.mkdtemp()
-        self.addCleanup(shutil.rmtree, self.tmp_dir)
         self.fake_conf_file = self.tmp_dir + '/cinder_huawei_conf.xml'
-        self.addCleanup(os.remove, self.fake_conf_file)
-
         self.create_fake_conf_file()
         self.configuration = mox.MockObject(conf.Configuration)
         self.configuration.cinder_huawei_conf_file = self.fake_conf_file
@@ -520,6 +517,12 @@ class HVSRESTiSCSIDriverTestCase(test.TestCase):
         self.driver.do_setup({})
         self.driver.common.test_normal = True
 
+    def tearDown(self):
+        if os.path.exists(self.fake_conf_file):
+            os.remove(self.fake_conf_file)
+        shutil.rmtree(self.tmp_dir)
+        super(HVSRESTiSCSIDriverTestCase, self).tearDown()
+
     def test_log_in_success(self):
         deviceid = self.driver.common.login()
         self.assertIsNotNone(deviceid)
@@ -531,17 +534,17 @@ class HVSRESTiSCSIDriverTestCase(test.TestCase):
     def test_create_volume_success(self):
         self.driver.common.login()
         self.driver.create_volume(test_volume)
-        self.assertEqual(self.driver.common.lun_id, "0")
+        self.assertEqual("0", self.driver.common.lun_id)
 
     def test_extend_volume_success(self):
         self.driver.common.login()
         self.driver.extend_volume(test_volume, volume_size)
-        self.assertEqual(self.driver.common.lun_id, "0")
+        self.assertEqual("0", self.driver.common.lun_id)
 
     def test_create_snapshot_success(self):
         self.driver.common.login()
         self.driver.create_snapshot(test_volume)
-        self.assertEqual(self.driver.common.snapshot_id, "3")
+        self.assertEqual("3", self.driver.common.snapshot_id)
 
     def test_delete_volume_success(self):
         self.driver.common.login()
@@ -556,34 +559,34 @@ class HVSRESTiSCSIDriverTestCase(test.TestCase):
     def test_colone_volume_success(self):
         self.driver.common.login()
         self.driver.create_cloned_volume(test_volume, test_volume)
-        self.assertEqual(self.driver.common.luncopy_id, "7")
+        self.assertEqual("7", self.driver.common.luncopy_id)
 
     def test_create_volume_from_snapshot_success(self):
         self.driver.common.login()
         self.driver.create_volume_from_snapshot(test_volume, test_volume)
-        self.assertEqual(self.driver.common.luncopy_id, "7")
+        self.assertEqual("7", self.driver.common.luncopy_id)
 
     def test_initialize_connection_success(self):
         self.driver.common.login()
         conn = self.driver.initialize_connection(test_volume, FakeConnector)
-        self.assertEqual(conn['data']['target_lun'], 1)
+        self.assertEqual(1, conn['data']['target_lun'])
 
     def test_terminate_connection_success(self):
         self.driver.common.login()
         self.driver.terminate_connection(test_volume, FakeConnector)
-        self.assertEqual(self.driver.common.termin_flag, True)
+        self.assertEqual(True, self.driver.common.termin_flag)
 
     def test_initialize_connection_no_view_success(self):
         self.driver.common.login()
         self.driver.common.other_flag = False
         conn = self.driver.initialize_connection(test_volume, FakeConnector)
-        self.assertEqual(conn['data']['target_lun'], 1)
+        self.assertEqual(1, conn['data']['target_lun'])
 
     def test_terminate_connectio_no_view_success(self):
         self.driver.common.login()
         self.driver.common.other_flag = False
         self.driver.terminate_connection(test_volume, FakeConnector)
-        self.assertEqual(self.driver.common.termin_flag, True)
+        self.assertEqual(True, self.driver.common.termin_flag)
 
     def test_get_volume_stats(self):
         self.driver.common.login()
@@ -696,10 +699,7 @@ class HVSRESTFCDriverTestCase(test.TestCase):
     def setUp(self):
         super(HVSRESTFCDriverTestCase, self).setUp()
         self.tmp_dir = tempfile.mkdtemp()
-        self.addCleanup(shutil.rmtree, self.tmp_dir)
         self.fake_conf_file = self.tmp_dir + '/cinder_huawei_conf.xml'
-        self.addCleanup(os.remove, self.fake_conf_file)
-
         self.create_fake_conf_file()
         self.configuration = mox.MockObject(conf.Configuration)
         self.configuration.cinder_huawei_conf_file = self.fake_conf_file
@@ -711,6 +711,12 @@ class HVSRESTFCDriverTestCase(test.TestCase):
         self.driver.do_setup({})
         self.driver.common.test_normal = True
 
+    def tearDown(self):
+        if os.path.exists(self.fake_conf_file):
+            os.remove(self.fake_conf_file)
+        shutil.rmtree(self.tmp_dir)
+        super(HVSRESTFCDriverTestCase, self).tearDown()
+
     def test_log_in_Success(self):
         deviceid = self.driver.common.login()
         self.assertIsNotNone(deviceid)
@@ -718,17 +724,17 @@ class HVSRESTFCDriverTestCase(test.TestCase):
     def test_create_volume_success(self):
         self.driver.common.login()
         self.driver.create_volume(test_volume)
-        self.assertEqual(self.driver.common.lun_id, "0")
+        self.assertEqual("0", self.driver.common.lun_id)
 
     def test_extend_volume_success(self):
         self.driver.common.login()
         self.driver.extend_volume(test_volume, volume_size)
-        self.assertEqual(self.driver.common.lun_id, "0")
+        self.assertEqual("0", self.driver.common.lun_id)
 
     def test_create_snapshot_success(self):
         self.driver.common.login()
         self.driver.create_snapshot(test_volume)
-        self.assertEqual(self.driver.common.snapshot_id, "3")
+        self.assertEqual("3", self.driver.common.snapshot_id)
 
     def test_delete_volume_success(self):
         self.driver.common.login()
@@ -743,34 +749,34 @@ class HVSRESTFCDriverTestCase(test.TestCase):
     def test_colone_volume_success(self):
         self.driver.common.login()
         self.driver.create_cloned_volume(test_volume, test_volume)
-        self.assertEqual(self.driver.common.luncopy_id, "7")
+        self.assertEqual("7", self.driver.common.luncopy_id)
 
     def test_create_volume_from_snapshot_success(self):
         self.driver.common.login()
         self.driver.create_volume_from_snapshot(test_volume, test_volume)
-        self.assertEqual(self.driver.common.luncopy_id, "7")
+        self.assertEqual("7", self.driver.common.luncopy_id)
 
     def test_initialize_connection_success(self):
         self.driver.common.login()
         conn = self.driver.initialize_connection(test_volume, FakeConnector)
-        self.assertEqual(conn['data']['target_lun'], 1)
+        self.assertEqual(1, conn['data']['target_lun'])
 
     def test_terminate_connection_success(self):
         self.driver.common.login()
         self.driver.terminate_connection(test_volume, FakeConnector)
-        self.assertEqual(self.driver.common.termin_flag, True)
+        self.assertEqual(True, self.driver.common.termin_flag)
 
     def test_initialize_connection_no_view_success(self):
         self.driver.common.login()
         self.driver.common.other_flag = False
         conn = self.driver.initialize_connection(test_volume, FakeConnector)
-        self.assertEqual(conn['data']['target_lun'], 1)
+        self.assertEqual(1, conn['data']['target_lun'])
 
     def test_terminate_connection_no_viewn_success(self):
         self.driver.common.login()
         self.driver.common.other_flag = False
         self.driver.terminate_connection(test_volume, FakeConnector)
-        self.assertEqual(self.driver.common.termin_flag, True)
+        self.assertEqual(True, self.driver.common.termin_flag)
 
     def test_get_volume_stats(self):
         self.driver.common.login()

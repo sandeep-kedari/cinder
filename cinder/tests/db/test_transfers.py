@@ -34,6 +34,9 @@ class TransfersTableTestCase(test.TestCase):
         self.ctxt = context.RequestContext(user_id='user_id',
                                            project_id='project_id')
 
+    def tearDown(self):
+        super(TransfersTableTestCase, self).tearDown()
+
     def _create_transfer(self, volume_id=None):
         """Create a transfer object."""
         transfer = {'display_name': 'display_name',
@@ -63,7 +66,7 @@ class TransfersTableTestCase(test.TestCase):
         xfer_id1 = self._create_transfer(volume_id1)
 
         xfer = db.transfer_get(self.ctxt, xfer_id1)
-        self.assertEqual(xfer.volume_id, volume_id1, "Unexpected volume_id")
+        self.assertEqual(volume_id1, xfer.volume_id, "Unexpected volume_id")
 
         nctxt = context.RequestContext(user_id='new_user_id',
                                        project_id='new_project_id')
@@ -71,7 +74,7 @@ class TransfersTableTestCase(test.TestCase):
                           db.transfer_get, nctxt, xfer_id1)
 
         xfer = db.transfer_get(nctxt.elevated(), xfer_id1)
-        self.assertEqual(xfer.volume_id, volume_id1, "Unexpected volume_id")
+        self.assertEqual(volume_id1, xfer.volume_id, "Unexpected volume_id")
 
     def test_transfer_get_all(self):
         volume_id1 = utils.create_volume(self.ctxt)['id']
@@ -83,10 +86,10 @@ class TransfersTableTestCase(test.TestCase):
                           db.transfer_get_all,
                           self.ctxt)
         xfer = db.transfer_get_all(context.get_admin_context())
-        self.assertEqual(len(xfer), 2, "Unexpected number of transfer records")
+        self.assertEqual(2, len(xfer), "Unexpected number of transfer records")
 
         xfer = db.transfer_get_all_by_project(self.ctxt, self.ctxt.project_id)
-        self.assertEqual(len(xfer), 2, "Unexpected number of transfer records")
+        self.assertEqual(2, len(xfer), "Unexpected number of transfer records")
 
         nctxt = context.RequestContext(user_id='new_user_id',
                                        project_id='new_project_id')
@@ -95,7 +98,7 @@ class TransfersTableTestCase(test.TestCase):
                           nctxt, self.ctxt.project_id)
         xfer = db.transfer_get_all_by_project(nctxt.elevated(),
                                               self.ctxt.project_id)
-        self.assertEqual(len(xfer), 2, "Unexpected number of transfer records")
+        self.assertEqual(2, len(xfer), "Unexpected number of transfer records")
 
     def test_transfer_destroy(self):
         volume_id = utils.create_volume(self.ctxt)['id']
@@ -104,13 +107,13 @@ class TransfersTableTestCase(test.TestCase):
         xfer_id2 = self._create_transfer(volume_id2)
 
         xfer = db.transfer_get_all(context.get_admin_context())
-        self.assertEqual(len(xfer), 2, "Unexpected number of transfer records")
+        self.assertEqual(2, len(xfer), "Unexpected number of transfer records")
         self.assertFalse(xfer[0]['deleted'], "Deleted flag is set")
 
         db.transfer_destroy(self.ctxt, xfer_id1)
         xfer = db.transfer_get_all(context.get_admin_context())
-        self.assertEqual(len(xfer), 1, "Unexpected number of transfer records")
-        self.assertEqual(xfer[0]['id'], xfer_id2,
+        self.assertEqual(1, len(xfer), "Unexpected number of transfer records")
+        self.assertEqual(xfer_id2, xfer[0]['id'],
                          "Unexpected value for Transfer id")
 
         nctxt = context.RequestContext(user_id='new_user_id',
@@ -120,4 +123,4 @@ class TransfersTableTestCase(test.TestCase):
 
         db.transfer_destroy(nctxt.elevated(), xfer_id2)
         xfer = db.transfer_get_all(context.get_admin_context())
-        self.assertEqual(len(xfer), 0, "Unexpected number of transfer records")
+        self.assertEqual(0, len(xfer), "Unexpected number of transfer records")

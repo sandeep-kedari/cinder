@@ -25,17 +25,17 @@ class BrickExceptionTestCase(test.TestCase):
             message = "default message"
 
         exc = FakeBrickException()
-        self.assertEqual(unicode(exc), 'default message')
+        self.assertEqual('default message', unicode(exc))
 
     def test_error_msg(self):
-        self.assertEqual(unicode(exception.BrickException('test')), 'test')
+        self.assertEqual('test', unicode(exception.BrickException('test')))
 
     def test_default_error_msg_with_kwargs(self):
         class FakeBrickException(exception.BrickException):
             message = "default message: %(code)s"
 
         exc = FakeBrickException(code=500)
-        self.assertEqual(unicode(exc), 'default message: 500')
+        self.assertEqual('default message: 500', unicode(exc))
 
     def test_error_msg_exception_with_kwargs(self):
         # NOTE(dprince): disable format errors for this test
@@ -45,18 +45,18 @@ class BrickExceptionTestCase(test.TestCase):
             message = "default message: %(mispelled_code)s"
 
         exc = FakeBrickException(code=500)
-        self.assertEqual(unicode(exc), 'default message: %(mispelled_code)s')
+        self.assertEqual('default message: %(mispelled_code)s', unicode(exc))
 
     def test_default_error_code(self):
         class FakeBrickException(exception.BrickException):
             code = 404
 
         exc = FakeBrickException()
-        self.assertEqual(exc.kwargs['code'], 404)
+        self.assertEqual(404, exc.kwargs['code'])
 
     def test_error_code_from_kwarg(self):
         class FakeBrickException(exception.BrickException):
             code = 500
 
         exc = FakeBrickException(code=404)
-        self.assertEqual(exc.kwargs['code'], 404)
+        self.assertEqual(404, exc.kwargs['code'])

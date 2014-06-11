@@ -110,9 +110,11 @@ class VolumeRpcAPITestCase(test.TestCase):
         self.fake_args = None
         self.fake_kwargs = None
 
+        real_prepare = rpcapi.client.prepare
+
         def _fake_prepare_method(*args, **kwds):
             for kwd in kwds:
-                self.assertEqual(kwds[kwd], target[kwd])
+                self.assertEqual(target[kwd], kwds[kwd])
             return rpcapi.client
 
         def _fake_rpc_method(*args, **kwargs):
@@ -126,14 +128,14 @@ class VolumeRpcAPITestCase(test.TestCase):
 
         retval = getattr(rpcapi, method)(ctxt, **kwargs)
 
-        self.assertEqual(retval, expected_retval)
+        self.assertEqual(expected_retval, retval)
         expected_args = [ctxt, method]
 
         for arg, expected_arg in zip(self.fake_args, expected_args):
-            self.assertEqual(arg, expected_arg)
+            self.assertEqual(expected_arg, arg)
 
         for kwarg, value in self.fake_kwargs.items():
-            self.assertEqual(value, expected_msg[kwarg])
+            self.assertEqual(expected_msg[kwarg], value)
 
     def test_create_volume(self):
         self._test_volume_api('create_volume',

@@ -25,7 +25,6 @@ from cinder import db
 from cinder import exception
 from cinder.openstack.common import importutils
 from cinder.openstack.common import log as logging
-from cinder.openstack.common import processutils
 from cinder import test
 from cinder.tests import fake_notifier
 from cinder import utils
@@ -78,32 +77,32 @@ class LVMVolumeDriverTestCase(test.TestCase):
     def test_convert_blocksize_option(self):
         # Test valid volume_dd_blocksize
         bs, count = volume_utils._calculate_count(1024, '10M')
-        self.assertEqual(bs, '10M')
-        self.assertEqual(count, 103)
+        self.assertEqual('10M', bs)
+        self.assertEqual(103, count)
 
         bs, count = volume_utils._calculate_count(1024, '1xBBB')
-        self.assertEqual(bs, '1M')
-        self.assertEqual(count, 1024)
+        self.assertEqual('1M', bs)
+        self.assertEqual(1024, count)
 
         # Test 'volume_dd_blocksize' with fraction
         bs, count = volume_utils._calculate_count(1024, '1.3M')
-        self.assertEqual(bs, '1M')
-        self.assertEqual(count, 1024)
+        self.assertEqual('1M', bs)
+        self.assertEqual(1024, count)
 
         # Test zero-size 'volume_dd_blocksize'
         bs, count = volume_utils._calculate_count(1024, '0M')
-        self.assertEqual(bs, '1M')
-        self.assertEqual(count, 1024)
+        self.assertEqual('1M', bs)
+        self.assertEqual(1024, count)
 
         # Test negative 'volume_dd_blocksize'
         bs, count = volume_utils._calculate_count(1024, '-1M')
-        self.assertEqual(bs, '1M')
-        self.assertEqual(count, 1024)
+        self.assertEqual('1M', bs)
+        self.assertEqual(1024, count)
 
         # Test non-digital 'volume_dd_blocksize'
         bs, count = volume_utils._calculate_count(1024, 'ABM')
-        self.assertEqual(bs, '1M')
-        self.assertEqual(count, 1024)
+        self.assertEqual('1M', bs)
+        self.assertEqual(1024, count)
 
 
 class ClearVolumeTestCase(test.TestCase):
@@ -196,24 +195,8 @@ class ClearVolumeTestCase(test.TestCase):
         vol_path = '/dev/mapper/cinder--volumes-%s-cow' % mangle_name
 
         def fake_copy_volume(srcstr, deststr, size, blocksize, **kwargs):
-            self.assertEqual(deststr, vol_path)
+            self.assertEqual(vol_path, deststr)
             return True
 
         self.stubs.Set(volume_utils, 'copy_volume', fake_copy_volume)
         volume_utils.clear_volume(123, vol_path)
-
-
-class CopyVolumeTestCase(test.TestCase):
-
-    def test_copy_volume_dd_iflag_and_oflag(self):
-        def fake_utils_execute(*cmd, **kwargs):
-            if 'if=/dev/zero' in cmd and 'iflag=direct' in cmd:
-                raise processutils.ProcessExecutionError()
-            if 'of=/dev/null' in cmd and 'oflag=direct' in cmd:
-                raise processutils.ProcessExecutionError()
-            if 'iflag=direct' in cmd and 'oflag=direct' in cmd:
-                raise exception.InvalidInput(message='iflag/oflag error')
-
-        volume_utils.copy_volume('/dev/zero', '/dev/null', 1024,
-                                 CONF.volume_dd_blocksize, sync=True,
-                                 ionice=None, execute=fake_utils_execute)

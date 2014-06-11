@@ -63,8 +63,8 @@ class HostManagerTestCase(test.TestCase):
 
         # Test 'volume' returns 1 correct function
         filter_classes = self.host_manager._choose_host_filters(None)
-        self.assertEqual(len(filter_classes), 1)
-        self.assertEqual(filter_classes[0].__name__, 'FakeFilterClass2')
+        self.assertEqual(1, len(filter_classes))
+        self.assertEqual('FakeFilterClass2', filter_classes[0].__name__)
 
     @mock.patch('cinder.scheduler.host_manager.HostManager.'
                 '_choose_host_filters')
@@ -104,9 +104,9 @@ class HostManagerTestCase(test.TestCase):
                                                       host3_volume_capabs)
 
         # Make sure dictionary isn't re-assigned
-        self.assertEqual(self.host_manager.service_states, service_states)
+        self.assertEqual(service_states, self.host_manager.service_states)
         # Make sure original dictionary wasn't copied
-        self.assertEqual(host1_volume_capabs['timestamp'], 1)
+        self.assertEqual(1, host1_volume_capabs['timestamp'])
 
         host1_volume_capabs['timestamp'] = 31337
         host2_volume_capabs['timestamp'] = 31338
@@ -133,6 +133,9 @@ class HostManagerTestCase(test.TestCase):
                  availability_zone='zone2', updated_at=timeutils.utcnow()),
             dict(id=4, host='host4', topic='volume', disabled=False,
                  availability_zone='zone3', updated_at=timeutils.utcnow()),
+            # service on host5 is disabled
+            dict(id=5, host='host5', topic='volume', disabled=True,
+                 availability_zone='zone4', updated_at=timeutils.utcnow()),
         ]
 
         # First test: service_is_up is always True, host5 is disabled
@@ -141,53 +144,51 @@ class HostManagerTestCase(test.TestCase):
         _mock_warning = mock.Mock()
         host_manager.LOG.warn = _mock_warning
 
-        # Get all states
+        # Get all states, make sure host5 is reported as down/disabled
         self.host_manager.get_all_host_states(context)
-        _mock_service_get_all_by_topic.assert_called_with(context,
-                                                          topic,
-                                                          disabled=False)
+        _mock_service_get_all_by_topic.assert_called_with(context, topic)
         expected = []
         for service in services:
             expected.append(mock.call(service))
         self.assertEqual(expected, _mock_service_is_up.call_args_list)
+        _mock_warning.assert_called_with("volume service is down or disabled. "
+                                         "(host: host5)")
 
         # Get host_state_map and make sure we have the first 4 hosts
         host_state_map = self.host_manager.host_state_map
-        self.assertEqual(len(host_state_map), 4)
+        self.assertEqual(4, len(host_state_map))
         for i in xrange(4):
             volume_node = services[i]
             host = volume_node['host']
-            self.assertEqual(host_state_map[host].service, volume_node)
+            self.assertEqual(volume_node, host_state_map[host].service)
 
         # Second test: Now service_is_up returns False for host4
         _mock_service_is_up.reset_mock()
-        _mock_service_is_up.side_effect = [True, True, True, False]
+        _mock_service_is_up.side_effect = [True, True, True, False, True]
         _mock_service_get_all_by_topic.reset_mock()
         _mock_warning.reset_mock()
 
-        # Get all states, make sure host 4 is reported as down
+        # Get all states, make sure hosts 4 and 5 is reported as down/disabled
         self.host_manager.get_all_host_states(context)
-        _mock_service_get_all_by_topic.assert_called_with(context,
-                                                          topic,
-                                                          disabled=False)
+        _mock_service_get_all_by_topic.assert_called_with(context, topic)
         expected = []
         for service in services:
             expected.append(mock.call(service))
         self.assertEqual(expected, _mock_service_is_up.call_args_list)
         expected = []
-        for num in ['4']:
-            expected.append(mock.call("volume service is down. "
+        for num in ['4', '5']:
+            expected.append(mock.call("volume service is down or disabled. "
                                       "(host: host" + num + ")"))
         self.assertEqual(expected, _mock_warning.call_args_list)
 
         # Get host_state_map and make sure we have the first 4 hosts
         host_state_map = self.host_manager.host_state_map
-        self.assertEqual(len(host_state_map), 3)
+        self.assertEqual(3, len(host_state_map))
         for i in xrange(3):
             volume_node = services[i]
             host = volume_node['host']
-            self.assertEqual(host_state_map[host].service,
-                             volume_node)
+            self.assertEqual(volume_node,
+                             host_state_map[host].service)
 
 
 class HostStateTestCase(test.TestCase):
@@ -203,7 +204,7 @@ class HostStateTestCase(test.TestCase):
                              'timestamp': None}
 
         fake_host.update_from_volume_capability(volume_capability)
-        self.assertEqual(fake_host.free_capacity_gb, 512)
+        self.assertEqual(512, fake_host.free_capacity_gb)
 
     def test_update_from_volume_infinite_capability(self):
         fake_host = host_manager.HostState('host1')
@@ -215,8 +216,8 @@ class HostStateTestCase(test.TestCase):
                              'timestamp': None}
 
         fake_host.update_from_volume_capability(volume_capability)
-        self.assertEqual(fake_host.total_capacity_gb, 'infinite')
-        self.assertEqual(fake_host.free_capacity_gb, 'infinite')
+        self.assertEqual('infinite', fake_host.total_capacity_gb)
+        self.assertEqual('infinite', fake_host.free_capacity_gb)
 
     def test_update_from_volume_unknown_capability(self):
         fake_host = host_manager.HostState('host1')
@@ -228,5 +229,5 @@ class HostStateTestCase(test.TestCase):
                              'timestamp': None}
 
         fake_host.update_from_volume_capability(volume_capability)
-        self.assertEqual(fake_host.total_capacity_gb, 'infinite')
-        self.assertEqual(fake_host.free_capacity_gb, 'unknown')
+        self.assertEqual('infinite', fake_host.total_capacity_gb)
+        self.assertEqual('unknown', fake_host.free_capacity_gb)

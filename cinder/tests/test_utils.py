@@ -86,7 +86,7 @@ exit 1
                                                          'always get passed '
                                                          'correctly')
             runs = int(runs.strip())
-            self.assertEqual(runs, 10, 'Ran %d times instead of 10.' % (runs,))
+            self.assertEqual(10, runs, 'Ran %d times instead of 10.' % (runs,))
         finally:
             os.unlink(tmpfilename)
             os.unlink(tmpfilename2)
@@ -364,7 +364,7 @@ class GenericUtilsTestCase(test.TestCase):
         generated_url = utils.generate_glance_url()
         actual_url = "http://%s:%d" % (CONF.glance_host,
                                        CONF.glance_port)
-        self.assertEqual(generated_url, actual_url)
+        self.assertEqual(actual_url, generated_url)
 
     @mock.patch('__builtin__.open')
     @mock.patch('os.path.getmtime', return_value=1)
@@ -373,7 +373,7 @@ class GenericUtilsTestCase(test.TestCase):
         cache_data = {"data": 1123, "mtime": 2}
         mock_open.return_value = _get_local_mock_open()
         data = utils.read_cached_file(fake_file, cache_data)
-        self.assertEqual(cache_data["data"], data)
+        self.assertEqual(data, cache_data["data"])
         mock_open.assert_called_once_with(fake_file)
 
     @mock.patch('__builtin__.open')
@@ -387,7 +387,7 @@ class GenericUtilsTestCase(test.TestCase):
         data = utils.read_cached_file(fake_file,
                                       cache_data,
                                       reload_func=mock_reload)
-        self.assertEqual(data, fake_data)
+        self.assertEqual(fake_data, data)
         mock_reload.assert_called_once_with(fake_data)
         mock_open.assert_called_once_with(fake_file)
 
@@ -407,7 +407,7 @@ class GenericUtilsTestCase(test.TestCase):
 
         self.stubs.Set(utils, 'execute', fake_execute)
         contents = utils.read_file_as_root('good')
-        self.assertEqual(contents, 'fakecontents')
+        self.assertEqual('fakecontents', contents)
         self.assertRaises(exception.FileNotFound,
                           utils.read_file_as_root, 'bad')
 
@@ -419,8 +419,8 @@ class GenericUtilsTestCase(test.TestCase):
 
         with tempfile.NamedTemporaryFile() as f:
             with utils.temporary_chown(f.name, owner_uid=2):
-                self.assertEqual(fake_execute.uid, 2)
-            self.assertEqual(fake_execute.uid, os.getuid())
+                self.assertEqual(2, fake_execute.uid)
+            self.assertEqual(os.getuid(), fake_execute.uid)
 
     @mock.patch('cinder.openstack.common.timeutils.utcnow')
     def test_service_is_up(self, mock_utcnow):
@@ -488,7 +488,7 @@ class GenericUtilsTestCase(test.TestCase):
         flo = six.StringIO(data)
         h1 = utils.hash_file(flo)
         h2 = hashlib.sha1(data).hexdigest()
-        self.assertEqual(h1, h2)
+        self.assertEqual(h2, h1)
 
     def test_check_ssh_injection(self):
         cmd_list = ['ssh', '-D', 'my_name@name_of_remote_computer']
@@ -551,26 +551,26 @@ class GenericUtilsTestCase(test.TestCase):
     def test_get_file_mode(self, mock_stat):
 
         class stat_result:
-            st_mode = 0o777
-            st_gid = 33333
+                    st_mode = 0o777
+                    st_gid = 33333
 
         test_file = '/var/tmp/made_up_file'
         mock_stat.return_value = stat_result
         mode = utils.get_file_mode(test_file)
-        self.assertEqual(mode, 0o777)
+        self.assertEqual(0o777, mode)
         mock_stat.assert_called_once_with(test_file)
 
     @mock.patch('os.stat')
     def test_get_file_gid(self, mock_stat):
 
         class stat_result:
-            st_mode = 0o777
-            st_gid = 33333
+                    st_mode = 0o777
+                    st_gid = 33333
 
         test_file = '/var/tmp/made_up_file'
         mock_stat.return_value = stat_result
         gid = utils.get_file_gid(test_file)
-        self.assertEqual(gid, 33333)
+        self.assertEqual(33333, gid)
         mock_stat.assert_called_once_with(test_file)
 
 
@@ -595,14 +595,14 @@ class MonkeyPatchTestCase(test.TestCase):
         exampleA = example_a.ExampleClassA()
         exampleA.example_method()
         ret_a = exampleA.example_method_add(3, 5)
-        self.assertEqual(ret_a, 8)
+        self.assertEqual(8, ret_a)
 
         self.assertEqual('Example function', example_b.example_function_b())
         exampleB = example_b.ExampleClassB()
         exampleB.example_method()
         ret_b = exampleB.example_method_add(3, 5)
 
-        self.assertEqual(ret_b, 8)
+        self.assertEqual(8, ret_b)
         package_a = self.example_package + 'example_a.'
         self.assertTrue(package_a + 'example_function_a'
                         in cinder.tests.monkey_patch_example.CALLED_FUNCTION)
@@ -638,126 +638,87 @@ class AuditPeriodTest(test.TestCase):
 
     def test_hour(self):
         begin, end = utils.last_completed_audit_period(unit='hour')
-        self.assertEqual(begin,
-                         datetime.datetime(hour=7,
-                                           day=5,
-                                           month=3,
-                                           year=2012))
-        self.assertEqual(end, datetime.datetime(hour=8,
-                                                day=5,
-                                                month=3,
-                                                year=2012))
+        self.assertEqual(datetime.datetime(hour=7, day=5, month=3,
+                         year=2012), begin)
+        self.assertEqual(datetime.datetime(hour=8, day=5, month=3,
+                         year=2012), end)
 
     def test_hour_with_offset_before_current(self):
         begin, end = utils.last_completed_audit_period(unit='hour@10')
-        self.assertEqual(begin, datetime.datetime(minute=10,
-                                                  hour=7,
-                                                  day=5,
-                                                  month=3,
-                                                  year=2012))
-        self.assertEqual(end, datetime.datetime(minute=10,
-                                                hour=8,
-                                                day=5,
-                                                month=3,
-                                                year=2012))
+        self.assertEqual(datetime.datetime(minute=10, hour=7, day=5,
+                         month=3, year=2012), begin)
+        self.assertEqual(datetime.datetime(minute=10, hour=8, day=5,
+                         month=3, year=2012), end)
 
     def test_hour_with_offset_after_current(self):
         begin, end = utils.last_completed_audit_period(unit='hour@30')
-        self.assertEqual(begin, datetime.datetime(minute=30,
-                                                  hour=6,
-                                                  day=5,
-                                                  month=3,
-                                                  year=2012))
-        self.assertEqual(end, datetime.datetime(minute=30,
-                                                hour=7,
-                                                day=5,
-                                                month=3,
-                                                year=2012))
+        self.assertEqual(datetime.datetime(minute=30, hour=6, day=5,
+                         month=3, year=2012), begin)
+        self.assertEqual(datetime.datetime(minute=30, hour=7, day=5,
+                         month=3, year=2012), end)
 
     def test_day(self):
         begin, end = utils.last_completed_audit_period(unit='day')
-        self.assertEqual(begin, datetime.datetime(day=4,
-                                                  month=3,
-                                                  year=2012))
-        self.assertEqual(end, datetime.datetime(day=5,
-                                                month=3,
-                                                year=2012))
+        self.assertEqual(datetime.datetime(day=4, month=3, year=2012),
+                         begin)
+        self.assertEqual(datetime.datetime(day=5, month=3, year=2012),
+                         end)
 
     def test_day_with_offset_before_current(self):
         begin, end = utils.last_completed_audit_period(unit='day@6')
-        self.assertEqual(begin, datetime.datetime(hour=6,
-                                                  day=4,
-                                                  month=3,
-                                                  year=2012))
-        self.assertEqual(end, datetime.datetime(hour=6,
-                                                day=5,
-                                                month=3,
-                                                year=2012))
+        self.assertEqual(datetime.datetime(hour=6, day=4, month=3,
+                         year=2012), begin)
+        self.assertEqual(datetime.datetime(hour=6, day=5, month=3,
+                         year=2012), end)
 
     def test_day_with_offset_after_current(self):
         begin, end = utils.last_completed_audit_period(unit='day@10')
-        self.assertEqual(begin, datetime.datetime(hour=10,
-                                                  day=3,
-                                                  month=3,
-                                                  year=2012))
-        self.assertEqual(end, datetime.datetime(hour=10,
-                                                day=4,
-                                                month=3,
-                                                year=2012))
+        self.assertEqual(datetime.datetime(hour=10, day=3, month=3,
+                         year=2012), begin)
+        self.assertEqual(datetime.datetime(hour=10, day=4, month=3,
+                         year=2012), end)
 
     def test_month(self):
         begin, end = utils.last_completed_audit_period(unit='month')
-        self.assertEqual(begin, datetime.datetime(day=1,
-                                                  month=2,
-                                                  year=2012))
-        self.assertEqual(end, datetime.datetime(day=1,
-                                                month=3,
-                                                year=2012))
+        self.assertEqual(datetime.datetime(day=1, month=2, year=2012),
+                         begin)
+        self.assertEqual(datetime.datetime(day=1, month=3, year=2012),
+                         end)
 
     def test_month_with_offset_before_current(self):
         begin, end = utils.last_completed_audit_period(unit='month@2')
-        self.assertEqual(begin, datetime.datetime(day=2,
-                                                  month=2,
-                                                  year=2012))
-        self.assertEqual(end, datetime.datetime(day=2,
-                                                month=3,
-                                                year=2012))
+        self.assertEqual(datetime.datetime(day=2, month=2, year=2012),
+                         begin)
+        self.assertEqual(datetime.datetime(day=2, month=3, year=2012),
+                         end)
 
     def test_month_with_offset_after_current(self):
         begin, end = utils.last_completed_audit_period(unit='month@15')
-        self.assertEqual(begin, datetime.datetime(day=15,
-                                                  month=1,
-                                                  year=2012))
-        self.assertEqual(end, datetime.datetime(day=15,
-                                                month=2,
-                                                year=2012))
+        self.assertEqual(datetime.datetime(day=15, month=1, year=2012),
+                         begin)
+        self.assertEqual(datetime.datetime(day=15, month=2, year=2012),
+                         end)
 
     def test_year(self):
         begin, end = utils.last_completed_audit_period(unit='year')
-        self.assertEqual(begin, datetime.datetime(day=1,
-                                                  month=1,
-                                                  year=2011))
-        self.assertEqual(end, datetime.datetime(day=1,
-                                                month=1,
-                                                year=2012))
+        self.assertEqual(datetime.datetime(day=1, month=1, year=2011),
+                         begin)
+        self.assertEqual(datetime.datetime(day=1, month=1, year=2012),
+                         end)
 
     def test_year_with_offset_before_current(self):
         begin, end = utils.last_completed_audit_period(unit='year@2')
-        self.assertEqual(begin, datetime.datetime(day=1,
-                                                  month=2,
-                                                  year=2011))
-        self.assertEqual(end, datetime.datetime(day=1,
-                                                month=2,
-                                                year=2012))
+        self.assertEqual(datetime.datetime(day=1, month=2, year=2011),
+                         begin)
+        self.assertEqual(datetime.datetime(day=1, month=2, year=2012),
+                         end)
 
     def test_year_with_offset_after_current(self):
         begin, end = utils.last_completed_audit_period(unit='year@6')
-        self.assertEqual(begin, datetime.datetime(day=1,
-                                                  month=6,
-                                                  year=2010))
-        self.assertEqual(end, datetime.datetime(day=1,
-                                                month=6,
-                                                year=2011))
+        self.assertEqual(datetime.datetime(day=1, month=6, year=2010),
+                         begin)
+        self.assertEqual(datetime.datetime(day=1, month=6, year=2011),
+                         end)
 
 
 class FakeSSHClient(object):
@@ -767,13 +728,7 @@ class FakeSSHClient(object):
         self.transport = FakeTransport()
 
     def set_missing_host_key_policy(self, policy):
-        self.policy = policy
-
-    def load_system_host_keys(self):
-        self.system_host_keys = 'system_host_keys'
-
-    def load_host_keys(self, hosts_key_file):
-        self.hosts_key_file = hosts_key_file
+        pass
 
     def connect(self, ip, port=22, username=None, password=None,
                 pkey=None, timeout=10):
@@ -781,9 +736,6 @@ class FakeSSHClient(object):
 
     def get_transport(self):
         return self.transport
-
-    def get_policy(self):
-        return self.policy
 
     def close(self):
         pass
@@ -812,33 +764,6 @@ class FakeTransport(object):
 
 class SSHPoolTestCase(test.TestCase):
     """Unit test for SSH Connection Pool."""
-    @mock.patch('paramiko.SSHClient')
-    def test_ssh_key_policy(self, mock_sshclient):
-        mock_sshclient.return_value = FakeSSHClient()
-
-        # create with customized setting
-        sshpool = utils.SSHPool("127.0.0.1", 22, 10,
-                                "test",
-                                password="test",
-                                min_size=1,
-                                max_size=1,
-                                missing_key_policy=paramiko.RejectPolicy(),
-                                hosts_key_file='dummy_host_keyfile')
-        with sshpool.item() as ssh:
-            self.assertTrue(isinstance(ssh.get_policy(),
-                                       paramiko.RejectPolicy))
-            self.assertEqual(ssh.hosts_key_file, 'dummy_host_keyfile')
-
-        # create with default setting
-        sshpool = utils.SSHPool("127.0.0.1", 22, 10,
-                                "test",
-                                password="test",
-                                min_size=1,
-                                max_size=1)
-        with sshpool.item() as ssh:
-            self.assertTrue(isinstance(ssh.get_policy(),
-                                       paramiko.AutoAddPolicy))
-            self.assertEqual(ssh.system_host_keys, 'system_host_keys')
 
     @mock.patch('paramiko.RSAKey.from_private_key_file')
     @mock.patch('paramiko.SSHClient')
@@ -857,7 +782,7 @@ class SSHPoolTestCase(test.TestCase):
         with sshpool.item() as ssh:
             second_id = ssh.id
 
-        self.assertEqual(first_id, second_id)
+        self.assertEqual(second_id, first_id)
         mock_sshclient.connect.assert_called_once()
 
         # create with private key
@@ -893,7 +818,7 @@ class SSHPoolTestCase(test.TestCase):
             ssh.get_transport().active = False
             sshpool.remove(ssh)
 
-        self.assertEqual(first_id, second_id)
+        self.assertEqual(second_id, first_id)
 
         # create a new client
         mock_sshclient.return_value = FakeSSHClient()
@@ -929,7 +854,7 @@ class BrickUtils(test.TestCase):
 
         self.mox.ReplayAll()
         props_actual = utils.brick_get_connector_properties()
-        self.assertEqual(props, props_actual)
+        self.assertEqual(props_actual, props)
         self.mox.VerifyAll()
 
     def test_brick_get_connector(self):

@@ -32,17 +32,21 @@ class VolumeTypeExtraSpecsTestCase(test.TestCase):
                                     vol_extra3=3)
         self.vol_type1['extra_specs'] = self.vol_type1_specs
         ref = db.volume_type_create(self.context, self.vol_type1)
-        self.addCleanup(db.volume_type_destroy, context.get_admin_context(),
-                        self.vol_type1['id'])
         self.volume_type1_id = ref.id
         for k, v in self.vol_type1_specs.iteritems():
             self.vol_type1_specs[k] = str(v)
 
         self.vol_type2_noextra = dict(name="TEST: Volume type without extra")
         ref = db.volume_type_create(self.context, self.vol_type2_noextra)
-        self.addCleanup(db.volume_type_destroy, context.get_admin_context(),
-                        self.vol_type2_noextra['id'])
         self.vol_type2_id = ref.id
+
+    def tearDown(self):
+        # Remove the volume type from the database
+        db.volume_type_destroy(context.get_admin_context(),
+                               self.vol_type1['id'])
+        db.volume_type_destroy(context.get_admin_context(),
+                               self.vol_type2_noextra['id'])
+        super(VolumeTypeExtraSpecsTestCase, self).tearDown()
 
     def test_volume_type_specs_get(self):
         expected_specs = self.vol_type1_specs.copy()
@@ -92,31 +96,31 @@ class VolumeTypeExtraSpecsTestCase(test.TestCase):
         volume_type = db.volume_type_get(
             context.get_admin_context(),
             self.volume_type1_id)
-        self.assertEqual(volume_type['extra_specs'], self.vol_type1_specs)
+        self.assertEqual(self.vol_type1_specs, volume_type['extra_specs'])
 
         volume_type = db.volume_type_get(
             context.get_admin_context(),
             self.vol_type2_id)
-        self.assertEqual(volume_type['extra_specs'], {})
+        self.assertEqual({}, volume_type['extra_specs'])
 
     def test_volume_type_get_by_name_with_extra_specs(self):
         volume_type = db.volume_type_get_by_name(
             context.get_admin_context(),
             self.vol_type1['name'])
-        self.assertEqual(volume_type['extra_specs'], self.vol_type1_specs)
+        self.assertEqual(self.vol_type1_specs, volume_type['extra_specs'])
 
         volume_type = db.volume_type_get_by_name(
             context.get_admin_context(),
             self.vol_type2_noextra['name'])
-        self.assertEqual(volume_type['extra_specs'], {})
+        self.assertEqual({}, volume_type['extra_specs'])
 
     def test_volume_type_get_all(self):
         expected_specs = self.vol_type1_specs.copy()
 
         types = db.volume_type_get_all(context.get_admin_context())
 
-        self.assertEqual(
-            types[self.vol_type1['name']]['extra_specs'], expected_specs)
+        self.assertEqual(expected_specs,
+                         types[self.vol_type1['name']]['extra_specs'])
 
-        self.assertEqual(
-            types[self.vol_type2_noextra['name']]['extra_specs'], {})
+        self.assertEqual({},
+                         types[self.vol_type2_noextra['name']]['extra_specs'])

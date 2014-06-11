@@ -24,6 +24,12 @@ from cinder.tests import utils as testutils
 class FinishVolumeMigrationTestCase(test.TestCase):
     """Test cases for finish_volume_migration."""
 
+    def setUp(self):
+        super(FinishVolumeMigrationTestCase, self).setUp()
+
+    def tearDown(self):
+        super(FinishVolumeMigrationTestCase, self).tearDown()
+
     def test_finish_volume_migration(self):
         ctxt = context.RequestContext(user_id='user_id',
                                       project_id='project_id',
@@ -39,8 +45,8 @@ class FinishVolumeMigrationTestCase(test.TestCase):
 
         src_volume = db.volume_get(ctxt, src_volume['id'])
         expected_name = 'volume-%s' % dest_volume['id']
-        self.assertEqual(src_volume['_name_id'], dest_volume['id'])
-        self.assertEqual(src_volume['name'], expected_name)
-        self.assertEqual(src_volume['host'], 'dest')
-        self.assertEqual(src_volume['status'], 'available')
+        self.assertEqual(dest_volume['id'], src_volume['_name_id'])
+        self.assertEqual(expected_name, src_volume['name'])
+        self.assertEqual('dest', src_volume['host'])
+        self.assertEqual('available', src_volume['status'])
         self.assertIsNone(src_volume['migration_status'])

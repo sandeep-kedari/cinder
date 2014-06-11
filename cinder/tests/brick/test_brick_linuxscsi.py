@@ -44,21 +44,19 @@ class LinuxSCSITestCase(test.TestCase):
         disk_path = ("/dev/disk/by-path/ip-10.10.220.253:3260-"
                      "iscsi-iqn.2000-05.com.3pardata:21810002ac00383d-lun-0")
         name = self.linuxscsi.get_name_from_path(disk_path)
-        self.assertEqual(name, device_name)
+        self.assertEqual(device_name, name)
         self.stubs.Set(os.path, 'realpath', lambda x: "bogus")
         name = self.linuxscsi.get_name_from_path(disk_path)
         self.assertIsNone(name)
 
     def test_remove_scsi_device(self):
         self.stubs.Set(os.path, "exists", lambda x: False)
-        self.linuxscsi.remove_scsi_device("/dev/sdc")
+        self.linuxscsi.remove_scsi_device("sdc")
         expected_commands = []
         self.assertEqual(expected_commands, self.cmds)
         self.stubs.Set(os.path, "exists", lambda x: True)
-        self.linuxscsi.remove_scsi_device("/dev/sdc")
-        expected_commands = [
-            ('blockdev --flushbufs /dev/sdc'),
-            ('tee -a /sys/block/sdc/device/delete')]
+        self.linuxscsi.remove_scsi_device("sdc")
+        expected_commands = [('tee -a /sys/block/sdc/device/delete')]
         self.assertEqual(expected_commands, self.cmds)
 
     def test_flush_multipath_device(self):
@@ -88,12 +86,9 @@ class LinuxSCSITestCase(test.TestCase):
                        fake_find_multipath_device)
 
         self.linuxscsi.remove_multipath_device('/dev/dm-3')
-        expected_commands = [
-            ('blockdev --flushbufs /dev/sde'),
-            ('tee -a /sys/block/sde/device/delete'),
-            ('blockdev --flushbufs /dev/sdf'),
-            ('tee -a /sys/block/sdf/device/delete'),
-            ('multipath -f 350002ac20398383d'), ]
+        expected_commands = [('tee -a /sys/block/sde/device/delete'),
+                             ('tee -a /sys/block/sdf/device/delete'),
+                             ('multipath -f 350002ac20398383d'), ]
         self.assertEqual(expected_commands, self.cmds)
 
     def test_find_multipath_device_3par(self):
