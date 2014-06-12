@@ -14,4 +14,4 @@
 #    under the License.
 
 # NOTE(vish): this forces the fixtures from tests/__init.py:setup() to work
-from cinder.tests import *
+#from cinder.tests import *

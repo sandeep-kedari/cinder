@@ -676,8 +676,7 @@ class NetAppEseriesIscsiDriverTestCase(test.TestCase):
         connector_new = {'initiator': 'iqn.1993-08.org.debian:01:1001'}
         connection_info = self.driver.initialize_connection(self.volume,
                                                             connector_new)
-        self.assertEqual('iscsi', connection_info['driver_volume_type'],
-                         'iscsi')
+        self.assertEqual('iscsi', connection_info['driver_volume_type'])
         properties = connection_info.get('data')
         self.assertIsNotNone(properties, 'Target portal is none')
 

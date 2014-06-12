@@ -356,13 +356,11 @@ class HP3PARBaseDriver(object):
 
     def test_migrate_volume_diff_host(self):
         conf = {
-            'getPorts.return_value': {
-                'members': self.FAKE_FC_PORTS + [self.FAKE_ISCSI_PORT]},
             'getStorageSystemInfo.return_value': {
                 'serialNumber': 'different'},
         }
 
-        mock_client = self.setup_driver(mock_conf=conf)
+        self.setup_driver(mock_conf=conf)
 
         volume = {'name': HP3PARBaseDriver.VOLUME_NAME,
                   'id': HP3PARBaseDriver.CLONE_ID,
@@ -383,8 +381,6 @@ class HP3PARBaseDriver(object):
 
     def test_migrate_volume_diff_domain(self):
         conf = {
-            'getPorts.return_value': {
-                'members': self.FAKE_FC_PORTS + [self.FAKE_ISCSI_PORT]},
             'getStorageSystemInfo.return_value': {
                 'serialNumber': '1234'},
             'getTask.return_value': {
@@ -393,7 +389,7 @@ class HP3PARBaseDriver(object):
             lambda x: {'OpenStackCPG': {'domain': 'OpenStack'}}.get(x, {})
         }
 
-        mock_client = self.setup_driver(mock_conf=conf)
+        self.setup_driver(mock_conf=conf)
 
         volume = {'name': HP3PARBaseDriver.VOLUME_NAME,
                   'id': HP3PARBaseDriver.CLONE_ID,
@@ -413,16 +409,8 @@ class HP3PARBaseDriver(object):
         self.assertEqual(result, (False, None))
 
     def test_migrate_volume_attached(self):
-        conf = {
-            'getPorts.return_value': {
-                'members': self.FAKE_FC_PORTS + [self.FAKE_ISCSI_PORT]},
-            'getStorageSystemInfo.return_value': {
-                'serialNumber': '1234'},
-            'getTask.return_value': {
-                'status': 1}
-        }
 
-        mock_client = self.setup_driver(mock_conf=conf)
+        mock_client = self.setup_driver()
 
         volume = {'name': HP3PARBaseDriver.VOLUME_NAME,
                   'id': HP3PARBaseDriver.CLONE_ID,
@@ -641,8 +629,6 @@ class HP3PARBaseDriver(object):
         # setup_mock_client drive with default configuration
         # and return the mock HTTP 3PAR client
         conf = {
-            'getPorts.return_value': {
-                'members': self.FAKE_FC_PORTS + [self.FAKE_ISCSI_PORT]},
             'getTask.return_value': {
                 'status': 4,
                 'failure message': 'out of disk space'},
@@ -650,7 +636,7 @@ class HP3PARBaseDriver(object):
             'getVolume.return_value': {}
         }
 
-        mock_client = self.setup_driver(mock_conf=conf)
+        self.setup_driver(mock_conf=conf)
 
         volume = self.volume.copy()
         volume['size'] = self.volume['size'] + 10
@@ -810,8 +796,6 @@ class HP3PARBaseDriver(object):
     def test_extend_volume_non_base_failure(self):
         extend_ex = hpexceptions.HTTPForbidden(error={'code': 150})
         conf = {
-            'getPorts.return_value': {
-                'members': self.FAKE_FC_PORTS + [self.FAKE_ISCSI_PORT]},
             'getTask.return_value': {
                 'status': 1},
             'getCPG.return_value': {},
@@ -821,7 +805,7 @@ class HP3PARBaseDriver(object):
             'growVolume.side_effect': extend_ex
         }
 
-        mock_client = self.setup_driver(mock_conf=conf)
+        self.setup_driver(mock_conf=conf)
         grow_size = 3
         old_size = self.volume['size']
         new_size = old_size + grow_size

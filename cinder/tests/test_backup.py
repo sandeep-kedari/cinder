@@ -370,7 +370,6 @@ class BackupTestCase(test.TestCase):
         backups = db.backup_get_all_by_project(self.ctxt, 'project1')
         self.assertEqual(0, len(backups))
 
-        b1 = self._create_backup_db_entry()
         b2 = self._create_backup_db_entry(project_id='project1')
         backups = db.backup_get_all_by_project(self.ctxt, 'project1')
         self.assertEqual(1, len(backups))
@@ -506,6 +505,7 @@ class BackupTestCase(test.TestCase):
                                       backup_driver.__class__.__name__,
                                       'verify'))
         with mock.patch(_mock_backup_verify_class) as _mock_record_verify:
+            _mock_record_verify.side_effect = NotImplementedError()
             self.backup_mgr.import_record(self.ctxt,
                                           imported_record,
                                           export['backup_service'],

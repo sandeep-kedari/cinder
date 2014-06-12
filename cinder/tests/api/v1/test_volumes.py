@@ -127,7 +127,7 @@ class VolumeApiTest(test.TestCase):
         vol.update(dict(volume_type=CONF.default_volume_type))
         body.update(dict(volume=vol))
         res_dict = self.controller.create(req, body)
-        volume_id = res_dict['volume']['id']
+        self.assertIn('id', res_dict['volume'])
         self.assertEqual(1, len(res_dict))
         self.assertEqual(db_vol_type['name'],
                          res_dict['volume']['volume_type'])
@@ -136,7 +136,6 @@ class VolumeApiTest(test.TestCase):
         vol.update(dict(volume_type=db_vol_type['id']))
         body.update(dict(volume=vol))
         res_dict = self.controller.create(req, body)
-        volume_id = res_dict['volume']['id']
         self.assertEqual(1, len(res_dict))
         self.assertEqual(db_vol_type['name'],
                          res_dict['volume']['volume_type'])
